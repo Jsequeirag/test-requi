@@ -13,7 +13,7 @@ export default function RolesAdministration() {
 
   return (
     <Layout>
-      <div className="m-4 ">
+      <div className="">
         <div className="border-b bg-white rounded-sm  h-full">
           <div className="p-4 mx-2 justify-between">
             <div className="flex items-center p-4 mx-2">

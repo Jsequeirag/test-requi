@@ -10,7 +10,7 @@ import {
   faCog, // Configuraciones
   faFileInvoiceDollar, // Payroll
   faCoins, // Finanzas
-  faLanguage, // Language toggle
+  faUserGear,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   getLocalStorageKeyValue,
@@ -26,7 +26,7 @@ const translations = {
     dashboard: "Dashboard",
     payroll: "Nómina",
     finance: "Finanzas",
-    configurations: "Configuraciones",
+    administrator: "Administrador",
     logout: "Cerrar Sesión",
     darkMode: "Modo Oscuro",
     language: "Idioma",
@@ -40,7 +40,7 @@ const translations = {
     dashboard: "Dashboard",
     payroll: "Payroll",
     finance: "Finance",
-    configurations: "Settings",
+    administrator: "Administrator",
     logout: "Logout",
     darkMode: "Dark Mode",
     language: "Language",
@@ -55,8 +55,6 @@ const translations = {
 function NewNav() {
   const navigate = useNavigate();
 
-  // Estados locales
-  const [darkMode, setDarkMode] = useState(false);
   const [language, setLanguage] = useState(() => {
     // Inicializar idioma desde localStorage o detectar navegador
     const storedLang = getLocalStorageItem("requi-language");
@@ -106,16 +104,6 @@ function NewNav() {
     setHiddenMenu(isMenuHiddenFromStorage);
     setShrinkMenu(isMenuHiddenFromStorage);
 
-    // Cargar modo oscuro
-    const storedDarkMode = getLocalStorageItem("requi-darkMode");
-    if (storedDarkMode) {
-      const isDarkModeActive = storedDarkMode === "true";
-      setDarkMode(isDarkModeActive);
-      const html = document.documentElement;
-      if (isDarkModeActive) html.classList.add("dark");
-      else html.classList.remove("dark");
-    }
-
     // Cargar idioma
     const storedLang = getLocalStorageItem("requi-language");
     if (storedLang) {
@@ -124,9 +112,6 @@ function NewNav() {
   }, []);
 
   // Efecto para guardar preferencia de modo oscuro
-  useEffect(() => {
-    saveLocalStorage("requi-darkMode", darkMode.toString());
-  }, [darkMode]);
 
   const handleLogout = () => {
     removeLocalStorageItem("requitool-employeeInfo");
@@ -345,138 +330,18 @@ function NewNav() {
                 navigateTo="/finance"
               />
             )}
-          </ul>
-        </div>
-
-        {/* Sección inferior: Configuraciones, Logout, Dark Mode, Language */}
-        <div className="mt-auto">
-          <ul className="space-y-1">
-            {roles?.find((role) => role === "SuperAdmin") && (
-              <NavItem
-                icon={faCog}
-                text={t("configurations")}
-                navigateTo="/ConfigurationDashboard"
-              />
-            )}
-            <NavItem
-              icon={faRightFromBracket}
-              text={t("logout")}
-              onClick={() => handleLogout()}
-              navigateTo="/login"
-            />
-
-            {/* Toggle de Idioma */}
-            <li
-              className={`nav-link relative h-12 mt-2 flex items-center ${
-                hiddenMenu && "justify-center"
-              } rounded-md group
-                          bg-gray-100 dark:bg-gray-700
-                          text-gray-700 dark:text-gray-300
-                          hover:bg-blue-100 dark:hover:bg-gray-600
-                          transition-colors duration-200 cursor-pointer`}
-              onClick={toggleLanguage}
-            >
-              <div
-                className={`min-w-[60px] h-[50px] flex items-center justify-center ${
-                  hiddenMenu ? "block" : "block"
-                }`}
-              >
-                <ReactCountryFlag
-                  countryCode={language === "es" ? "CR" : "US"}
-                  svg
-                  style={{
-                    width: "1.5em",
-                    height: "1.5em",
-
-                    borderRadius: "2px",
-                  }}
-                  title={language === "es" ? "Costa Rica" : "United States"}
+          </ul>{" "}
+          <div className="mt-auto">
+            <ul className="space-y-1">
+              {roles?.find((role) => role === "SuperAdmin") && (
+                <NavItem
+                  icon={faUserGear}
+                  text={t("administrator")}
+                  navigateTo="/ConfigurationDashboard"
                 />
-              </div>
-              <span
-                className={`text nav-text font-semibold dark:text-gray-200 transition-all delay-100 whitespace-nowrap ${
-                  hiddenMenu ? "w-0 opacity-0" : "w-auto opacity-100"
-                } overflow-hidden`}
-              >
-                {language.toUpperCase()}
-              </span>
-              {/* Tooltip para idioma */}
-              {hiddenMenu && (
-                <div
-                  className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-50 
-                                px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-lg
-                                opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                                transition-all duration-300 delay-500 whitespace-nowrap pointer-events-none
-                                before:content-[''] before:absolute before:top-1/2 before:-left-1 
-                                before:-translate-y-1/2 before:border-4 before:border-transparent 
-                                before:border-r-gray-900 dark:bg-gray-700 dark:before:border-r-gray-700"
-                >
-                  {t("language")} ({language.toUpperCase()})
-                </div>
               )}
-            </li>
-
-            {/* Toggle de Modo Oscuro */}
-            <li
-              className={`nav-link  relative h-12 mt-2 flex items-center rounded-md group
-                          ${darkMode ? "bg-gray-700" : "bg-gray-100"}
-                          text-gray-700 dark:text-gray-300
-                          transition-colors duration-200`}
-            >
-              <div
-                className={`min-w-[60px] h-[50px] flex items-center justify-center ${
-                  hiddenMenu ? "hidden" : "block"
-                }`}
-              >
-                <FontAwesomeIcon
-                  className={`${!darkMode && "hidden"} text-2xl`}
-                  icon={faMoon}
-                  color="#bdab78"
-                />
-                <FontAwesomeIcon
-                  className={`${darkMode && "hidden"} text-2xl`}
-                  icon={faSun}
-                  color="black"
-                />
-              </div>
-              <span
-                className={`text nav-text font-semibold dark:text-gray-200 transition-all delay-100 whitespace-nowrap ${
-                  hiddenMenu && "hidden"
-                }`}
-              >
-                {t("darkMode")}
-              </span>
-              <div className={`${hiddenMenu ? "" : "ml-3"} flex items-center`}>
-                <label className="inline-flex items-center cursor-pointer">
-                  <input
-                    type="checkbox"
-                    value=""
-                    checked={darkMode}
-                    className="sr-only peer"
-                    onClick={() => {
-                      setDarkMode(!darkMode);
-                      DarkModeSeleted();
-                    }}
-                  />
-                  <div className="relative w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 rounded-full peer dark:bg-gray-700 peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"></div>
-                </label>
-              </div>
-              {/* Tooltip para modo oscuro */}
-              {hiddenMenu && (
-                <div
-                  className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-50 
-                                px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-lg
-                                opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                                transition-all duration-300 delay-500 whitespace-nowrap pointer-events-none
-                                before:content-[''] before:absolute before:top-1/2 before:-left-1 
-                                before:-translate-y-1/2 before:border-4 before:border-transparent 
-                                before:border-r-gray-900 dark:bg-gray-700 dark:before:border-r-gray-700"
-                >
-                  {t("darkMode")}
-                </div>
-              )}
-            </li>
-          </ul>
+            </ul>
+          </div>
         </div>
       </header>
     </nav>

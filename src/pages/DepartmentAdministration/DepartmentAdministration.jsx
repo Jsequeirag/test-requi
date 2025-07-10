@@ -164,7 +164,7 @@ export default function DepartmentAdministration() {
           pcWidthPorcentage="40%"
         />
       }
-      <div className="m-4">
+      <div className="">
         <div className="border-b bg-white rounded-sm  h-full">
           <div className="flex items-center p-4 mx-2">
             <a

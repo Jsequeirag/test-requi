@@ -2,6 +2,7 @@ import "./App.css";
 import routes from "./routes/Routes";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Nav from "./components/Nav/Nav";
+import Topnav from "./components/Nav/Topnav";
 import { useState } from "react";
 
 function App() {
@@ -29,7 +30,7 @@ function App() {
     <>
       {/* Mostrar Nav solo si NO es una ruta de autenticación */}
       {!isAuthRoute && <Nav />}
-
+      {!isAuthRoute && <Topnav />}
       <Routes>{pageRoutes}</Routes>
     </>
   );
