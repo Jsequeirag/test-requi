@@ -136,7 +136,7 @@ export default function RDetailMovimientoLateral() {
             Nuevo encargado
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
+            url={`https://localhost:7040/getEmployees`}
             name={"newDominoEffectManager"}
             disabled={
               formValues.changeManager === false ||

@@ -5,27 +5,32 @@ import Nav from "./components/Nav/Nav";
 import { useState } from "react";
 
 function App() {
-  const location = useLocation().pathname;
-  const [hiddenMenu, setHiddenMenu] = useState(false); // Estado para controlar el menú
+  const location = useLocation();
+  const [hiddenMenu, setHiddenMenu] = useState(false);
 
+  // Rutas donde NO se debe mostrar el Nav
+  const authRoutes = [
+    "/login",
+    "/register",
+    "/updatePassword",
+    "/recoverPassword",
+    "/validateCode",
+  ];
+
+  // Verificar si la ruta actual es una ruta de autenticación
+  const isAuthRoute = authRoutes.includes(location.pathname);
+
+  // Generar las rutas desde la configuración
   const pageRoutes = routes.map(({ path, title, element }) => {
-    const fullPath = path.startsWith("/") ? path : `/${path}`;
-    return <Route key={title} path={fullPath} element={element} />;
+    return <Route key={title} path={path} element={element} />;
   });
-
-  // Determinar si el menú de navegación está visible
-  const isNavVisible = location !== "/login";
 
   return (
     <>
-      {location === "/login" ||
-      location === "/register" ||
-      location === "/updatePassword" ||
-      location === "/recoverPassword" ||
-      location === "/validateCode" ? null : (
-        <Nav />
-      )}
-      {<Routes>{pageRoutes}</Routes>}
+      {/* Mostrar Nav solo si NO es una ruta de autenticación */}
+      {!isAuthRoute && <Nav />}
+
+      <Routes>{pageRoutes}</Routes>
     </>
   );
 }

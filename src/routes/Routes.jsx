@@ -1,5 +1,4 @@
 import Login from "../pages/Login/Login";
-
 import RecoverPassword from "../pages/Auth/RecoverPassword";
 import Home from "../pages/Home/Home";
 import RolesAdministration from "../pages/RolesAdministration/RolesAdministration";
@@ -18,97 +17,102 @@ import DepartmentAdministration from "../pages/DepartmentAdministration/Departme
 import PayrollRequest from "../pages/PayrollDashboard/PayrollRequest";
 import FinanceSidebar from "../pages/FinanceDashboard/FinanceSidebar";
 import FinanceRequest from "../pages/FinanceDashboard/FinanceRequest";
-//https://dev.to/kachiic/the-right-way-structure-your-react-router-1i3l
+
 export default [
   {
-    path: "login",
+    path: "/",
+    element: <Navigate to="/login" replace />,
+    title: "Root",
+  },
+  {
+    path: "/login",
     element: <Login />,
     title: "Login",
   },
   {
-    path: "register",
+    path: "/register",
     element: <Register />,
-    title: "register",
+    title: "Register",
   },
-
   {
-    path: "home",
+    path: "/home",
     element: <Home />,
     title: "Home",
   },
   {
-    path: "newRequisition",
+    path: "/newRequisition",
     element: <NewRequisition />,
-    title: "newRequisition",
+    title: "New Requisition",
   },
   {
-    path: "requisitions",
+    path: "/requisitions",
     element: <Requisitions />,
     title: "Requisitions",
   },
   {
-    path: "form",
+    path: "/form",
     element: <Form />,
-    title: "form",
+    title: "Form",
   },
   {
-    path: "rolesAdministration",
+    path: "/rolesAdministration",
     element: <RolesAdministration />,
-    title: "rolesAdministration",
+    title: "Roles Administration",
   },
   {
-    path: "validateCode",
+    path: "/validateCode",
     element: <ValidateCode />,
-    title: "validateCode",
+    title: "Validate Code",
   },
   {
-    path: "updatePassword",
+    path: "/updatePassword",
     element: <UpdatePassword />,
-    title: "updatePassword",
+    title: "Update Password",
   },
   {
-    path: "recoverPassword",
+    path: "/recoverPassword",
     element: <RecoverPassword />,
-    title: "recoverPassword",
+    title: "Recover Password",
   },
   {
-    path: "configurationDashboard",
+    path: "/configurationDashboard",
     element: <ConfigurationDashboard />,
-    title: "configurationDashboard",
+    title: "Configuration Dashboard",
   },
   {
-    path: "finance",
+    path: "/finance",
     element: <FinanceDashboard />,
-    title: "finance",
+    title: "Finance Dashboard",
   },
   {
-    path: "FinanceRequests",
+    path: "/financeRequests",
     element: <FinanceRequest />,
-    title: "finance",
+    title: "Finance Requests",
   },
   {
-    path: "departmentMaintenance",
+    path: "/departmentMaintenance",
     element: <DepartmentMaintenance />,
-    title: "departmentMaintenance",
+    title: "Department Maintenance",
   },
   {
-    path: "payRoll",
+    path: "/payRoll",
     element: <PayrollDashboard />,
-    title: "payRoll",
+    title: "Payroll Dashboard",
   },
   {
-    path: "departmentAdministration",
+    path: "/departmentAdministration",
     element: <DepartmentAdministration />,
-    title: "departmentAdministration",
+    title: "Department Administration",
   },
   {
-    path: "payrollRequests",
+    path: "/payrollRequests",
     element: <PayrollRequest />,
-    title: "payrollRequests",
+    title: "Payroll Requests",
   },
+  // Catch-all route - debe ir al final
   {
     path: "*",
-    element: <Navigate to="/rolesAdministration" replace />,
-    title: "Login",
+    element: <Navigate to="/login" replace />,
+    title: "Not Found",
   },
 ];

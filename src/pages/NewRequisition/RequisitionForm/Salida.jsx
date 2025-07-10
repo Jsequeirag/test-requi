@@ -32,7 +32,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
+            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
             name={"requisitionTypeId"}
             id={"requisitionMotivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""}
@@ -49,7 +49,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
+            url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtype || ""}
@@ -116,7 +116,7 @@ export default function Salida() {
               : "Tipo de Renuncia"}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
+            url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtype || ""}

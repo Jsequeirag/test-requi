@@ -16,6 +16,7 @@ import {
   getLocalStorageKeyValue,
   saveLocalStorage,
   getLocalStorageItem,
+  removeLocalStorageItem,
 } from "../../utils/localstore";
 import WebsiteConfig from "../../../stores/WebsiteConfig";
 import ReactCountryFlag from "react-country-flag";
@@ -127,6 +128,10 @@ function NewNav() {
     saveLocalStorage("requi-darkMode", darkMode.toString());
   }, [darkMode]);
 
+  const handleLogout = () => {
+    removeLocalStorageItem();
+    navigate("/login");
+  };
   // Componente helper para elementos de navegación
   const NavItem = ({ icon, text, navigateTo, hasNotification = false }) => (
     <li
@@ -355,6 +360,7 @@ function NewNav() {
             <NavItem
               icon={faRightFromBracket}
               text={t("logout")}
+              onClick={() => handleLogout()}
               navigateTo="/login"
             />
 
