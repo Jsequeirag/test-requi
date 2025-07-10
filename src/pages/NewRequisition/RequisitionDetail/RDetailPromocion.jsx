@@ -138,7 +138,7 @@ export default function RDetailPromocion() {
             Nuevo encargado
           </label>
           <AsyncSelect
-            url={`https://localhost:7040/getEmployees`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
             name={"newDominoEffectManager"}
             customNameParam={"nombre"}
             value={formValues.newDominoEffectManager || ""}
@@ -209,7 +209,7 @@ export default function RDetailPromocion() {
               {
                 <>
                   <AsyncSelect
-                    url={`https://localhost:7040/getEmployees`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
                     name={"asignEmployees"}
                     customNameParam={"nombre"}
                     disabled={!employeesData?.length > 0}

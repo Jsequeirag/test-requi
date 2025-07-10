@@ -166,7 +166,7 @@ export default function RDetailSalida({ closeModel }) {
           <div className="">
             <>
               <AsyncSelect
-                url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=4`}
+                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=4`}
                 name={"processType"}
                 disabled={formValues.requiresReplacement !== "true"}
                 value={formValues.processType || ""}
@@ -188,7 +188,7 @@ export default function RDetailSalida({ closeModel }) {
             {
               <>
                 <AsyncSelect
-                  url={`https://localhost:7040/getEmployees`}
+                  url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
                   name={"asignEmployees"}
                   customNameParam={"nombre"}
                   disabled={!employeesData?.length > 0}
