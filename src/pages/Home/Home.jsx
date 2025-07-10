@@ -617,12 +617,6 @@ const Dashboard = () => {
               { id: "overview", label: "Resumen", icon: Building2 },
               { id: "departamentos", label: "Departamentos", icon: Building2 },
               { id: "personal", label: "Personal", icon: Users },
-              {
-                id: "pendientes",
-                label: "Solicitudes Pendientes",
-                icon: Clock,
-              },
-              { id: "historial", label: "Historial", icon: CheckCircle },
             ].map((tab) => (
               <button
                 key={tab.id}
@@ -646,8 +640,6 @@ const Dashboard = () => {
         {activeTab === "overview" && renderOverview()}
         {activeTab === "departamentos" && renderDepartamentos()}
         {activeTab === "personal" && renderPersonal()}
-        {activeTab === "pendientes" && renderSolicitudesPendientes()}
-        {activeTab === "historial" && renderHistorial()}
       </main>
     </div>
   );
