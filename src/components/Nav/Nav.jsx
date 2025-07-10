@@ -11,6 +11,7 @@ import {
   faFileInvoiceDollar, // Payroll
   faCoins, // Finanzas
   faUserGear,
+  faHome,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   getLocalStorageKeyValue,
@@ -23,7 +24,8 @@ import ReactCountryFlag from "react-country-flag";
 // Configuración de idiomas
 const translations = {
   es: {
-    dashboard: "Dashboard",
+    inicio: "inicio",
+    supervisor: "Supervisor",
     payroll: "Nómina",
     finance: "Finanzas",
     administrator: "Administrador",
@@ -37,7 +39,8 @@ const translations = {
     requitools: "Requitools",
   },
   en: {
-    dashboard: "Dashboard",
+    home: "home",
+    supervisor: "Supervisor",
     payroll: "Payroll",
     finance: "Finance",
     administrator: "Administrator",
@@ -314,7 +317,13 @@ function NewNav() {
         {/* Menú de Navegación Principal */}
         <div className="flex-grow mb-4">
           <ul className="space-y-1">
-            <NavItem icon={faGauge} text={t("dashboard")} navigateTo="/home" />
+            {" "}
+            <NavItem icon={faHome} text={t("home")} navigateTo="/home" />
+            <NavItem
+              icon={faGauge}
+              text={t("supervisor")}
+              navigateTo="/supervisor"
+            />
             {roles?.find((role) => role === "Payroll") && (
               <NavItem
                 icon={faFileInvoiceDollar}

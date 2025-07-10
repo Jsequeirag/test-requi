@@ -1,6 +1,6 @@
 import Login from "../pages/Login/Login";
 import RecoverPassword from "../pages/Auth/RecoverPassword";
-import Home from "../pages/Home/Home";
+import Supervisor from "../pages/Supervisor/Supervisor";
 import RolesAdministration from "../pages/RolesAdministration/RolesAdministration";
 import { Navigate } from "react-router-dom";
 import Form from "../pages/ExampleFormik/Form";
@@ -17,12 +17,17 @@ import DepartmentAdministration from "../pages/DepartmentAdministration/Departme
 import PayrollRequest from "../pages/PayrollDashboard/PayrollRequest";
 import FinanceSidebar from "../pages/FinanceDashboard/FinanceSidebar";
 import FinanceRequest from "../pages/FinanceDashboard/FinanceRequest";
-
+import Home from "../pages/Home/Home";
 export default [
   {
     path: "/",
     element: <Navigate to="/login" replace />,
     title: "Root",
+  },
+  {
+    path: "/home",
+    element: <Home />,
+    title: "home",
   },
   {
     path: "/login",
@@ -35,9 +40,9 @@ export default [
     title: "Register",
   },
   {
-    path: "/home",
-    element: <Home />,
-    title: "Home",
+    path: "/supervisor",
+    element: <Supervisor />,
+    title: "supervisor",
   },
   {
     path: "/newRequisition",
