@@ -129,7 +129,8 @@ function NewNav() {
   }, [darkMode]);
 
   const handleLogout = () => {
-    removeLocalStorageItem();
+    removeLocalStorageItem("requitool-employeeInfo");
+    removeLocalStorageItem("requitool-roles");
     navigate("/login");
   };
   // Componente helper para elementos de navegación
