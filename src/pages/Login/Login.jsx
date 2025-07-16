@@ -181,10 +181,7 @@ const Login = () => {
       // Usar la función personalizada para guardar con expiración
       saveLocalStorage("requitool-employeeInfo", JSON.stringify(data));
       saveLocalStorage("requitool-roles", JSON.stringify(getRoles(data.role)));
-      saveLocalStorage(
-        "requitool-rememberSession",
-        JSON.stringify(rememberSession.toString())
-      );
+      saveLocalStorage("requitool-rememberSession", rememberSession.toString());
       saveWithExpiration(rememberSession);
       // Guardar preferencia de recordar sesión
 

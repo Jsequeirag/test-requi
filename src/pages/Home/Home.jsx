@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import Layout from "../../components/Layout/Layout";
 import {
   Users,
   Building2,
@@ -578,70 +579,46 @@ const Dashboard = () => {
   );
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center py-4">
-            <div className="flex items-center space-x-4">
-              <h1 className="text-2xl font-bold text-gray-900">
-                Dashboard de Gestión
-              </h1>
-            </div>
-            <div className="flex items-center space-x-4">
-              <button className="p-2 text-gray-400 hover:text-gray-600">
-                <Bell className="h-6 w-6" />
-              </button>
-              <button className="p-2 text-gray-400 hover:text-gray-600">
-                <Settings className="h-6 w-6" />
-              </button>
-              <div className="flex items-center space-x-3">
-                <div className="h-8 w-8 bg-blue-100 rounded-full flex items-center justify-center">
-                  <User className="h-5 w-5 text-blue-600" />
-                </div>
-                <div className="text-sm">
-                  <p className="font-medium text-gray-900">Admin Usuario</p>
-                  <p className="text-gray-500">Administrador</p>
-                </div>
+    <Layout>
+      <div className="w-full  mx-auto p-4 sm:p-6 lg:p-8 bg-gray-50 dark:bg-gray-900 text-gray-900 dark:text-gray-100">
+        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 lg:p-10 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+          <nav className="bg-white shadow-sm">
+            <div className="">
+              <div className="flex space-x-8">
+                {[
+                  { id: "overview", label: "Resumen", icon: Building2 },
+                  {
+                    id: "departamentos",
+                    label: "Departamentos",
+                    icon: Building2,
+                  },
+                  { id: "personal", label: "Personal", icon: Users },
+                ].map((tab) => (
+                  <button
+                    key={tab.id}
+                    onClick={() => setActiveTab(tab.id)}
+                    className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
+                      activeTab === tab.id
+                        ? "border-blue-500 text-blue-600"
+                        : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
+                    }`}
+                  >
+                    <tab.icon className="h-4 w-4" />
+                    <span>{tab.label}</span>
+                  </button>
+                ))}
               </div>
             </div>
-          </div>
-        </div>
-      </header>
+          </nav>
 
-      {/* Navigation */}
-      <nav className="bg-white shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8">
-            {[
-              { id: "overview", label: "Resumen", icon: Building2 },
-              { id: "departamentos", label: "Departamentos", icon: Building2 },
-              { id: "personal", label: "Personal", icon: Users },
-            ].map((tab) => (
-              <button
-                key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center space-x-2 py-4 px-1 border-b-2 font-medium text-sm ${
-                  activeTab === tab.id
-                    ? "border-blue-500 text-blue-600"
-                    : "border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300"
-                }`}
-              >
-                <tab.icon className="h-4 w-4" />
-                <span>{tab.label}</span>
-              </button>
-            ))}
-          </div>
-        </div>
-      </nav>
-
-      {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {activeTab === "overview" && renderOverview()}
-        {activeTab === "departamentos" && renderDepartamentos()}
-        {activeTab === "personal" && renderPersonal()}
-      </main>
-    </div>
+          <main className="">
+            {activeTab === "overview" && renderOverview()}
+            {activeTab === "departamentos" && renderDepartamentos()}
+            {activeTab === "personal" && renderPersonal()}
+          </main>
+        </div>{" "}
+      </div>
+    </Layout>
   );
 };
 

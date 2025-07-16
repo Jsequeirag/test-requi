@@ -1,58 +1,86 @@
-import React, { useState, useEffect } from "react"; // Importar useState y useEffect
-import { IconButton, TextButton } from "../../components/Button/Button";
+import React, { useState, useEffect } from "react";
+import { IconButton } from "../../components/Button/Button"; // Assuming Button.jsx exports IconButton
 import { faCircleXmark } from "@fortawesome/free-solid-svg-icons";
-// import RDetailMovimientoLateral from "../../pages/NewRequisition/RequisitionDetail/RDetailMovimientoLateral"; // No es necesario importar aquí si solo se usa como children
-import { getLocalStorageItem } from "../../utils/localstore"; // Para el modo oscuro
+import { getLocalStorageItem } from "../../utils/localstore"; // For dark mode
 
 export default function ModalRequisitionDetails({
   openModal = false,
   setOpenModal,
   childrenComponent,
+  // Removed pcWidth/movilWidth. We'll use a single maxWidth prop like in GeneralModal.
+  // This ensures consistency and proper Tailwind JIT compilation.
+  maxWidth = "max-w-2xl", // Default max-width (e.g., 48rem or 768px). Adjust as needed.
 }) {
-  // Estado local para el modo oscuro, sincronizado con localStorage
-  const [darkMode, setDarkMode] = useState(true);
+  // Local state for dark mode. Make sure `getLocalStorageItem` returns "true" or "false" string.
+  // This useEffect looks correct for initial dark mode setting.
+  const [darkMode, setDarkMode] = useState(false); // Default to false, then check local storage
 
-  /*useEffect(() => {
+  useEffect(() => {
     const storedDarkMode = getLocalStorageItem("requi-darkMode");
     if (storedDarkMode === "true") {
       setDarkMode(true);
+    } else {
+      setDarkMode(false);
     }
-  }, []);*/
+  }, []);
+
+  // If the modal is not open, return null to prevent rendering
+  if (!openModal) {
+    return null;
+  }
+
+  // Handle closing the modal when clicking outside of it
+  const handleBackdropClick = (e) => {
+    if (e.target === e.currentTarget) {
+      setOpenModal(false);
+    }
+  };
 
   return (
+    // Backdrop / Overlay
     <div
       className={`
-        fixed inset-0 z-50 flex items-center justify-center // Clases para el overlay: ocupa toda la pantalla, centrado
-        transition-opacity duration-300 // Transición suave para la opacidad
+        fixed inset-0 z-50 flex items-center justify-center 
+        bg-gray-950/50 backdrop-blur-sm  
+        transition-opacity duration-300  
         ${
           openModal ? "opacity-100 visible" : "opacity-0 invisible"
-        } // Control de visibilidad
-        ${"bg-gray-900/75"} // Fondo semitransparente para modo oscuro/claro
-        backdrop-blur-sm // Efecto de desenfoque en el fondo
+        } // Control visibility
       `}
-      style={{ display: openModal ? "flex" : "none" }} // Usar 'flex' para el centrado
-      role="dialog" // Rol para accesibilidad
-      aria-modal="true" // Indica que es un modal
-      aria-labelledby="modal-title" // Enlaza con el título del modal (si lo tiene childrenComponent)
+      onClick={handleBackdropClick} // Click outside to close
+      role="dialog"
+      aria-modal="true"
+      aria-labelledby="modal-title" // Points to the main title within childrenComponent
     >
+      {/* Modal Content */}
       <div
-        className={`modal-content pc:w-[50%] movil:w-[60%] mt-[15%] m-auto pt-1 pr-1 border rounded-sm
-          ${"bg-slate-50 text-gray-900"} // Fondo y texto para modo oscuro/claro
+        className={`
+          relative bg-white dark:bg-gray-800 rounded-lg shadow-xl // Main modal box styling
+          p-6 // Increased padding for better internal spacing
+          transform transition-all // For potential entry/exit animations
+          sm:w-full ${maxWidth} mx-auto my-8 // Responsive width, max-width, horizontal auto-margin, vertical margin
         `}
       >
-        <div className="flex justify-end items-end">
-          <div className="text-center ">
-            <IconButton
-              bgColor={`bg-red-500`}
-              hoverBgColor={`hover:bg-red-500 `}
-              hoverTextColor={`hover:text-black`}
-              otherProperties="w-auto "
-              icon={faCircleXmark}
-              onClick={() => setOpenModal(false)}
-            />
-          </div>
+        {/* Close Button */}
+        <div className="absolute top-4 right-4 z-10">
+          <IconButton
+            bgColor={`bg-red-500`}
+            hoverBgColor={`hover:bg-red-600`} // Slightly darker red on hover
+            hoverTextColor={`hover:text-white`} // Ensure text stays white for contrast
+            otherProperties="rounded-full w-8 h-8 flex items-center justify-center p-0" // Small, round button
+            icon={faCircleXmark}
+            onClick={() => setOpenModal(false)}
+            aria-label="Cerrar modal" // Accessibility
+          />
         </div>
-        <div className="w-full p-2" key={openModal ? Date.now() : "closed"}>
+
+        {/* Children Component (Modal Body) */}
+        {/* The key={openModal ? Date.now() : "closed"} is a good pattern if you need to force re-render
+            childrenComponent every time the modal opens, useful if childrenComponent has internal state
+            that needs to be reset on modal open. Otherwise, it can be removed. */}
+        <div className="pt-4 pb-2 px-2">
+          {" "}
+          {/* Added internal padding for content */}
           {childrenComponent}
         </div>
       </div>

@@ -12,6 +12,7 @@ export default function Salida() {
 
   //API - Keeping the call as formValues?.requestTypeId is used in AsyncSelect URLs
   useApiGet(["RequestType"], getRequestType);
+  // API GET HOOK (for employees by boss)
 
   return (
     <>
@@ -32,7 +33,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
+            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
             name={"requisitionTypeId"}
             id={"requisitionMotivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""}
@@ -49,7 +50,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
+            url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtype || ""}
@@ -67,12 +68,12 @@ export default function Salida() {
             {formValues?.requisitionTypeId === 4
               ? "Carta de Despido"
               : "Carta de Renuncia"}{" "}
-            Número de teléfono <span className="text-red-500">*</span>{" "}
+            <span className="text-red-500">*</span>{" "}
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400
                        file:mr-4 file:py-2 file:px-4
                        file:rounded-md file:border-0 file:text-sm file:font-semibold
                        file:bg-blue-50 file:text-blue-700
@@ -116,7 +117,7 @@ export default function Salida() {
               : "Tipo de Renuncia"}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
+            url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtype || ""}
@@ -137,7 +138,7 @@ export default function Salida() {
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             disabled={formValues?.requisitionSubtype !== 1} // Mantener lógica de deshabilitado
             id="rForm" // ID único
             name="rForm"
@@ -168,7 +169,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             name="trialPeriod"
             id="trialPeriod" // Añadido ID
             value={
@@ -206,7 +207,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             name="rehirable"
             id="rehirable" // Añadido ID
             value={
@@ -244,7 +245,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="date"
             id="officialEmployeeDepartureDate" // ID único
             name="officialEmployeeDepartureDate"
@@ -276,7 +277,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="date"
             id="employeeDepartureDate" // ID único
             name="employeeDepartureDate"
@@ -308,7 +309,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="date"
             name="returnWorkEquipmentDate"
             id="returnWorkEquipmentDate" // ID único
@@ -340,7 +341,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="number"
             name="phoneNumber"
             id="phoneNumber" // ID único
@@ -361,13 +362,13 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="personalEmail" // ID único
           >
-            Correo Personal Número de teléfono{" "}
+            Correo Personal
             <span className="text-red-500">*</span>{" "}
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="email"
             name="personalEmail"
             id="personalEmail" // ID único
@@ -394,7 +395,7 @@ export default function Salida() {
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="text"
             name="joinNewCompany" // Nombre corregido
             id="joinNewCompany" // ID corregido
@@ -420,7 +421,7 @@ export default function Salida() {
           <textarea
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400 h-[200px]"
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400 h-[200px]"
             placeholder="Comentario"
             name="comment"
             id="comment" // Añadido ID

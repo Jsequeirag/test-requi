@@ -1,6 +1,7 @@
 import { React, useState, useEffect } from "react";
 import ReactCountryFlag from "react-country-flag";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useNavigate } from "react-router-dom";
 import {
   faRightFromBracket, // Logout
   faMoon, // Dark Mode
@@ -13,7 +14,6 @@ import {
   faLanguage, // Language toggle
 } from "@fortawesome/free-solid-svg-icons";
 import {
-  getLocalStorageKeyValue,
   saveLocalStorage,
   getLocalStorageItem,
   removeLocalStorageItem,
@@ -25,6 +25,7 @@ import {
 // control its visibility from a parent.
 
 export default function Topnav() {
+  const navigate = useNavigate();
   const translations = {
     es: {
       dashboard: "Dashboard",
@@ -82,6 +83,7 @@ export default function Topnav() {
   const handleLogout = () => {
     removeLocalStorageItem("requitool-employeeInfo");
     removeLocalStorageItem("requitool-roles");
+
     navigate("/login");
   };
   // Efecto para cargar configuraciones iniciales

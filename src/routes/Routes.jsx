@@ -32,7 +32,7 @@ export default [
   {
     path: "/login",
     element: <Login />,
-    title: "Login",
+    title: "login",
   },
   {
     path: "/register",
@@ -47,72 +47,72 @@ export default [
   {
     path: "/newRequisition",
     element: <NewRequisition />,
-    title: "New Requisition",
+    title: "newRequisition",
   },
   {
     path: "/requisitions",
     element: <Requisitions />,
-    title: "Requisitions",
+    title: "requisitions",
   },
   {
     path: "/form",
     element: <Form />,
-    title: "Form",
+    title: "form",
   },
   {
     path: "/rolesAdministration",
     element: <RolesAdministration />,
-    title: "Roles Administration",
+    title: "rolesAdministration",
   },
   {
     path: "/validateCode",
     element: <ValidateCode />,
-    title: "Validate Code",
+    title: "validateCode",
   },
   {
     path: "/updatePassword",
     element: <UpdatePassword />,
-    title: "Update Password",
+    title: "updatePassword",
   },
   {
     path: "/recoverPassword",
     element: <RecoverPassword />,
-    title: "Recover Password",
+    title: "recoverPassword",
   },
   {
     path: "/configurationDashboard",
     element: <ConfigurationDashboard />,
-    title: "Configuration Dashboard",
+    title: "configurationDashboard",
   },
   {
     path: "/finance",
     element: <FinanceDashboard />,
-    title: "Finance Dashboard",
+    title: "financeDashboard",
   },
   {
     path: "/financeRequests",
     element: <FinanceRequest />,
-    title: "Finance Requests",
+    title: "financeRequests",
   },
   {
     path: "/departmentMaintenance",
     element: <DepartmentMaintenance />,
-    title: "Department Maintenance",
+    title: "departmentMaintenance",
   },
   {
     path: "/payRoll",
     element: <PayrollDashboard />,
-    title: "Payroll Dashboard",
+    title: "payRoll",
   },
   {
     path: "/departmentAdministration",
     element: <DepartmentAdministration />,
-    title: "Department Administration",
+    title: "departmentAdministration",
   },
   {
     path: "/payrollRequests",
     element: <PayrollRequest />,
-    title: "Payroll Requests",
+    title: "payrollRequests",
   },
   // Catch-all route - debe ir al final
   {

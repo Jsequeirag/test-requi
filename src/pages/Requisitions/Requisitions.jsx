@@ -200,7 +200,7 @@ function Requisitions() {
           <div className="flex items-center border-b p-4 mx-2 justify-between">
             <div className="flex items-center p-4 mx-2">
               <a
-                href="/home"
+                href="/supervisor"
                 className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group"
               >
                 <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-0.5 transition-transform" />
@@ -358,32 +358,36 @@ function Requisitions() {
                                   <div
                                     className={`bg-white border rounded-lg ${
                                       idx === 0 ? "shadow-md" : ""
-                                    } p-6 w-full hover:shadow-lg transition-shadow ${
-                                      req?.infoEmpleadoAkilesDto
-                                        ?.descrip_Departamento ===
-                                      employeeLoggedDeparment
-                                        ? "cursor-pointer"
-                                        : "cursor-not-allowed"
-                                    }`}
+                                    } p-6 w-full hover:shadow-lg transition-shadow `}
                                     //si el usuario logueado el del mismo departamento del empleado asociado a la Requisición
                                     onClick={() => {
+                                      /*
                                       if (
                                         req?.infoEmpleadoAkilesDto
                                           ?.descrip_Departamento ===
                                         employeeLoggedDeparment
                                       ) {
-                                        setFormValues(req);
-                                        navigate("/newRequisition", {
-                                          state: {
-                                            requisition: req,
-                                            action: "update",
-                                          },
-                                        });
-                                      }
+                                        setFormValues(req);*/
+                                      navigate("/newRequisition", {
+                                        state: {
+                                          request: request,
+                                          requisition: req,
+                                          hasPrevRequisition: request
+                                            ?.requisitions[idx + 1]
+                                            ? true
+                                            : false,
+                                          prevRequisition:
+                                            request.requisitions.length > 1
+                                              ? request.requisitions[idx + 1]
+                                              : null,
+                                          action: "update",
+                                        },
+                                      });
                                     }}
                                   >
                                     <div className="flex">
                                       <p className="text-gray-600 text-sm font-bold py-1 mr-2">
+                                        {idx}
                                         {req.state === "Pendiente" &&
                                           "Finanzas"}
                                       </p>

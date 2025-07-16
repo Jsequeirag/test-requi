@@ -17,7 +17,7 @@ function Requisition() {
           <div className="flex items-center border-b p-4 mx-2">
             <TextButton
               onClick={() => {
-                navigate("/home");
+                navigate("/supervisor");
               }}
               text={"Atras"}
             />

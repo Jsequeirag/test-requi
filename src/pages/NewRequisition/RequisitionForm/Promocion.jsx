@@ -32,7 +32,7 @@ export default function Promocion() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
+            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
             name={"requisitionTypeId"}
             id={"motivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""} // Usamos 'value' y un fallback a ""

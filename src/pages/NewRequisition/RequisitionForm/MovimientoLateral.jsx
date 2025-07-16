@@ -31,16 +31,16 @@ export default function MovimientoLateral() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="motivo" // ID corregido y único
           >
-            Motivo{" "}
-            {/* Add * here if needed, e.g., <span className="text-red-500">*</span> */}
+            Motivo <span className="text-red-500">*</span>{" "}
+            {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
+            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
             name={"requisitionTypeId"}
             id={"motivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""} // Usamos 'value' y un fallback a ""
             className="w-full text-base"
-            // required={true} // Uncomment and set to true if this field is mandatory
+            required // Añadido required si este campo debe ser obligatorio
           />
         </div>
         {/* Campo 2: Fecha Oficial del Movimiento */}

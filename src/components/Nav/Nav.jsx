@@ -12,6 +12,7 @@ import {
   faCoins, // Finanzas
   faUserGear,
   faHome,
+  faUsers,
 } from "@fortawesome/free-solid-svg-icons";
 import {
   getLocalStorageKeyValue,
@@ -24,7 +25,7 @@ import ReactCountryFlag from "react-country-flag";
 // Configuración de idiomas
 const translations = {
   es: {
-    inicio: "inicio",
+    inicio: "Inicio",
     supervisor: "Supervisor",
     payroll: "Nómina",
     finance: "Finanzas",
@@ -39,7 +40,7 @@ const translations = {
     requitools: "Requitools",
   },
   en: {
-    home: "home",
+    home: "Home",
     supervisor: "Supervisor",
     payroll: "Payroll",
     finance: "Finance",
@@ -320,7 +321,7 @@ function NewNav() {
             {" "}
             <NavItem icon={faHome} text={t("home")} navigateTo="/home" />
             <NavItem
-              icon={faGauge}
+              icon={faUsers}
               text={t("supervisor")}
               navigateTo="/supervisor"
             />
@@ -346,7 +347,7 @@ function NewNav() {
                 <NavItem
                   icon={faUserGear}
                   text={t("administrator")}
-                  navigateTo="/ConfigurationDashboard"
+                  navigateTo="/configurationDashboard"
                 />
               )}
             </ul>
