@@ -1,13 +1,23 @@
-import React, { useState, useEffect } from "react"; // Add useEffect here
-import { useNavigate } from "react-router-dom";
-
-import TextButton from "../../components/Button/TextButton"; // This import is not used in the provided code, consider removing if not needed.
+import React, { useReducer, useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { useApiSend } from "../../api/config/customHooks";
-import { Register as registerUser } from "../../api/urls/auth";
-import RegisterStore from "../../../stores/RegisterStore";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faInfoCircle } from "@fortawesome/free-solid-svg-icons";
+import { useNavigate } from "react-router-dom";
+import { login } from "../../../api/urls/auth";
+import { useApiSend } from "../../../api/config/customHooks";
+import { saveLocalStorage } from "../../../utils/localstore"; // Corrected path
+import websiteConfig from "../../../../stores/WebsiteConfig"; // Corrected path
+
+const initialState = { formValues: { employeeId: "", password: "" } };
+const reducer = (state, action) => {
+  switch (action.type) {
+    case "SET_FORM_VALUES":
+      return {
+        ...state,
+        formValues: { ...state.formValues, ...action.payload },
+      };
+    default:
+      return state;
+  }
+};
 
 // Iconos SVG personalizados
 const UserIcon = ({ className }) => (
@@ -26,6 +36,22 @@ const UserIcon = ({ className }) => (
   </svg>
 );
 
+const LockIcon = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
+    />
+  </svg>
+);
+
 const ArrowRightIcon = ({ className }) => (
   <svg
     className={className}
@@ -38,22 +64,6 @@ const ArrowRightIcon = ({ className }) => (
       strokeLinejoin="round"
       strokeWidth={2}
       d="M17 8l4 4m0 0l-4 4m4-4H3"
-    />
-  </svg>
-);
-
-const ArrowLeftIcon = ({ className }) => (
-  <svg
-    className={className}
-    fill="none"
-    viewBox="0 0 24 24"
-    stroke="currentColor"
-  >
-    <path
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      strokeWidth={2}
-      d="M7 16l-4-4m0 0l4-4m-4 4h18"
     />
   </svg>
 );
@@ -76,7 +86,61 @@ const SpinnerIcon = ({ className }) => (
   </svg>
 );
 
-// Iconos para el saludo dinámico con animaciones mejoradas (Copiados del componente Login)
+const EyeIcon = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+    />
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+    />
+  </svg>
+);
+
+const EyeOffIcon = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.878 9.878L3 3m6.878 6.878L21 21"
+    />
+  </svg>
+);
+
+const CheckIcon = ({ className }) => (
+  <svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+  >
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      d="M5 13l4 4L19 7"
+    />
+  </svg>
+);
+
+// Iconos para el saludo dinámico con animaciones mejoradas
 const SunIcon = ({ className }) => (
   <motion.svg
     className={className}
@@ -351,24 +415,31 @@ const MoonIcon = ({ className }) => (
   </motion.svg>
 );
 
-export default function Register() {
-  const { isPending, error, mutateAsync } = useApiSend(registerUser);
-  //global
-  const [formValues, setFormValues] = useState({});
-  const [userExisted, setUserExisted] = useState();
-  const [focusedField, setFocusedField] = useState(null);
-  const registerValues = RegisterStore((state) => state.registerValues); // eslint-disable-line no-unused-vars
-  const setRegisterValues = RegisterStore((state) => state.setRegisterValues);
-  //router
+const getRoles = (Roles) => {
+  const roleNames = Roles.filter(
+    (roleUser) => roleUser && roleUser.role && roleUser.role.name
+  ) // Filtra objetos válidos
+    .map((roleUser) => roleUser.role.name); // Mapea a solo el nombre del rol
+  return roleNames;
+};
+
+const Login = () => {
   const navigate = useNavigate();
-
-  // --- Sección de Saludos ---
+  const [state, dispatcher] = useReducer(reducer, initialState);
+  const { isPending, mutateAsync } = useApiSend(login);
+  const [focusedField, setFocusedField] = useState(null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberSession, setRememberSession] = useState(false);
   const [greeting, setGreeting] = useState({ message: "", icon: SunIcon });
-
+  const setRandomThemeColorNumber = websiteConfig(
+    (state) => state.setRandomThemeColorNumber
+  );
   // Función para obtener el saludo según la hora
   const getGreeting = () => {
+    const currentHour = new Date().getHours();
+    // Use the current time from the prompt to ensure correct greeting
     const nowInCostaRica = new Date();
-    const currentHourCR = nowInCostaRica.getHours();
+    const currentHourCR = nowInCostaRica.getHours(); // Since it's 6:36 PM CST, it's 18:36.
 
     if (currentHourCR >= 5 && currentHourCR < 12) {
       return { message: "Buenos días", icon: SunIcon };
@@ -383,29 +454,50 @@ export default function Register() {
   useEffect(() => {
     setGreeting(getGreeting());
   }, []);
-  // --- Fin Sección de Saludos ---
 
-  //onSubmit
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    mutateAsync(formValues)
-      .then((data) => {
-        if (!data?.existed) {
-          setRegisterValues(data);
-          navigate("/validateCode");
-        }
-        data?.existed && setUserExisted(data);
-      })
-      .catch((e) => {
-        console.log(e);
-      });
+  // Función para guardar con expiración
+  const saveWithExpiration = () => {
+    const now = new Date();
+    const expirationTime = rememberSession
+      ? now.getTime() + 30 * 24 * 60 * 60 * 1000 // 30 días
+      : now.getTime() + 24 * 60 * 60 * 1000; // 24 horas
+
+    const item = {
+      expiration: expirationTime,
+    };
+    if (rememberSession) {
+      // Save to localStorage correctly
+      localStorage.setItem("sessionExpiration", JSON.stringify(item));
+    } else {
+      // Remove if rememberSession is false
+      localStorage.removeItem("sessionExpiration");
+    }
   };
 
-  function handleData(e) {
-    setFormValues({ [e.target.name]: e.target.value });
-  }
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    try {
+      const data = await mutateAsync(state.formValues);
+      console.log("Login successful:", data);
 
-  // Variantes de animación
+      // Usar la función personalizada para guardar con expiración
+      saveLocalStorage("requitool-employeeInfo", JSON.stringify(data));
+      // Ensure 'data.role' is an array or handle the case where it's not
+      saveLocalStorage(
+        "requitool-roles",
+        JSON.stringify(getRoles(data.role || []))
+      );
+      saveLocalStorage("requitool-rememberSession", rememberSession.toString());
+      saveWithExpiration(); // Call without rememberSession as it's a state variable
+      // Guardar preferencia de recordar sesión
+      setRandomThemeColorNumber();
+      navigate("/home");
+    } catch (err) {
+      console.error("Error en el login:", err);
+    }
+  };
+
+  // Variantes de animación mejoradas
   const backgroundVariants = {
     hidden: {
       opacity: 0,
@@ -477,7 +569,6 @@ export default function Register() {
     },
   };
 
-  // --- Nueva variante para el saludo (copiada del componente Login) ---
   const greetingVariants = {
     hidden: {
       opacity: 0,
@@ -495,7 +586,6 @@ export default function Register() {
       },
     },
   };
-  // --- Fin Nueva variante ---
 
   return (
     <motion.div
@@ -503,7 +593,7 @@ export default function Register() {
       initial="hidden"
       animate="visible"
     >
-      {/* Wallpaper Background */}
+      {/* Wallpaper Background - Animado mejorado */}
       <motion.div
         className="absolute inset-0 bg-cover bg-center bg-no-repeat"
         style={{
@@ -516,7 +606,7 @@ export default function Register() {
         variants={backgroundVariants}
       />
 
-      {/* Overlay para mejor contraste */}
+      {/* Overlay para mejor contraste del formulario */}
       <motion.div
         className="absolute inset-0 bg-black/25"
         variants={backgroundVariants}
@@ -527,13 +617,13 @@ export default function Register() {
         className="relative z-10 w-full max-w-md"
         variants={containerVariants}
       >
-        {/* Register Card */}
+        {/* Login Card - Glassmorphism mejorado para mejor visibilidad */}
         <div className="bg-white/50 backdrop-blur-2xl rounded-3xl shadow-2xl border border-white/30 overflow-hidden backdrop-saturate-150">
           {/* Header with Logo */}
           <div className="bg-gradient-to-r from-[#bdab78]/40 to-[#a38e67]/40 backdrop-blur-md px-8 py-10 text-center relative border-b border-white/20">
             <div className="absolute inset-0 bg-black/10"></div>
             <motion.div className="relative z-10" variants={logoVariants}>
-              {/* Saludo dinámico (Agregado del componente Login) */}
+              {/* Saludo dinámico */}
               <motion.div
                 className="mb-6 flex items-center justify-center gap-3"
                 variants={greetingVariants}
@@ -563,7 +653,7 @@ export default function Register() {
                     },
                   }}
                 >
-                  <greeting.icon className="w-7 h-7 text-gray-800 drop-shadow-lg stroke-2" />
+                  <greeting.icon className="w-7 h-7 text-gray-800 0 drop-shadow-lg stroke-2" />
                 </motion.div>
                 <motion.p
                   className="text-lg font-semibold text-gray-800 drop-shadow-lg"
@@ -585,9 +675,8 @@ export default function Register() {
                   {greeting.message}
                 </motion.p>
               </motion.div>
-              {/* Fin Saludo dinámico */}
 
-              {/* Logo */}
+              {/* Logo con animación mejorada */}
               <motion.div
                 className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg border border-white/30"
                 whileHover={{
@@ -602,51 +691,31 @@ export default function Register() {
                 </span>
               </motion.div>
 
-              {/* Title */}
+              {/* Title con animación de texto */}
               <motion.h1
                 className="text-2xl font-bold text-black/70 drop-shadow-lg"
                 animate={{ opacity: [0, 1] }}
                 transition={{ delay: 1.4, duration: 0.6 }}
               >
-                Registro de usuario
+                Requitools
               </motion.h1>
               <motion.p
                 className="text-black/70 font-medium mt-1"
                 animate={{ opacity: [0, 1] }}
                 transition={{ delay: 1.6, duration: 0.6 }}
               >
-                Crea tu cuenta
+                Bienvenido de vuelta
               </motion.p>
             </motion.div>
           </div>
 
-          {/* Form Section */}
+          {/* Form Section - Con mayor opacidad para mejor visibilidad */}
           <motion.div
             className="px-8 py-8 bg-white/15 backdrop-blur-md"
             variants={formVariants}
           >
-            <form onSubmit={onSubmit} className="space-y-6">
-              {/* Mensaje de error/info */}
-              {(userExisted || error) && (
-                <motion.div
-                  className="bg-white/20 backdrop-blur-md border border-white/30 rounded-xl p-4"
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <div className="flex items-center">
-                    <div className="text-blue-400 mr-2">
-                      <FontAwesomeIcon icon={faInfoCircle} size="lg" />
-                    </div>
-                    <p className="text-black/70 font-medium">
-                      {userExisted && "El usuario ya está registrado"}
-                      {error && "El usuario no existe"}
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-
-              {/* Campo ID de empleado */}
+            <div className="space-y-6">
+              {/* Campo Usuario */}
               <motion.div
                 className="space-y-2"
                 initial={{ opacity: 0, x: -20 }}
@@ -654,7 +723,7 @@ export default function Register() {
                 transition={{ delay: 1.4, duration: 0.5 }}
               >
                 <label className="block text-sm font-semibold text-black/70 ml-1 drop-shadow-sm">
-                  ID de empleado / Lion login
+                  Usuario
                 </label>
                 <div className="relative group">
                   <UserIcon
@@ -665,29 +734,124 @@ export default function Register() {
                     }`}
                   />
                   <input
-                    type="number"
+                    type="text"
                     name="employeeId"
-                    id="employeeId"
                     placeholder="Ingresa tu usuario, ejemplo: 718956"
-                    className={`w-full pl-12 pr-4 py-4 bg-white/20 backdrop-blur-md border-2 rounded-xl font-medium text-black/70 placeholder-black/50 
+                    className={`w-full pl-12 pr-4 py-4 bg-white/20 backdrop-blur-md border-2 rounded-xl font-medium text-black/70 placeholder-black/50
                       transition-all duration-300 focus:outline-none focus:bg-white/25 focus:shadow-lg border-white/30
                       ${
                         focusedField === "employeeId"
                           ? "border-[#bdab78] bg-white/25 shadow-lg shadow-[#bdab78]/20"
                           : "border-white/30 hover:border-white/50 hover:bg-white/25"
                       }`}
-                    onChange={handleData}
+                    onChange={(e) => {
+                      dispatcher({
+                        type: "SET_FORM_VALUES",
+                        payload: { [e.target.name]: e.target.value },
+                      });
+                    }}
                     onFocus={() => setFocusedField("employeeId")}
                     onBlur={() => setFocusedField(null)}
-                    autoComplete="off"
-                    required
+                    autoComplete="username"
                   />
                 </div>
               </motion.div>
 
-              {/* Botón de envío */}
+              {/* Campo Contraseña */}
+              <motion.div
+                className="space-y-2"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.6, duration: 0.5 }}
+              >
+                <label className="block text-sm font-semibold text-black/70 ml-1 drop-shadow-sm">
+                  Contraseña
+                </label>
+                <div className="relative group">
+                  <LockIcon
+                    className={`absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 transition-colors duration-200 ${
+                      focusedField === "password"
+                        ? "text-[#bdab78]"
+                        : "text-black/60"
+                    }`}
+                  />
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    name="password"
+                    placeholder="Ingresa tu contraseña"
+                    className={`w-full pl-12 pr-12 py-4 bg-white/20 backdrop-blur-md border-2 rounded-xl font-medium text-black/70 placeholder-black/50
+                      transition-all duration-300 focus:outline-none focus:bg-white/25 focus:shadow-lg border-white/30
+                      ${
+                        focusedField === "password"
+                          ? "border-[#bdab78] bg-white/25 shadow-lg shadow-[#bdab78]/20"
+                          : "border-white/30 hover:border-white/50 hover:bg-white/25"
+                      }`}
+                    onChange={(e) => {
+                      dispatcher({
+                        type: "SET_FORM_VALUES",
+                        payload: { [e.target.name]: e.target.value },
+                      });
+                    }}
+                    onFocus={() => setFocusedField("password")}
+                    onBlur={() => setFocusedField(null)}
+                    minLength={6}
+                    autoComplete="current-password"
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-black/60 hover:text-[#bdab78] transition-colors duration-200"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOffIcon className="w-5 h-5" />
+                    ) : (
+                      <EyeIcon className="w-5 h-5" />
+                    )}
+                  </button>
+                </div>
+              </motion.div>
+
+              {/* Checkbox Recordar Sesión */}
+              <motion.div
+                className="flex items-center space-x-3"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 1.7, duration: 0.5 }}
+              >
+                <div className="relative">
+                  <input
+                    type="checkbox"
+                    id="rememberSession"
+                    checked={rememberSession}
+                    onChange={(e) => setRememberSession(e.target.checked)}
+                    className="sr-only"
+                  />
+                  <motion.label
+                    htmlFor="rememberSession"
+                    className={`flex items-center justify-center w-5 h-5 rounded border-2 cursor-pointer transition-all duration-200 ${
+                      rememberSession
+                        ? "bg-[#bdab78] border-[#bdab78] text-white"
+                        : "bg-white/20 border-white/40 hover:border-white/60"
+                    }`}
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                  >
+                    {rememberSession && (
+                      <CheckIcon className="w-3 h-3 stroke-[3]" />
+                    )}
+                  </motion.label>
+                </div>
+                <label
+                  htmlFor="rememberSession"
+                  className="text-sm font-medium text-black/70 cursor-pointer select-none drop-shadow-sm"
+                >
+                  Recordar sesión por 30 días
+                </label>
+              </motion.div>
+
+              {/* Botón de login */}
               <motion.button
-                type="submit"
+                onClick={onSubmit}
                 disabled={isPending}
                 className={`w-full py-4 px-6 rounded-xl font-bold text-lg transition-all duration-300 transform relative overflow-hidden
                     ${
@@ -699,23 +863,23 @@ export default function Register() {
                 whileHover={{ scale: isPending ? 1 : 1.03 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1.6, duration: 0.5 }}
+                transition={{ delay: 1.8, duration: 0.5 }}
               >
                 <div className="flex items-center justify-center space-x-3 relative z-10">
                   {isPending ? (
                     <>
                       <SpinnerIcon className="w-5 h-5" />
-                      <span>Enviando...</span>
+                      <span>Iniciando sesión...</span>
                     </>
                   ) : (
                     <>
-                      <span>Enviar</span>
+                      <span>Iniciar Sesión</span>
                       <ArrowRightIcon className="w-5 h-5" />
                     </>
                   )}
                 </div>
 
-                {/* Efecto de brillo */}
+                {/* Efecto de brillo mejorado */}
                 {!isPending && (
                   <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full hover:translate-x-full transition-transform duration-700"></div>
                 )}
@@ -726,25 +890,35 @@ export default function Register() {
                 className="space-y-4 pt-6 border-t border-white/20"
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                transition={{ delay: 1.8, duration: 0.6 }}
+                transition={{ delay: 2.0, duration: 0.6 }}
               >
                 <div className="text-center">
                   <p className="text-black/70 mb-2 font-medium drop-shadow-sm">
-                    ¿Ya tienes una cuenta?
+                    ¿No tienes cuenta?
                   </p>
                   <a
-                    href="/login"
-                    className="inline-flex items-center space-x-2 text-[#bdab78] hover:text-[#a38e67] font-semibold transition-colors duration-200 hover:underline drop-shadow-sm"
+                    href="/register"
+                    className="inline-flex items-center text-[#bdab78] hover:text-[#a38e67] font-semibold transition-colors duration-200 hover:underline drop-shadow-sm"
                   >
-                    <ArrowLeftIcon className="w-4 h-4" />
-                    <span>Iniciar sesión</span>
+                    Regístrate aquí
+                  </a>
+                </div>
+
+                <div className="text-center">
+                  <a
+                    href="/recoverPassword"
+                    className="inline-flex items-center text-black/70 hover:text-black font-medium transition-colors duration-200 hover:underline drop-shadow-sm"
+                  >
+                    ¿Olvidaste tu contraseña?
                   </a>
                 </div>
               </motion.div>
-            </form>
+            </div>
           </motion.div>
         </div>
       </motion.div>
     </motion.div>
   );
-}
+};
+
+export default Login;

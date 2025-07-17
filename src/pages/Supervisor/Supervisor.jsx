@@ -17,13 +17,17 @@ export default function Supervisor() {
       title: "Crear Requisición",
       description: "Podras gestionar la creacion de Requisiciones",
       path: "/newRequisition",
-      icon: <FileText className="w-8 h-8 text-white" />,
+      icon: <FileText className="w-8 h-8  text-blue-600  dark:text-blue-400" />,
+      bgColor: "bg-blue-100 dark:bg-blue-900",
     },
     {
       title: "Ver Requisiciones",
       description: "Podras ver el listado de requisiciones",
       path: "/requisitions",
-      icon: <List className="w-8 h-8 text-white" />,
+      icon: (
+        <List className="w-8 h-8  mr-3 text-green-600  dark:text-green-400" />
+      ),
+      bgColor: "bg-green-100 dark:bg-green-900",
     },
   ];
   return (
@@ -41,6 +45,7 @@ export default function Supervisor() {
               path={option.path}
               requestCount={option.requestCount}
               icon={option.icon}
+              bgColor={option.bgColor}
             />
           ))}
         </div>

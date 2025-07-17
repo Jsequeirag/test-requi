@@ -7,7 +7,7 @@ export default function Layout(props) {
   return (
     <>
       <div
-        className={`relative  min-h-screen`}
+        className={`relative  h-auto`}
         style={{
           marginLeft: shrinkMenu === true ? "78px" : "254px",
           width: `calc(100% - ${shrinkMenu} === "true" ? "78px" : "254px"`,

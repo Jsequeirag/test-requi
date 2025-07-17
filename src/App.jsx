@@ -11,7 +11,7 @@ import {
 import Nav from "./components/Nav/Nav";
 import Topnav from "./components/Nav/Topnav";
 
-import Login from "./pages/Login/Login";
+import Login from "./pages/Auth/Login/Login";
 
 function App() {
   // Obtener la ruta actual y el usuario de localStorage
@@ -51,16 +51,28 @@ function App() {
   });
 
   return (
-    <>
-      {!isAuthRoute && ispermitRoute && <Nav />}
-      {!isAuthRoute && ispermitRoute && <Topnav />}
-      <Routes>
-        <Route element={<LoginSaved />}>
-          <Route path="/login" element={<Login />}></Route>
-        </Route>
-        {pageRoutes}
-      </Routes>
-    </>
+    <div
+      className="flex flex-col min-h-screen
+                 relative overflow-hidden // Importante para manejar los elementos de fondo
+                 bg-gray-200 dark:bg-gray-900/90"
+    >
+      {/* Elementos de fondo abstracto para añadir profundidad y movimiento */}
+      <div className="absolute top-0 left-0 w-80 h-80 bg-blue-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob dark:bg-blue-700/30"></div>
+      <div className="absolute top-0 right-0 w-80 h-80 bg-purple-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000 dark:bg-purple-700/30"></div>
+      <div className="absolute bottom-0 left-1/2 w-80 h-80 bg-sky-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000 dark:bg-sky-700/30"></div>
+
+      {/* Contenido principal de la aplicación */}
+      <div className="relative z-10 flex flex-col min-h-screen">
+        {!isAuthRoute && ispermitRoute && <Nav />}
+        {!isAuthRoute && ispermitRoute && <Topnav />}
+        <Routes>
+          <Route element={<LoginSaved />}>
+            <Route path="/login" element={<Login />}></Route>
+          </Route>
+          {pageRoutes}
+        </Routes>
+      </div>
+    </div>
   );
 }
 

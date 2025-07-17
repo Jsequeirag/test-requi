@@ -1,4 +1,4 @@
-import Login from "../pages/Login/Login";
+import Login from "../pages/Auth/Login/Login";
 import RecoverPassword from "../pages/Auth/RecoverPassword";
 import Supervisor from "../pages/Supervisor/Supervisor";
 import RolesAdministration from "../pages/RolesAdministration/RolesAdministration";

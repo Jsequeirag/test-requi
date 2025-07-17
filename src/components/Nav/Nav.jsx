@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { useNavigate } from "react-router-dom";
+import { formatUserName } from "../../utils/general";
+import WebsiteConfig, {
+  getInitialThemeColorNumber,
+} from "../../../stores/WebsiteConfig"; // Corrected path
+
 import {
-  faRightFromBracket, // Logout
-  faMoon, // Dark Mode
-  faSun, // Light Mode
-  faGauge, // Dashboard
   faArrowAltCircleRight, // Toggle menu
   faCog, // Configuraciones
   faFileInvoiceDollar, // Payroll
@@ -18,10 +19,8 @@ import {
   getLocalStorageKeyValue,
   saveLocalStorage,
   getLocalStorageItem,
-  removeLocalStorageItem,
 } from "../../utils/localstore";
-import WebsiteConfig from "../../../stores/WebsiteConfig";
-import ReactCountryFlag from "react-country-flag";
+
 // Configuración de idiomas
 const translations = {
   es: {
@@ -58,6 +57,8 @@ const translations = {
 
 function NewNav() {
   const navigate = useNavigate();
+  //const themeColorNumber = WebsiteConfig((state) => state.themeColorNumber);
+  const themeColors = WebsiteConfig((state) => state.themeColors);
 
   const [language, setLanguage] = useState(() => {
     // Inicializar idioma desde localStorage o detectar navegador
@@ -67,6 +68,12 @@ function NewNav() {
     const browserLang = navigator.language.split("-")[0];
     return browserLang === "es" ? "es" : "en";
   });
+  const [theme, setTheme] = useState(() => {
+    // Inicializar idioma desde localStorage o detectar navegador
+    const storedTheme = getLocalStorageItem("requitool-themeColorNumber");
+    if (storedTheme) return themeColors[storedTheme];
+  });
+
   const [hiddenMenu, setHiddenMenu] = useState(() => {
     const storedShrink = getLocalStorageItem("requi-shrinkMenu");
     return storedShrink === "true";
@@ -80,21 +87,8 @@ function NewNav() {
   // Función para obtener traducciones
   const t = (key) => translations[language][key] || key;
 
-  // Función para cambiar idioma
-  const toggleLanguage = () => {
-    const newLang = language === "es" ? "en" : "es";
-    setLanguage(newLang);
-    saveLocalStorage("requi-language", newLang);
-  };
-
-  // Función DarkModeSelected
-  const DarkModeSeleted = () => {
-    const html = document.documentElement;
-    if (!darkMode) html.classList.add("dark");
-    else html.classList.remove("dark");
-  };
-
   // Efecto para cargar configuraciones iniciales
+
   useEffect(() => {
     // Cargar roles
     setRoles(JSON.parse(getLocalStorageItem("requitool-roles")) || []);
@@ -113,16 +107,11 @@ function NewNav() {
     if (storedLang) {
       setLanguage(storedLang);
     }
+    // Cargar idioma
+    const storedTheme = getLocalStorageItem("requitool-themeColorNumber");
+    if (storedTheme) setTheme(themeColors[storedTheme]);
   }, []);
 
-  // Efecto para guardar preferencia de modo oscuro
-
-  const handleLogout = () => {
-    removeLocalStorageItem("requitool-employeeInfo");
-    removeLocalStorageItem("requitool-roles");
-    navigate("/login");
-  };
-  // Componente helper para elementos de navegación
   const NavItem = ({ icon, text, navigateTo, hasNotification = false }) => (
     <li
       className="nav-link relative h-12 flex items-center hover:bg-blue-100 rounded-lg
@@ -179,7 +168,7 @@ function NewNav() {
   // Función para obtener inicial del usuario
   const getUserInitial = () => {
     const userName = getLocalStorageKeyValue("requitool-employeeInfo", "name");
-    return userName ? userName.charAt(0).toUpperCase() : "U";
+    return userName ? formatUserName(userName).charAt(0).toUpperCase() : "U";
   };
 
   // Manejar toggle del menú
@@ -190,12 +179,17 @@ function NewNav() {
     setShrinkMenu(newHiddenState);
   };
 
+  const handleTheme = () => {
+    const storedShrink = getLocalStorageItem("requi-shrinkMenu");
+    setShrinkMenu(newHiddenState);
+  };
+
   return (
     <nav
-      className={`fixed top-0 left-0 h-full
+      className={` fixed top-0 left-0 h-full
         ${hiddenMenu ? "w-20" : "w-64"}
-        bg-gray-50 dark:bg-gray-900/90
-        backdrop-blur-xl shadow-lg
+        bg-white/30 dark:bg-gray-900/35 
+          backdrop-blur-md shadow-lg
         px-4 py-6 transition-all duration-300 z-50
         border-r border-gray-200 dark:border-gray-800`}
     >
@@ -203,6 +197,7 @@ function NewNav() {
         {/* Sección superior: Logo/Título y Perfil de Usuario */}
         <div className="flex flex-col items-center mb-6">
           {/* Logo/Título */}
+
           <div className="relative flex flex-col items-center justify-center mb-4 group">
             <img
               className="rounded-lg shadow-md bg-gray-100 "
@@ -234,14 +229,17 @@ function NewNav() {
 
           {/* Perfil de Usuario */}
           <div
-            className={`relative flex shadow-md bg-gray-100 group ${
+            className={`relative flex shadow-md   group ${
               hiddenMenu && "justify-center"
-            } items-center w-full p-2 rounded-lg
-                            dark:bg-gray-800 transition-all duration-300`}
+            } items-center w-full p-2 rounded-lg  transition-all duration-300 ${
+              theme?.bgColor
+            }`}
           >
             <span className="flex-shrink-0">
               <div
-                className={`inline-flex items-center justify-center rounded-full bg-blue-500 text-white font-bold
+                className={`inline-flex items-center justify-center rounded-full darktext-white dark:text-white ${
+                  theme?.accentColor
+                }  font-bold
                             ${
                               hiddenMenu
                                 ? "w-10 h-10 text-xl"
@@ -253,17 +251,28 @@ function NewNav() {
                     "width 0.3s ease-in-out, height 0.3s ease-in-out ",
                 }}
               >
-                {getUserInitial()}
+                {formatUserName(getUserInitial())}
               </div>
             </span>
             {!hiddenMenu && (
               <div className="flex flex-col ml-3 overflow-hidden whitespace-nowrap">
                 <span className="font-semibold text-gray-900 dark:text-gray-100 truncate">
-                  {getLocalStorageKeyValue("requitool-employeeInfo", "name") ||
-                    "User Name"}
+                  {formatUserName(
+                    getLocalStorageKeyValue("requitool-employeeInfo", "name")
+                  ) || "User Name"}
                 </span>
                 <span className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                  {t("dataAnalyst")}
+                  <>
+                    {" "}
+                    {`${getLocalStorageKeyValue(
+                      "requitool-employeeInfo",
+                      "descripPuesto"
+                    )} -
+                     ${getLocalStorageKeyValue(
+                       "requitool-employeeInfo",
+                       "descripDepartamento"
+                     )}`}
+                  </>
                 </span>
               </div>
             )}
