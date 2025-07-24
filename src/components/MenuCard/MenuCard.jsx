@@ -3,7 +3,7 @@ import { FileText, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function MenuCard({
-  requestCount = 1,
+  requestCount = 0,
   title = "Sin titulo",
   description = "Sin descripcion",
   path = "/default-path",

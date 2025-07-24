@@ -57,8 +57,8 @@ function App() {
                  bg-gray-200 dark:bg-gray-900/90"
     >
       {/* Elementos de fondo abstracto para añadir profundidad y movimiento */}
-      <div className="absolute top-0 left-0 w-80 h-80 bg-blue-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob dark:bg-blue-700/30"></div>
-      <div className="absolute top-0 right-0 w-80 h-80 bg-purple-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000 dark:bg-purple-700/30"></div>
+      <div className="absolute top-0 left-0 w-80 h-80 bg-red-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob dark:bg-blue-700/30"></div>
+      <div className="absolute top-0 right-0 w-80 h-80 bg-purple-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000 dark:bg-red-700/30"></div>
       <div className="absolute bottom-0 left-1/2 w-80 h-80 bg-sky-300/30 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-4000 dark:bg-sky-700/30"></div>
 
       {/* Contenido principal de la aplicación */}

@@ -14,5 +14,9 @@ export const getRequestByUserId = (userId, pageNumber = 1, pageSize = 10) =>
 
 export const createRequests = (data) =>
   request({ url: "/createRequest", method: "POST", data });
+
+export const draftRequest = (data) =>
+  request({ url: "/draftRequest", method: "POST", data });
+
 export const updateRequests = (data) =>
   request({ url: "/updateRequest", method: "POST", data });

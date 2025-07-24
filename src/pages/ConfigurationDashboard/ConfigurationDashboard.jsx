@@ -13,14 +13,16 @@ export default function ConfigurationDashboard() {
       title: "Roles y permisos",
       description:
         "Asignar roles a empleados para que puedan acceder a determinadas secciones del sistema",
-      path: "/rolesAdministrations",
-      icon: <UserLock className="w-8 h-8 text-white" />,
+      path: "/rolesAdministration",
+      icon: <UserLock className="w-8 h-8  text-blue-600  dark:text-blue-400" />,
     },
     {
       title: "Asignación de departamentos",
       description: "Asignar departamentos a supervivisores",
       path: "/departmentAdministration",
-      icon: <LayoutPanelTop className="w-8 h-8 text-white" />,
+      icon: (
+        <LayoutPanelTop className="w-8 h-8  mr-3 text-green-600  dark:text-green-400" />
+      ),
     },
   ];
 

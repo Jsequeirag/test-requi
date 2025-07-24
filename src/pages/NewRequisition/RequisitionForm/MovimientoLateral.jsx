@@ -35,7 +35,7 @@ export default function MovimientoLateral() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
+            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
             name={"requisitionTypeId"}
             id={"motivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""} // Usamos 'value' y un fallback a ""

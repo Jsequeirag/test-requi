@@ -22,24 +22,25 @@ export default function Entrada() {
       {/* ESTE ES EL ÚNICO CONTENEDOR PRINCIPAL DEL GRID */}
       {/* Se asegura 1 columna en móvil, 2 en mediano y 3 en grande */}
       <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
-        {/* Campo 1: Motivo */}
+        {/* Campo 1: Motivo 
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="motivo" // ID único y corregido
           >
             Motivo <span className="text-red-500">*</span>{" "}
-            {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
+            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
             name={"requisitionTypeId"}
             id={"requisitionTypeId"} // Añadido ID
             value={formValues?.requisitionTypeId || ""} // Usamos 'value' y un fallback a ""
             className="w-full text-base"
-            required={true} // Marcado como requerido
+            required={
+              !formValues?.requisitionTypeId && !formValues?.requisitionTypeId
+            }
           />
-        </div>
+        </div>*/}
         {/* Campo 2: Periodo */}
         <div>
           <label
@@ -166,7 +167,7 @@ export default function Entrada() {
                 maxLength={8}
                 pattern="[A-Za-z0-9]{1,8}"
                 title="Solo caracteres alfanuméricos, máximo 8 caracteres"
-                required
+                disabled={formValues.requisitionTypeId === 11}
               />
             </div>
             {/* Campo 2: Supervisor */}
@@ -182,7 +183,7 @@ export default function Entrada() {
                 )}
               </label>
               <AsyncSelect
-                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesBySupervisorRole`}
+                url={`https://localhost:7040/getEmployeesBySupervisorRole`}
                 name={"supervisor"}
                 id={"supervisor"}
                 value={formValues?.supervisor || ""}
@@ -206,7 +207,7 @@ export default function Entrada() {
                 )}
               </label>
               <AsyncSelect
-                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetGrades`}
+                url={`https://localhost:7040/GetGrades`}
                 name={"grade"}
                 id={"grade"}
                 value={formValues?.grade || ""}
@@ -229,7 +230,7 @@ export default function Entrada() {
                 )}
               </label>
               <AsyncSelect
-                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
+                url={`https://localhost:7040/GetProjectsByExactus`}
                 name={"project"}
                 id={"project"}
                 value={formValues?.project || ""}
@@ -252,7 +253,7 @@ export default function Entrada() {
                 )}
               </label>
               <AsyncSelect
-                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getDepartments`}
+                url={`https://localhost:7040/getDepartments`}
                 name={"department"}
                 id={"department"}
                 customNameParam={"descriptionDepartamento"}
@@ -261,29 +262,29 @@ export default function Entrada() {
                 className="w-full text-base"
                 required={true}
                 placeholder="Lista desplegable de los nombres de las áreas únicas de exactus"
-                disabled={formValues.requisitionTypeId === 11}
+                disabled={formValues?.requisitionTypeId === 11}
               />
             </div>
-            {/* Campo 6: Matriz SOD */}
+
             {/* Campo 7: Matriz SOD */}
             <div>
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="sodMatrix" // ID único y corregido
               >
-                Matriz SOD <span className="text-red-500">*</span>{" "}
+                Matriz SOD {/* <span className="text-red-500">*</span>*/}
                 {/* Asterisco de requerido */}
               </label>
               <AsyncSelect
-                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getMatriz`}
+                url={`https://localhost:7040/getMatriz`}
                 name={"sodMatrix"}
                 id={"sodMatrix"} // Añadido ID
                 value={formValues.sodMatrix || ""}
                 className="w-full text-base"
-                required={true} // Marcado como requerido
+                disabled={formValues?.requisitionTypeId === 11}
               />
             </div>
-            <div>
+            {/*<div>
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="recruitment" // ID único para este select
@@ -320,14 +321,20 @@ export default function Entrada() {
                 <option value="Internal">Interno</option>
                 <option value="External">Externo</option>
               </select>
-            </div>
+            </div>*/}
             {/* Campo 1: Full Name */}
             <div>
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="fullName"
               >
-                Nombre <span className="text-red-500">*</span>
+                Nombre{" "}
+                {!formValues.requisitionTypeId == 11 ||
+                  !formValues.requisitionTypeId === 12 ||
+                  (!formValues.requisitionTypeId === 5 &&
+                    !formValues.recruitmentProccess === 14 && (
+                      <>{/* <span className="text-red-500">*</span>*/}</>
+                    ))}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
@@ -348,8 +355,18 @@ export default function Entrada() {
                 autoComplete="off"
                 value={formValues.fullName || ""}
                 type="text"
-                required
-                disabled={formValues?.recruitmentType === "Internal"}
+                required={
+                  !formValues.requisitionTypeId == 11 ||
+                  !formValues.requisitionTypeId === 12 ||
+                  (!formValues.requisitionTypeId === 5 &&
+                    !formValues.recruitmentProccess)
+                }
+                disabled={
+                  !formValues.requisitionTypeId == 11 ||
+                  !formValues.requisitionTypeId === 12 ||
+                  (!formValues.requisitionTypeId === 5 &&
+                    !formValues.recruitmentProccess)
+                }
               />
             </div>
             {/* Campo 2: Exactus ID */}
@@ -358,7 +375,8 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="exactusId"
               >
-                ID Empleado Exactus <span className="text-red-500">*</span>
+                ID Empleado Exactus{" "}
+                {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
@@ -383,7 +401,6 @@ export default function Entrada() {
                 min={0}
                 pattern="[0-9]{1,6}"
                 title="Solo números, máximo 6 caracteres"
-                required
                 disabled={formValues?.recruitmentType === "Internal"}
               />
             </div>
@@ -393,7 +410,8 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="carrerSettingsId"
               >
-                Carrer Settings ID <span className="text-red-500">*</span>
+                Carrer Settings ID{" "}
+                {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
@@ -414,7 +432,6 @@ export default function Entrada() {
                 autoComplete="off"
                 value={formValues.carrerSettingsId || ""}
                 type="number"
-                required
                 disabled={formValues?.recruitmentType === "Internal"}
               />
             </div>
@@ -424,7 +441,7 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="lionLogin"
               >
-                LL <span className="text-red-500">*</span>
+                LL {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
@@ -447,7 +464,6 @@ export default function Entrada() {
                 type="text"
                 pattern="[A-Za-z0-9]+"
                 title="Solo caracteres alfanuméricos"
-                required
                 disabled={formValues?.recruitmentType === "Internal"}
               />
             </div>
@@ -457,7 +473,7 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="companyEmail"
               >
-                Correo empresa<span className="text-red-500">*</span>
+                Correo empresa {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
@@ -480,7 +496,6 @@ export default function Entrada() {
                 type="email"
                 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                 title="Ingrese un correo electrónico válido"
-                required
                 disabled={formValues?.recruitmentType === "Internal"}
               />
             </div>
@@ -490,7 +505,7 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="startDate"
               >
-                Fecha de Ingreso <span className="text-red-500">*</span>
+                Fecha de Ingreso {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
@@ -512,7 +527,7 @@ export default function Entrada() {
                 value={formValues.startDate || ""}
                 type="date"
                 disabled={formValues?.recruitmentType === "Internal"}
-                required
+                X
               />
             </div>
             {/* Campo 5: Correo empresa */}
@@ -521,7 +536,7 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="companyEmail"
               >
-                Correo empresa <span className="text-red-500">*</span>{" "}
+                Correo empresa {/* <span className="text-red-500">*</span>*/}
                 {/* Asterisco de requerido */}
               </label>
               <input
@@ -543,7 +558,6 @@ export default function Entrada() {
                 autoComplete="off"
                 value={formValues.companyEmail || ""}
                 disabled={formValues?.recruitmentType === "Internal"}
-                required // Marcado como requerido
               />
             </div>
           </div>

@@ -3,7 +3,11 @@ import Layout from "../../components/Layout/Layout";
 import { useLocation } from "react-router-dom";
 import TextButton from "../../components/Button/TextButton";
 import { initialState, reducer } from "./Reducer";
-import { createRequests, updateRequests } from "../../api/urls/Request";
+import {
+  createRequests,
+  updateRequests,
+  draftRequest,
+} from "../../api/urls/Request";
 import AsyncSelect from "../../components/AsyncComponents/AsyncSelect.jsx";
 import formStore from "../../../stores/FormStore.js";
 import LoadingModal from "../../components/LoadingModal/LoadingModal";
@@ -53,6 +57,26 @@ function NewRequisition() {
 
   const userLogged = getLocalStorageKeyValue("requitool-employeeInfo", "id");
 
+  //draft
+  const { mutateAsync: draftRequisition, isPending: isPendingDraftRequest } =
+    useApiSend(
+      draftRequest,
+      () => {
+        toast.success("Solicitud guardada exitosamente!", {
+          className: "bg-green-600 text-white",
+          progressClassName: "bg-white",
+        });
+        navigate("/requisitions");
+      },
+      (e) => {
+        console.error("Error al crear la solicitud:", e);
+        toast.error("Error al crear la solicitud", {
+          className: "bg-red-600 text-white",
+          progressClassName: "bg-white",
+        });
+      }
+    );
+  //crear
   const {
     mutateAsync: createRequisition,
     isPending: isPendingCreateRequisition,
@@ -63,7 +87,7 @@ function NewRequisition() {
         className: "bg-green-600 text-white",
         progressClassName: "bg-white",
       });
-      navigate("/requisitions");
+      navigate("/requisitions", { replace: true, state: { refresh: true } });
     },
     (e) => {
       console.error("Error al crear la solicitud:", e);
@@ -122,6 +146,13 @@ function NewRequisition() {
     }
     console.log(location.state);
   }, [location.state, setFormValues]);
+
+  const onSubmitDraftRequest = async () => {
+    await draftRequisition({
+      ...formValues,
+      userId: userLogged,
+    });
+  };
 
   const onSubmitEntradaRequest = async () => {
     if (location.state?.action === "create") {
@@ -223,7 +254,11 @@ function NewRequisition() {
       />
 
       <LoadingModal
-        openModal={isPendingCreateRequisition || isPendingUpdateRequisition}
+        openModal={
+          isPendingCreateRequisition ||
+          isPendingUpdateRequisition ||
+          isPendingDraftRequest
+        }
         text={
           location.state?.action === "update"
             ? "Actualizando solicitud..."
@@ -232,11 +267,11 @@ function NewRequisition() {
       />
 
       {/* Contenedor principal de la página: Ahora con fondo y colores de texto para Dark Mode */}
-      <div className="w-full  mx-auto p-4 sm:p-6 lg:p-8   text-gray-900 dark:text-gray-100">
+      <div className="w-full  mx-auto p-4 sm:p-6 lg:p-8   text-gray-900 dark:text-gray-100 ">
         {/* Cabecera de la página */}
         <div className="flex items-center justify-between mb-6">
           <a
-            href="/requisitions"
+            href={"requisitions"}
             className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group"
           >
             <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-0.5 transition-transform" />
@@ -249,7 +284,7 @@ function NewRequisition() {
         </div>
 
         {/* Contenedor principal del formulario (la "tarjeta" grande): Colores ajustados para Dark Mode */}
-        <div className="bg-white rounded-2xl shadow-xl p-6 sm:p-8 lg:p-10 border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+        <div className=" rounded-2xl shadow-xl p-6 sm:p-8 lg:p-10  bg-white/30 dark:bg-gray-900/40  border border-gray-200   dark:border-gray-700">
           <form onSubmit={onSubmit}>
             {/* Sección: Tipo de Solicitud - Colores ajustados para Dark Mode */}
             <div className="group mb-8 p-6 bg-blue-50/50 rounded-xl border border-blue-100 shadow-sm dark:bg-blue-950/50 dark:border-blue-800">
@@ -271,7 +306,7 @@ function NewRequisition() {
                         htmlFor="requiresReplacement"
                         className="block text-gray-800 dark:text-gray-200 text-lg font-semibold mb-2"
                       >
-                        Requiere reemplazo
+                        Requiere reemplazo {formValues.requiresReplacement}
                         <span className="text-red-500 font-bold dark:text-red-400">
                           *
                         </span>
@@ -307,7 +342,7 @@ function NewRequisition() {
                         </span>
                       </label>
                       <AsyncSelect
-                        url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestType/false/${location.state.prevRequisition.requestTypeId}/${formValues.requiresReplacement}`}
+                        url={`https://localhost:7040/getRequestType/false/${location.state.prevRequisition.requestTypeId}/${formValues.requiresReplacement}`}
                         name={"requestTypeId"}
                         value={formValues?.requestTypeId || ""}
                         disabled={formValues?.requiresReplacement?.length === 0}
@@ -331,7 +366,7 @@ function NewRequisition() {
                     {/*Cuando se esta creando solo carga entra y salida */}
                     {location.state?.action === "create" && (
                       <AsyncSelect
-                        url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestType/true/0/false`}
+                        url={`https://localhost:7040/getRequestType/true/0/false`}
                         name={"requestTypeId"}
                         value={formValues?.requestTypeId || ""}
                       />
@@ -342,7 +377,7 @@ function NewRequisition() {
                         {location.state?.prevRequisition?.requestTypeId ===
                         2 ? (
                           <AsyncSelect
-                            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestTypeForPrevNewJoiner/${location.state.prevRequisition.requisitionTypeId}/${location.state.prevRequisition.recruitmentType}`}
+                            url={`https://localhost:7040/getRequestTypeForPrevNewJoiner/${location.state.prevRequisition.requisitionTypeId}/${location.state.prevRequisition.recruitmentType}`}
                             name={"requestTypeId"}
                             value={formValues?.requestTypeId || ""}
                             // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
@@ -351,7 +386,7 @@ function NewRequisition() {
                           />
                         ) : (
                           <AsyncSelect
-                            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestType/false/0/false`}
+                            url={`https://localhost:7040/getRequestType/false/0/false`}
                             name={"requestTypeId"}
                             value={formValues?.requestTypeId || ""}
                             // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
@@ -371,6 +406,78 @@ function NewRequisition() {
                   </div>
                 )}
               </div>
+              {/*Si la accion es promocion*/}
+              {formValues.requestTypeId === 3 && (
+                <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-2">
+                  {/* Campo 1: Motivo */}
+                  <div>
+                    <label
+                      className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+                      htmlFor="motivo" // ID corregido y único
+                    >
+                      Proceso de contratación
+                      <span className="text-red-500">*</span>{" "}
+                      {/* Asterisco de requerido */}
+                    </label>
+                    <AsyncSelect
+                      url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=6`}
+                      name={"recruitmentProccess"}
+                      id={"recruitmentProccess"} // Añadido ID
+                      value={formValues?.recruitmentProccess || ""} // Usamos 'value' y un fallback a ""
+                      className="w-full text-base"
+                      required // Añadido required si este campo debe ser obligatorio
+                    />
+                  </div>
+                </div>
+              )}{" "}
+              {formValues.requestTypeId === 2 && (
+                <>
+                  <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-2">
+                    <div>
+                      <label
+                        className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+                        htmlFor="motivo" // ID único y corregido
+                      >
+                        Motivo
+                        <span className="text-red-500">*</span>{" "}
+                        {/* Asterisco de requerido */}
+                      </label>
+                      <AsyncSelect
+                        url={`${
+                          location.state?.action === "update"
+                            ? `https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`
+                            : `https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`
+                        }`}
+                        name={"requisitionTypeId"}
+                        id={"requisitionTypeId"} // Añadido ID
+                        value={formValues?.requisitionTypeId || ""} // Usamos 'value' y un fallback a ""
+                        className="w-full text-base"
+                        required={true} // Marcado como requerido
+                      />
+                    </div>
+                    {location.state?.action === "update" && (
+                      <div>
+                        <label
+                          className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+                          htmlFor="RecruitmentProcess" // ID corregido y único
+                        >
+                          Proceso de contratación{" "}
+                          <span className="text-red-500">*</span>{" "}
+                          {/* Asterisco de requerido */}
+                        </label>
+                        <AsyncSelect
+                          url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=6`}
+                          name={"recruitmentProccess"}
+                          id={"motivo"} // Añadido ID
+                          value={formValues?.recruitmentProccess || ""} // Usamos 'value' y un fallback a ""
+                          className="w-full text-base"
+                          required // Añadido required si este campo debe ser obligatorio
+                        />
+                      </div>
+                    )}
+                  </div>
+                </>
+              )}
             </div>
 
             {/* Sección: Información del Empleado (condicional) - Colores ajustados para Dark Mode */}
@@ -409,24 +516,89 @@ function NewRequisition() {
             <div
               className={`w-full flex justify-end items-center border-t border-gray-200 pt-6 mt-8 dark:border-gray-700`}
             >
+              {formValues?.requestTypeId === 2 && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onSubmitDraftRequest();
+                  }}
+                  className={`bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl
+              transition-all duration-300 shadow-md hover:shadow-lg
+              flex items-center justify-center space-x-2
+              focus:outline-none focus:ring-4 focus:ring-blue-300/50
+              dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-600/50
+              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600 mr-2`}
+                  disabled={isPendingDraftRequest}
+                >
+                  {!isPendingDraftRequest && (
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                  )}
+
+                  <span>
+                    {isPendingDraftRequest
+                      ? "Guardando"
+                      : "Guardar temporalmente"}
+                  </span>
+                </button>
+              )}
               {formValues?.requestTypeId === 5 ||
               formValues?.requestTypeId === 2 ? (
-                <button
-                  type="submit"
-                  className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl
+                <>
+                  <button
+                    type="submit"
+                    className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl
               transition-all duration-300 shadow-md hover:shadow-lg
               flex items-center justify-center space-x-2
               focus:outline-none focus:ring-4 focus:ring-blue-300/50
               dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
               disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
-                >
-                  <CheckCircle className="w-5 h-5 mr-2" />
-                  <span>
-                    {location.state?.action === "update"
-                      ? "Actualizar Solicitud"
-                      : "Crear Solicitud"}
-                  </span>
-                </button>
+                  >
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    <span>
+                      {location.state?.action === "update"
+                        ? "Actualizar Solicitud"
+                        : "Crear Solicitud"}
+                    </span>
+                  </button>
+                </>
+              ) : formValues.requestTypeId === 3 ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onSubmitDraftRequest();
+                    }}
+                    className={`bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl
+              transition-all duration-300 shadow-md hover:shadow-lg
+              flex items-center justify-center space-x-2
+              focus:outline-none focus:ring-4 focus:ring-blue-300/50
+              dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-600/50
+              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600 mr-2`}
+                    disabled={isPendingDraftRequest}
+                  >
+                    {!isPendingDraftRequest && (
+                      <CheckCircle className="w-5 h-5 mr-2" />
+                    )}
+
+                    <span>
+                      {isPendingDraftRequest
+                        ? "Guardando"
+                        : "Guardar temporalmente"}
+                    </span>
+                  </button>
+                  <button
+                    type="submit"
+                    className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl
+              transition-all duration-300 shadow-md hover:shadow-lg
+              flex items-center justify-center space-x-2
+              focus:outline-none focus:ring-4 focus:ring-blue-300/50
+              dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
+              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
+                  >
+                    <CheckCircle className="w-5 h-5 mr-2" />
+                    <span>Completar</span>
+                  </button>
+                </>
               ) : (
                 <button
                   disabled={!isFetchedEmployeesByBoss}

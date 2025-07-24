@@ -60,7 +60,7 @@ const Pagination = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between bg-white px-4 py-3 border-t">
+    <div className="flex items-center justify-between   bg-white/30 dark:bg-gray-900/40  border border-gray-200   dark:border-gray-700 px-4 py-3 border-t">
       <div className="flex items-center space-x-2">
         <span className="text-sm text-gray-700">Mostrar</span>
         <select
@@ -76,7 +76,7 @@ const Pagination = ({
         <span className="text-sm text-gray-700">por página</span>
       </div>
 
-      <div className="flex items-center space-x-1">
+      <div className="flex items-center space-x-1 roun">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
@@ -196,7 +196,7 @@ function Requisitions() {
   return (
     <Layout>
       <div className="m-4 ">
-        <div className="border-b bg-white rounded-sm h-full">
+        <div className="border-b   bg-white/30 dark:bg-gray-900/40  border border-gray-200   dark:border-gray-700 rounded-md h-full">
           <div className="flex items-center border-b p-4 mx-2 justify-between">
             <div className="flex items-center p-4 mx-2">
               <a
@@ -228,7 +228,7 @@ function Requisitions() {
 
           {/* Información de paginación */}
           {requestIsSuccess && requestData && (
-            <div className="flex justify-between items-center p-4 bg-gray-50 text-sm text-gray-600">
+            <div className="flex justify-between items-center p-4 bg-gray-50 text-sm text-gray-600 rounded-md mx-4">
               <div>
                 Mostrando {startRecord} a {endRecord} de {totalRecords}{" "}
                 requisiciones
@@ -249,12 +249,9 @@ function Requisitions() {
                       <div key={request.id} className="border rounded-md">
                         {/* Header de la requisición - siempre visible */}
                         <div className="flex items-center bg-slate-50 p-4 rounded-md justify-between">
-                          <p>
-                            <strong>Solicitud:</strong> {request.id}
-                          </p>
                           <span
                             className={`p-2 rounded-md font-semibold text-black ${
-                              request.state === "pendiente"
+                              request.state === "Completado"
                                 ? "bg-yellow-400"
                                 : "bg-blue-400"
                             }`}
@@ -386,19 +383,16 @@ function Requisitions() {
                                     }}
                                   >
                                     <div className="flex">
-                                      <p className="text-gray-600 text-sm font-bold py-1 mr-2">
-                                        {idx}
-                                        {req.state === "Pendiente" &&
-                                          "Finanzas"}
-                                      </p>
                                       <p
                                         className={`text-black font-bold py-1 px-2 rounded-full text-xs ${
-                                          req.state === "Pendiente"
-                                            ? "bg-yellow-400"
-                                            : "bg-blue-400"
+                                          req.state === "Completado"
+                                            ? "bg-green-400"
+                                            : "bg-gray-400"
                                         }`}
                                       >
-                                        {req.state}
+                                        {req.state === "En Proceso"
+                                          ? "Incompleto"
+                                          : req.state}
                                       </p>
                                     </div>
                                     <h3 className="font-semibold text-xl mb-1">
