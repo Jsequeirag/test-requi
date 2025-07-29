@@ -63,44 +63,38 @@ const websiteConfig = create((set) => ({
   themeColors: [
     {
       bgColor: "bg-gray-100 dark:bg-gray-900",
-      accentColor: "bg-gray-600 dark:bg-gray-400",
+      accentColor: "bg-gray-500 dark:bg-gray-300",
+      hoverColor: "hover:bg-gray-100 dark:hover:bg-gray-500", // Un poco más oscuro/claro para hover
     },
     {
-      bgColor: "bg-blue-100 dark:bg-blue-900",
+      bgColor: "bg-blue-100 dark:bg-blue-800",
       accentColor: "bg-blue-600 dark:bg-blue-400",
+      hoverColor: "hover:bg-blue-100 dark:hover:bg-blue-800",
     },
     {
-      bgColor: "bg-indigo-100 dark:bg-indigo-900",
-      accentColor: "bg-indigo-600 dark:bg-indigo-400",
+      bgColor: "bg-violet-100 dark:bg-violet-900",
+      accentColor: "bg-violet-500 dark:bg-violet-300",
+      hoverColor: "hover:bg-violet-200 dark:hover:bg-violet-900",
     },
     {
       bgColor: "bg-green-100 dark:bg-green-900",
       accentColor: "bg-green-600 dark:bg-green-400",
+      hoverColor: "hover:bg-green-300 dark:hover:bg-green-900",
     },
     {
       bgColor: "bg-teal-100 dark:bg-teal-900",
-      accentColor: "bg-teal-600 dark:bg-teal-400",
+      accentColor: "bg-teal-600 dark:bg-teal-100 ",
+      hoverColor: "hover:bg-teal-100  dark:hover:bg-teal-900",
     },
-
     {
       bgColor: "bg-cyan-100 dark:bg-cyan-900",
-      accentColor: "bg-cyan-600 dark:bg-cyan-400",
+      accentColor: "bg-cyan-700 dark:bg-cyan-300",
+      hoverColor: "hover:bg-cyan-100 dark:hover:bg-cyan-900",
     },
     {
       bgColor: "bg-orange-100 dark:bg-orange-900",
-      accentColor: "bg-orange-600 dark:bg-orange-400",
-    },
-    {
-      bgColor: "bg-stone-100 dark:bg-stone-900",
-      accentColor: "bg-yellow-600 dark:bg-yellow-400", // Accent amarillo para Stone
-    },
-    {
-      bgColor: "bg-slate-100 dark:bg-slate-900",
-      accentColor: "bg-emerald-600 dark:bg-emerald-400", // Accent esmeralda para Slate
-    },
-    {
-      bgColor: "bg-neutral-100 dark:bg-neutral-900",
-      accentColor: "bg-sky-600 dark:bg-sky-400", // Accent sky para Neutral
+      accentColor: "bg-orange-800 dark:bg-orange-300",
+      hoverColor: "hover:bg-orange-700 dark:hover:bg-orange-500",
     },
   ],
 }));
