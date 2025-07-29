@@ -25,12 +25,13 @@ export default function Promocion() {
         {/* Campo 1: Motivo */}
 
         {/* Campo 2: Level Up */}
+        {/*
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="levelUp" // ID corregido y único
           >
-            {/* Asterisco de requerido */}
+            Level Up <span className="text-red-500">*</span>{" "}
           </label>
           <select
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -53,7 +54,7 @@ export default function Promocion() {
               })
             }
           >
-            {/* Si necesitas un placeholder, puedes añadir una opción deshabilitada */}
+        
             <option value="" disabled>
               Seleccionar una opción
             </option>
@@ -61,14 +62,14 @@ export default function Promocion() {
             <option value={false}>No</option>
           </select>
         </div>
-
+ */}
         {/* Campo 3: Carta de Promocion */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="promotionLetterAttachment" // ID más descriptivo
           >
-            Carta de Promocion
+            Carta de Promoción
             {/* Asterisco de requerido */}
           </label>
           <input
@@ -116,7 +117,7 @@ export default function Promocion() {
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="recordDate"
+            htmlFor="promotionDate"
           >
             Fecha Oficial del Movimiento (Fecha efectiva){" "}
             {/* Asterisco de requerido */}
@@ -125,11 +126,13 @@ export default function Promocion() {
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            id="recordDate"
+            id="promotionDate"
             type="date"
-            name="recordDate"
+            name="promotionDate"
             value={
-              formValues.recordDate ? formValues.recordDate.split("T")[0] : ""
+              formValues.promotionDate
+                ? formValues.promotionDate.split("T")[0]
+                : new Date().toISOString().split("T")[0]
             }
             onChange={(e) => {
               setFormValues({
@@ -144,22 +147,22 @@ export default function Promocion() {
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="promotionMoth" // Corregido a "promotionMonth" si es un error de tipeo original
+            htmlFor="movementDate" // Corregido a "MovementDate" si es un error de tipeo original
           >
-            Ventana de Promocion <span className="text-red-500">*</span>{" "}
+            Ventana de Promoción <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            id="promotionMoth" // Corregido a "promotionMonth"
+            id="movementMonth" // Corregido a "movementMonth"
             type="date"
-            name="promotionMoth" // Corregido a "promotionMonth"
+            name="movementDate" // Corregido a "MovementDate"
             value={
-              formValues.promotionMoth
-                ? formValues.promotionMoth.split("T")[0]
-                : ""
+              formValues.movementDate
+                ? formValues.movementDate.split("T")[0]
+                : new Date().toISOString().split("T")[0]
             }
             onChange={(e) => {
               setFormValues({
@@ -176,7 +179,7 @@ export default function Promocion() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="promotionJustification"
           >
-            Justificación de Promocion (Ingles) {/* Asterisco de requerido */}
+            Justificación de Promoción (Ingles) {/* Asterisco de requerido */}
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -184,7 +187,7 @@ export default function Promocion() {
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             id="promotionJustification"
             name="promotionJustification"
-            placeholder="Justificación de Promocion"
+            placeholder="Justificación de Promoción"
             value={formValues.promotionJustification || ""} // Asegura que el valor se controle, y usa el nombre consistente
             onChange={(e) => {
               setFormValues({

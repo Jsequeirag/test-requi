@@ -27,9 +27,11 @@ import {
   ChevronRight, // Para Expandir/Contraer menú
   User, // Para Perfil de Usuario
   BarChart2, // Para Analista de Datos
+  Coins,
+  UserPlus,
+  Landmark,
 } from "lucide-react";
 
-// === IMPORTAR NavItem si está en un archivo separado ===
 import NavItem from "./NavItem"; // Ajusta la ruta según donde lo guardes
 
 // Configuración de idiomas
@@ -37,10 +39,13 @@ const translations = {
   es: {
     home: "Inicio", // Cambiado de 'inicio' a 'home' para consistencia con pathSegment
     supervisor: "Supervisor",
-    payroll: "Nómina",
+    payroll: "Payroll",
     finance: "Finanzas",
-    superAdmin: "Administrador", // Clave ajustada para coincidir con roleNavConfig
+    activos: "Activos",
+    superAdmin: "Administrador",
+    recruitment: "Reclutamiento", // Clave ajustada para coincidir con roleNavConfig
     logout: "Cerrar Sesión",
+    asolion: "Asolion",
     darkMode: "Modo Oscuro",
     language: "Idioma",
     expandMenu: "Expandir menú",
@@ -48,13 +53,15 @@ const translations = {
     userProfile: "Perfil de Usuario",
     dataAnalyst: "Analista de Datos",
     requitools: "Requitools",
-    hr: "RRHH", // Añadido
+    hr: "HR", // Añadido
     md: "MD", // Añadido
     it: "IT", // Añadido
   },
   en: {
     home: "Home",
     supervisor: "Supervisor",
+    recluitment: "Recruitment",
+    activo: "Actives",
     payroll: "Payroll",
     finance: "Finance",
     superAdmin: "Administrator", // Clave ajustada
@@ -76,6 +83,11 @@ function NewNav() {
   // === roleNavConfig con claves en minúsculas y componentes Lucid ===
   const roleNavConfig = {
     home: { icon: Home, translationKey: "home", pathSegment: "home" }, // Añadido para el inicio
+    recruitment: {
+      icon: UserPlus,
+      translationKey: "recruitment",
+      pathSegment: "recruitment",
+    },
     supervisor: {
       icon: Users,
       translationKey: "supervisor",
@@ -92,19 +104,26 @@ function NewNav() {
       translationKey: "payroll",
       pathSegment: "payroll",
     },
+    activos: {
+      icon: Landmark,
+      translationKey: "activos",
+      pathSegment: "activos",
+    },
     hr: { icon: UserCheck, translationKey: "hr", pathSegment: "hr" }, // Clave 'hr'
     md: { icon: Briefcase, translationKey: "md", pathSegment: "md" },
     it: { icon: MonitorSmartphone, translationKey: "it", pathSegment: "it" },
+    asolion: {
+      icon: Coins,
+      translationKey: "asolion",
+      pathSegment: "asolion",
+    },
     superadmin: {
       icon: Settings,
-      translationKey: "configuration",
+      translationKey: "SuperAdmin",
       pathSegment: "configurationDashboard",
-    }, // translationKey a "superAdmin"
-    // Puedes añadir más roles si es necesario aquí
-    // dataanalyst: { icon: BarChart2, translationKey: "dataAnalyst", pathSegment: "dataanalyst" },
+    },
   };
 
-  const navigate = useNavigate();
   const themeColors = WebsiteConfig((state) => state.themeColors);
 
   const [language, setLanguage] = useState(() => {
@@ -116,7 +135,7 @@ function NewNav() {
   const [theme, setTheme] = useState(() => {
     const storedTheme = getLocalStorageItem("requitool-themeColorNumber");
     if (storedTheme) return themeColors[storedTheme];
-    return themeColors[getInitialThemeColorNumber()]; // Fallback si no hay tema guardado
+    return themeColors[0]; // Fallback si no hay tema guardado
   });
 
   const [hiddenMenu, setHiddenMenu] = useState(() => {
@@ -149,7 +168,7 @@ function NewNav() {
 
     const storedTheme = getLocalStorageItem("requitool-themeColorNumber");
     if (storedTheme) setTheme(themeColors[storedTheme]);
-    else setTheme(themeColors[getInitialThemeColorNumber()]); // Asegurar que el tema siempre se inicialice
+    else setTheme(themeColors[0]); // Asegurar que el tema siempre se inicialice
   }, []);
 
   // Función para obtener inicial del usuario (si es necesario)
@@ -351,7 +370,7 @@ function NewNav() {
             {/* <NavItem icon={faUsers} text={t("supervisor")} navigateTo="/supervisor" /> */}
             {/* {roles?.find((role) => role === "Payroll") && ( ... )} */}
             {/* {roles?.find((role) => role === "Finance") && ( ... )} */}
-          </ul>{" "}
+          </ul>
           <div className="mt-auto">
             <ul className="space-y-1">
               {/* === ESTE TAMBIÉN SE PUEDE INTEGRAR EN EL MAPEO DINÁMICO === */}

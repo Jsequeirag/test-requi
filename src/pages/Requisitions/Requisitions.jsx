@@ -259,6 +259,9 @@ function Requisitions() {
                             {request.state}
                           </span>
                           <p className="text-sm">
+                            <strong>Solicitud:</strong> {request.id}
+                          </p>
+                          <p className="text-sm">
                             <strong>Fecha:</strong>{" "}
                             {new Date(request.createdDate).toLocaleString()}
                           </p>
@@ -328,7 +331,7 @@ function Requisitions() {
                               {request.requisitions.map((req, idx) => (
                                 <div
                                   key={req.id}
-                                  className="flex-shrink-0 min-w-[24rem] relative flex flex-col items-center z-10"
+                                  className="flex-shrink-0 min-w-[24rem] relative flex flex-col items-center z-10 cursor-pointer"
                                 >
                                   {/* Punto */}
                                   <div className="flex flex-col items-center mb-4 relative">

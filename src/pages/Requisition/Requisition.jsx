@@ -121,7 +121,7 @@ function Requisition() {
                   className="block text-black text-lg font-bold mb-2"
                   htmlFor="userName"
                 >
-                  # POS_COD
+                  # Código de Posición
                 </label>
                 <input
                   className=" border rounded-sm w-full py-2 px-3 text-grey-darker text-lg  bg-slate-100 focus:outline-none "

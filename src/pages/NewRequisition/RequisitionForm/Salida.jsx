@@ -17,7 +17,8 @@ export default function Salida() {
   return (
     <>
       <h1 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-200">
-        Salida de Empleado
+        Salida de Empleado {formValues?.requisitionSubtype}{" "}
+        {formValues?.personalEmail}
       </h1>
 
       {/* ESTE ES EL ÚNICO CONTENEDOR PRINCIPAL DEL GRID */}
@@ -53,8 +54,8 @@ export default function Salida() {
             url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
               formValues?.requisitionTypeId || ""
             }`}
-            value={formValues?.requisitionSubtype || ""}
-            name={"requisitionSubtype"}
+            value={formValues?.requisitionSubtypeId || ""}
+            name={"requisitionSubtypeId"}
             id={"RequisitionSubtypeSelect"} // Añadido ID
             className="w-full text-base"
           />

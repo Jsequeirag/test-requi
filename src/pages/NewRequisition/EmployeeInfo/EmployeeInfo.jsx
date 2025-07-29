@@ -76,13 +76,13 @@ export default function EmployeeInfo() {
           )}
         </div>
 
-        {/* Campo 2: ID Empleado Exactus */}
+        {/* Campo 2: Exactus ID */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="idExactus"
           >
-            ID Empleado Exactus
+            Exactus ID
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -99,13 +99,13 @@ export default function EmployeeInfo() {
           />
         </div>
 
-        {/* Campo 3: # POS_COD */}
+        {/* Campo 3: # Código de Posición */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="posCod"
           >
-            # POS_COD
+            # Código de Posición
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base

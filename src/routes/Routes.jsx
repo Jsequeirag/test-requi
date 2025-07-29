@@ -1,7 +1,8 @@
 import Login from "../pages/Auth/Login/Login";
 import RecoverPassword from "../pages/Auth/RecoverPassword";
-import Supervisor from "../pages/Supervisor/Supervisor";
+import Supervisor from "../pages/RolePage/Supervisor/Supervisor";
 import RolesAdministration from "../pages/RolesAdministration/RolesAdministration";
+
 import { Navigate } from "react-router-dom";
 import Form from "../pages/ExampleFormik/Form";
 import Register from "../pages/Auth/Register";
@@ -10,13 +11,34 @@ import UpdatePassword from "../pages/Auth/UpdatePassword";
 import NewRequisition from "../pages/NewRequisition/NewRequisition";
 import Requisitions from "../pages/Requisitions/Requisitions";
 import ConfigurationDashboard from "../pages/ConfigurationDashboard/ConfigurationDashboard";
-import PayrollDashboard from "../pages/PayrollDashboard/PayrollDashboard";
-import FinanceDashboard from "../pages/FinanceDashboard/FinanceDashboard";
+
 import DepartmentMaintenance from "../pages/Maintenance/DepartmentMaintenance";
 import DepartmentAdministration from "../pages/DepartmentAdministration/DepartmentAdministration";
-import PayrollRequest from "../pages/PayrollDashboard/PayrollRequest";
-import FinanceSidebar from "../pages/FinanceDashboard/FinanceSidebar";
-import FinanceRequest from "../pages/FinanceDashboard/FinanceRequest";
+
+import PayrollDashboard from "../pages/RolePage/PayrollDashboard/PayrollDashboard";
+import PayrollRequest from "../pages/RolePage/PayrollDashboard/PayrollRequest";
+
+import FinanceDashboard from "../pages/RolePage/FinanceDashboard/FinanceDashboard";
+import FinanceRequest from "../pages/RolePage/FinanceDashboard/FinanceRequest";
+
+import RRHHDashboard from "../pages/RolePage/RRHHDashboard/RRHHDashboard";
+import RRHHRequest from "../pages/RolePage/RRHHDashboard/RRHHRequest";
+
+import MDDashboard from "../pages/RolePage/MDDashboard/MDDashboard";
+import MDRequest from "../pages/RolePage/MDDashboard/MDRequest";
+
+import TIDashboard from "../pages/RolePage/TIDashboard/TIDashboard";
+import TIRequest from "../pages/RolePage/TIDashboard/TIRequest";
+
+import AsolionDashboard from "../pages/RolePage/AsolionDashboard/AsolionDashboard";
+import AsolionRequest from "../pages/RolePage/AsolionDashboard/AsolionRequest";
+
+import RecluitmentDashboard from "../pages/RolePage/Recluitment/RecluitmentDashboard";
+import RecluitmentRequest from "../pages/RolePage/Recluitment/RecluitmentRequest";
+
+import ActivosDashboard from "../pages/RolePage/Activos/ActivosDashboard";
+import ActivosRequest from "../pages/RolePage/Activos/ActivosRequest";
+
 import Home from "../pages/Home/Home";
 export default [
   {
@@ -95,6 +117,69 @@ export default [
     title: "financeRequests",
   },
   {
+    path: "/activos",
+    element: <ActivosDashboard />,
+    title: "activos",
+  },
+  {
+    path: "/activosRequests",
+    element: <ActivosRequest />,
+    title: "activosRequests",
+  },
+  {
+    path: "/md",
+    element: <MDDashboard />,
+    title: "md",
+  },
+  {
+    path: "/mdRequests",
+    element: <MDRequest />,
+    title: "mdRequests",
+  },
+  {
+    path: "/hr",
+    element: <RRHHDashboard />,
+    title: "hr",
+  },
+  {
+    path: "/rrhhRequests",
+    element: <RRHHRequest />,
+    title: "rrhhRequests",
+  },
+  {
+    path: "/it",
+    element: <TIDashboard />,
+    title: "it",
+  },
+  {
+    path: "/itRequests",
+    element: <TIRequest />,
+    title: "itRequests",
+  },
+
+  {
+    path: "/asolion",
+    element: <AsolionDashboard />,
+    title: "asolion",
+  },
+  {
+    path: "/asolionRequests",
+    element: <AsolionRequest />,
+    title: "asolionRequests",
+  },
+
+  {
+    path: "/recruitment",
+    element: <RecluitmentDashboard />,
+    title: "recruitment",
+  },
+  {
+    path: "/recruitmentRequests",
+    element: <RecluitmentRequest />,
+    title: "recruitmentRequests",
+  },
+
+  {
     path: "/departmentMaintenance",
     element: <DepartmentMaintenance />,
     title: "departmentMaintenance",
@@ -114,7 +199,7 @@ export default [
     element: <PayrollRequest />,
     title: "payrollRequests",
   },
-  // Catch-all route - debe ir al final
+
   {
     path: "*",
     element: <Navigate to="/login" replace />,

@@ -1,5 +1,6 @@
 import React from "react";
 import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
+import AsyncSelectFreeText from "../../../components/AsyncComponents/AsyncSelectFreeText.jsx";
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
@@ -49,7 +50,7 @@ export default function Entrada() {
           >
             Periodo
             {formValues?.requisitionTypeId === 12 && (
-              <span className="text-red-500">*</span>
+              <span className="text-red-500"> *</span>
             )}
           </label>
           <select
@@ -92,17 +93,14 @@ export default function Entrada() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="tForm" // ID único y corregido
           >
-            TForm{" "}
-            {formValues?.requisitionTypeId === 5 && (
-              <span className="text-red-500">*</span>
-            )}
-            {/* Asterisco de requerido */}
+            TForm {/* Asterisco de requerido */}
           </label>
           <input
             className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        ${
                          formValues.requisitionTypeId === 12 ||
-                         formValues.requisitionTypeId === 11
+                         formValues.requisitionTypeId === 11 ||
+                         formValues.requisitionTypeId === ""
                            ? "bg-gray-100 cursor-not-allowed"
                            : "bg-white"
                        } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -112,9 +110,9 @@ export default function Entrada() {
             placeholder="TForm"
             disabled={
               formValues.requisitionTypeId === 12 ||
-              formValues.requisitionTypeId === 11
+              formValues.requisitionTypeId === 11 ||
+              formValues.requisitionTypeId === ""
             }
-            required
             onChange={(e) => {
               formValues.requisitionTypeId &&
                 // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
@@ -132,14 +130,14 @@ export default function Entrada() {
             Informacion de Empleado
           </h1>
           <div></div> <div></div>
-          {/* Campo 1: POS_COD */}{" "}
+          {/* Campo 1: Código de Posición */}{" "}
           <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-6">
             <div className="">
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                htmlFor="posCode"
+                htmlFor="positionCode"
               >
-                POS_COD{" "}
+                Código de Posición{" "}
                 {(formValues?.requisitionTypeId === 5 ||
                   formValues?.requisitionTypeId === 12) && (
                   <span className="text-red-500">*</span>
@@ -153,9 +151,9 @@ export default function Entrada() {
                             : "bg-white"
                         } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                id="posCode"
-                name="posCode"
-                placeholder="POS_COD"
+                id="positionCode"
+                name="positionCode"
+                placeholder="Código de Posición"
                 onChange={(e) => {
                   setFormValues({
                     ...formValues,
@@ -163,7 +161,7 @@ export default function Entrada() {
                   });
                 }}
                 autoComplete="off"
-                value={formValues.posCode || ""}
+                value={formValues.positionCode || ""}
                 maxLength={8}
                 pattern="[A-Za-z0-9]{1,8}"
                 title="Solo caracteres alfanuméricos, máximo 8 caracteres"
@@ -229,7 +227,7 @@ export default function Entrada() {
                   <span className="text-red-500">*</span>
                 )}
               </label>
-              <AsyncSelect
+              <AsyncSelectFreeText
                 url={`https://localhost:7040/GetProjectsByExactus`}
                 name={"project"}
                 id={"project"}
@@ -246,7 +244,7 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="department"
               >
-                Departamento{" "}
+                Nombre del Area{" "}
                 {(formValues?.requisitionTypeId === 5 ||
                   formValues?.requisitionTypeId === 12) && (
                   <span className="text-red-500">*</span>
@@ -266,13 +264,13 @@ export default function Entrada() {
               />
             </div>
 
-            {/* Campo 7: Matriz SOD */}
+            {/* Campo 7: Perfil SOD */}
             <div>
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="sodMatrix" // ID único y corregido
               >
-                Matriz SOD {/* <span className="text-red-500">*</span>*/}
+                Perfil SOD <span className="text-red-500">*</span>
                 {/* Asterisco de requerido */}
               </label>
               <AsyncSelect
@@ -282,6 +280,7 @@ export default function Entrada() {
                 value={formValues.sodMatrix || ""}
                 className="w-full text-base"
                 disabled={formValues?.requisitionTypeId === 11}
+                required
               />
             </div>
             {/*<div>
@@ -338,7 +337,8 @@ export default function Entrada() {
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues?.recruitmentType === "Internal"
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -355,17 +355,11 @@ export default function Entrada() {
                 autoComplete="off"
                 value={formValues.fullName || ""}
                 type="text"
-                required={
-                  !formValues.requisitionTypeId == 11 ||
-                  !formValues.requisitionTypeId === 12 ||
-                  (!formValues.requisitionTypeId === 5 &&
-                    !formValues.recruitmentProccess)
-                }
+                required={!formValues.requisitionTypeId === 5}
                 disabled={
-                  !formValues.requisitionTypeId == 11 ||
-                  !formValues.requisitionTypeId === 12 ||
-                  (!formValues.requisitionTypeId === 5 &&
-                    !formValues.recruitmentProccess)
+                  //Si ingreso nuevo y concurso interno no se llena
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
                 }
               />
             </div>
@@ -375,19 +369,19 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="exactusId"
               >
-                ID Empleado Exactus{" "}
-                {/* <span className="text-red-500">*</span>*/}
+                Exactus ID {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues?.recruitmentType === "Internal"
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="exactusId"
                 name="exactusId"
-                placeholder="ID Empleado Exactus"
+                placeholder="Exactus ID"
                 onChange={(e) => {
                   setFormValues({
                     ...formValues,
@@ -401,27 +395,32 @@ export default function Entrada() {
                 min={0}
                 pattern="[0-9]{1,6}"
                 title="Solo números, máximo 6 caracteres"
-                disabled={formValues?.recruitmentType === "Internal"}
+                disabled={
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
+                }
               />
             </div>
             {/* Campo 3: Carrer Settings ID */}
             <div>
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                htmlFor="carrerSettingsId"
+                htmlFor="careerSettingsId"
               >
-                Carrer Settings ID{" "}
+                Career Settings ID{" "}
                 {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues?.recruitmentType === "Internal"
+                  (formValues.requisitionTypeId === 5 &&
+                    formValues.recruitmentProccess === 14) ||
+                  formValues.requisitionTypeId === 12
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                id="carrerSettingsId"
-                name="carrerSettingsId"
+                id="careerSettingsId"
+                name="careerSettingsId"
                 placeholder="Carrer Settings ID"
                 onChange={(e) => {
                   setFormValues({
@@ -432,7 +431,10 @@ export default function Entrada() {
                 autoComplete="off"
                 value={formValues.carrerSettingsId || ""}
                 type="number"
-                disabled={formValues?.recruitmentType === "Internal"}
+                disabled={
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
+                }
               />
             </div>
             {/* Campo 4: Lion Login */}
@@ -441,18 +443,19 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="lionLogin"
               >
-                LL {/* <span className="text-red-500">*</span>*/}
+                Lion Login {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues?.recruitmentType === "Internal"
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="lionLogin"
                 name="lionLogin"
-                placeholder="LL"
+                placeholder="Lion Login"
                 onChange={(e) => {
                   setFormValues({
                     ...formValues,
@@ -464,7 +467,10 @@ export default function Entrada() {
                 type="text"
                 pattern="[A-Za-z0-9]+"
                 title="Solo caracteres alfanuméricos"
-                disabled={formValues?.recruitmentType === "Internal"}
+                disabled={
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
+                }
               />
             </div>
             {/* Campo 5: Company Email */}
@@ -477,14 +483,15 @@ export default function Entrada() {
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues?.recruitmentType === "Internal"
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="companyEmail"
                 name="companyEmail"
-                placeholder="correo electronico"
+                placeholder="Correo empresa"
                 onChange={(e) => {
                   setFormValues({
                     ...formValues,
@@ -496,7 +503,10 @@ export default function Entrada() {
                 type="email"
                 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                 title="Ingrese un correo electrónico válido"
-                disabled={formValues?.recruitmentType === "Internal"}
+                disabled={
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
+                }
               />
             </div>
             {/* Campo 6: Start Date */}
@@ -509,7 +519,8 @@ export default function Entrada() {
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues?.recruitmentType === "Internal"
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -526,38 +537,11 @@ export default function Entrada() {
                 autoComplete="off"
                 value={formValues.startDate || ""}
                 type="date"
-                disabled={formValues?.recruitmentType === "Internal"}
+                disabled={
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
+                }
                 X
-              />
-            </div>
-            {/* Campo 5: Correo empresa */}
-            <div>
-              <label
-                className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                htmlFor="companyEmail"
-              >
-                Correo empresa {/* <span className="text-red-500">*</span>*/}
-                {/* Asterisco de requerido */}
-              </label>
-              <input
-                className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues?.recruitmentType === "Internal"
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : "bg-white"
-                } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                id="companyEmail"
-                name="companyEmail"
-                placeholder="Correo de compañia"
-                onChange={(e) => {
-                  // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
-                  setFormValues({
-                    [e.target.name]: e.target.value,
-                  });
-                }}
-                autoComplete="off"
-                value={formValues.companyEmail || ""}
-                disabled={formValues?.recruitmentType === "Internal"}
               />
             </div>
           </div>

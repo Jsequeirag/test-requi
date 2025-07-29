@@ -271,7 +271,11 @@ function NewRequisition() {
         {/* Cabecera de la página */}
         <div className="flex items-center justify-between mb-6">
           <a
-            href={"requisitions"}
+            href={
+              location.state?.action === "create"
+                ? "supervisor"
+                : "requisitions"
+            }
             className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group"
           >
             <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-0.5 transition-transform" />
@@ -371,7 +375,7 @@ function NewRequisition() {
                         value={formValues?.requestTypeId || ""}
                       />
                     )}
-                    {/*Entrada*/}
+                    {/*Entrada* -> cuando se ocupa  obtener solo promocion y movimiento*/}
                     {location.state?.action === "update" && (
                       <>
                         {location.state?.prevRequisition?.requestTypeId ===
@@ -406,13 +410,14 @@ function NewRequisition() {
                   </div>
                 )}
               </div>
-              {/*Si la accion es promocion*/}
-              {formValues.requestTypeId === 3 && (
+              {/*Si la accion es promocion o movimiento lateral*/}
+              {(formValues.requestTypeId === 3 ||
+                formValues.requestTypeId === 4) && (
                 <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-2">
                   {/* Campo 1: Motivo */}
                   <div>
                     <label
-                      className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+                      className="block text-gray-700  text-lg font-semibold mb-2 dark:text-gray-300"
                       htmlFor="motivo" // ID corregido y único
                     >
                       Proceso de contratación
@@ -420,7 +425,9 @@ function NewRequisition() {
                       {/* Asterisco de requerido */}
                     </label>
                     <AsyncSelect
-                      url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=6`}
+                      url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=${
+                        formValues.requestTypeId === 4 ? 8 : 7
+                      }`}
                       name={"recruitmentProccess"}
                       id={"recruitmentProccess"} // Añadido ID
                       value={formValues?.recruitmentProccess || ""} // Usamos 'value' y un fallback a ""
@@ -435,7 +442,7 @@ function NewRequisition() {
                   <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-2">
                     <div>
                       <label
-                        className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+                        className="block text-gray-700   text-lg font-semibold mb-2 dark:text-gray-300"
                         htmlFor="motivo" // ID único y corregido
                       >
                         Motivo
@@ -445,7 +452,7 @@ function NewRequisition() {
                       <AsyncSelect
                         url={`${
                           location.state?.action === "update"
-                            ? `https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`
+                            ? `https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/true`
                             : `https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`
                         }`}
                         name={"requisitionTypeId"}
@@ -458,7 +465,27 @@ function NewRequisition() {
                     {location.state?.action === "update" && (
                       <div>
                         <label
-                          className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+                          className="block text-gray-700 text-lg font-semibold mb-2 dark:text-gray-300"
+                          htmlFor="RecruitmentProcess" // ID corregido y único
+                        >
+                          Proceso de contratación{" "}
+                          <span className="text-red-500">*</span>{" "}
+                          {/* Asterisco de requerido */}
+                        </label>
+                        <AsyncSelect
+                          url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=6`}
+                          name={"recruitmentProccess"}
+                          id={"motivo"} // Añadido ID
+                          value={formValues?.recruitmentProccess || ""} // Usamos 'value' y un fallback a ""
+                          className="w-full text-base"
+                          required // Añadido required si este campo debe ser obligatorio
+                        />
+                      </div>
+                    )}
+                    {location.state?.action === "create" && (
+                      <div>
+                        <label
+                          className="block text-gray-700 text-lg font-semibold mb-2 dark:text-gray-300"
                           htmlFor="RecruitmentProcess" // ID corregido y único
                         >
                           Proceso de contratación{" "}
@@ -516,31 +543,33 @@ function NewRequisition() {
             <div
               className={`w-full flex justify-end items-center border-t border-gray-200 pt-6 mt-8 dark:border-gray-700`}
             >
-              {formValues?.requestTypeId === 2 && (
-                <button
-                  type="button"
-                  onClick={() => {
-                    onSubmitDraftRequest();
-                  }}
-                  className={`bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl
+              {/*Si es entrada y no esta completada  */}
+              {formValues?.requestTypeId === 2 &&
+                formValues?.state !== "Completado" && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      onSubmitDraftRequest();
+                    }}
+                    className={`bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl
               transition-all duration-300 shadow-md hover:shadow-lg
               flex items-center justify-center space-x-2
               focus:outline-none focus:ring-4 focus:ring-blue-300/50
               dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-600/50
               disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600 mr-2`}
-                  disabled={isPendingDraftRequest}
-                >
-                  {!isPendingDraftRequest && (
-                    <CheckCircle className="w-5 h-5 mr-2" />
-                  )}
+                    disabled={isPendingDraftRequest}
+                  >
+                    {!isPendingDraftRequest && (
+                      <CheckCircle className="w-5 h-5 mr-2" />
+                    )}
 
-                  <span>
-                    {isPendingDraftRequest
-                      ? "Guardando"
-                      : "Guardar temporalmente"}
-                  </span>
-                </button>
-              )}
+                    <span>
+                      {isPendingDraftRequest
+                        ? "Guardando"
+                        : "Guardar temporalmente"}
+                    </span>
+                  </button>
+                )}
               {formValues?.requestTypeId === 5 ||
               formValues?.requestTypeId === 2 ? (
                 <>
@@ -561,7 +590,11 @@ function NewRequisition() {
                     </span>
                   </button>
                 </>
-              ) : formValues.requestTypeId === 3 ? (
+              ) : //*Si es promoción o movimiento sin completar  */}
+              (formValues.requestTypeId === 3 &&
+                  formValues?.state !== "Completado") ||
+                (formValues.requestTypeId === 4 &&
+                  formValues?.state !== "Completado") ? (
                 <>
                   <button
                     type="button"
