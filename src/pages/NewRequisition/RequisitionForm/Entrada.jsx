@@ -32,7 +32,7 @@ export default function Entrada() {
             Motivo <span className="text-red-500">*</span>{" "}
           </label>
           <AsyncSelect
-            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
             name={"requisitionTypeId"}
             id={"requisitionTypeId"} // Añadido ID
             value={formValues?.requisitionTypeId || ""} // Usamos 'value' y un fallback a ""
@@ -181,7 +181,7 @@ export default function Entrada() {
                 )}
               </label>
               <AsyncSelect
-                url={`https://localhost:7040/getEmployeesBySupervisorRole`}
+                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesBySupervisorRole`}
                 name={"supervisor"}
                 id={"supervisor"}
                 value={formValues?.supervisor || ""}
@@ -205,7 +205,7 @@ export default function Entrada() {
                 )}
               </label>
               <AsyncSelect
-                url={`https://localhost:7040/GetGrades`}
+                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetGrades`}
                 name={"grade"}
                 id={"grade"}
                 value={formValues?.grade || ""}
@@ -228,7 +228,7 @@ export default function Entrada() {
                 )}
               </label>
               <AsyncSelectFreeText
-                url={`https://localhost:7040/GetProjectsByExactus`}
+                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
                 name={"project"}
                 id={"project"}
                 value={formValues?.project || ""}
@@ -251,7 +251,7 @@ export default function Entrada() {
                 )}
               </label>
               <AsyncSelect
-                url={`https://localhost:7040/getDepartments`}
+                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getDepartments`}
                 name={"department"}
                 id={"department"}
                 customNameParam={"descriptionDepartamento"}
@@ -274,7 +274,7 @@ export default function Entrada() {
                 {/* Asterisco de requerido */}
               </label>
               <AsyncSelect
-                url={`https://localhost:7040/getMatriz`}
+                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getMatriz`}
                 name={"sodMatrix"}
                 id={"sodMatrix"} // Añadido ID
                 value={formValues.sodMatrix || ""}
