@@ -421,7 +421,7 @@ export default function Entrada() {
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="careerSettingsId"
                 name="careerSettingsId"
-                placeholder="Carrer Settings ID"
+                placeholder="Career Settings ID"
                 onChange={(e) => {
                   setFormValues({
                     ...formValues,
