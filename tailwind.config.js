@@ -1,0 +1,151 @@
+/** @type {import('tailwindcss').Config} */
+export default {
+  darkMode: "selector", // <--- CAMBIO AQUÍ: Usa 'class' en lugar de 'selector'
+  content: [
+    "./index.html",
+    "./src/**/*.{js,ts,jsx,tsx}",
+    "./node_modules/tw-elements/dist/js/**/*.js",
+  ],
+  safelist: [
+    // Clases de fondo (bgColor)
+    "bg-gray-100",
+    "dark:bg-gray-900",
+    "bg-blue-100",
+    "dark:bg-blue-900",
+    "bg-violet-100",
+    "dark:bg-violet-900",
+    "bg-green-100",
+    "dark:bg-green-900",
+    "bg-teal-100",
+    "dark:bg-teal-900",
+    "bg-cyan-100",
+    "dark:bg-cyan-900",
+    "bg-orange-100",
+    "dark:bg-orange-900",
+    "bg-stone-100",
+    "dark:bg-stone-900",
+    "bg-slate-100",
+    "dark:bg-slate-900",
+    "bg-neutral-100",
+    "dark:bg-neutral-900",
+
+    // Clases de acento (accentColor)
+    "bg-gray-400",
+    "dark:bg-gray-600",
+    "bg-blue-400",
+    "dark:bg-blue-600", // (Aunque ahora son grises, si en algún momento vuelves a ellos)
+    "bg-violet-400",
+    "dark:bg-violet-600",
+    "dark:bg-violet-300",
+    "dark:hover:bg-green-900",
+    "hover:green-800",
+    "bg-teal-600",
+    "dark:hover:bg-teal-900",
+    "bg-orange-800",
+    "hover:bg-violet-200",
+    "hover:bg-green-300",
+    "bg-violet-500",
+    "dark:bg-orange-300",
+    "g-orange-600",
+    "hover:bg-teal-100",
+    "bg-cyan-700",
+    "dark:bg-cyan-300",
+    "hover:bg-cyan-100",
+    "dark:hover:bg-cyan-900",
+    "bg-green-400",
+    "dark:bg-green-600",
+    "bg-teal-400",
+    "dark:bg-teal-600",
+    "bg-cyan-400",
+    "dark:bg-cyan-600",
+    "bg-orange-400",
+    "dark:bg-orange-600",
+    "bg-stone-400",
+    "dark:bg-stone-600",
+    "bg-slate-400",
+    "dark:bg-slate-600",
+    "bg-neutral-400",
+    "dark:bg-neutral-600",
+
+    // Clases de hover (hoverColor)
+    "hover:bg-gray-500",
+    "dark:hover:bg-gray-700",
+    "hover:bg-blue-500",
+    "dark:hover:bg-blue-700",
+    "hover:bg-violet-500",
+    "dark:hover:bg-violet-700",
+    "hover:bg-green-500",
+    "dark:hover:bg-green-700",
+    "hover:bg-teal-500",
+    "dark:hover:bg-teal-700",
+    "hover:bg-cyan-500",
+    "dark:hover:bg-cyan-700",
+    "hover:bg-orange-500",
+    "dark:hover:bg-orange-700",
+    "hover:bg-yellow-700",
+    "dark:hover:bg-yellow-500", // Cuidado con yellow en stone
+    "hover:bg-emerald-700",
+    "dark:hover:bg-emerald-500", // Cuidado con emerald en slate
+    "hover:bg-sky-700",
+    "dark:hover:bg-sky-500", // Cuidado con sky en neutral
+
+    // Revisa las que cambiamos a tonos neutros para acento y hover
+    "hover:bg-stone-500",
+    "dark:hover:bg-stone-700",
+    "hover:bg-slate-500",
+    "dark:hover:bg-slate-700",
+    "hover:bg-neutral-500",
+    "dark:hover:bg-neutral-700",
+    "dark:hover:bg-blue-900",
+    "dark:hover:bg-blue-900",
+    "dark:bg-gray-300",
+    "hover:bg-violet-100",
+    "dark:hover:bg-violet-900",
+  ],
+  theme: {
+    extend: {
+      animation: {
+        blob: "blob 7s infinite",
+      },
+      keyframes: {
+        blob: {
+          "0%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
+          "33%": {
+            transform: "translate(30px, -50px) scale(1.1)",
+          },
+          "66%": {
+            transform: "translate(-20px, 20px) scale(0.9)",
+          },
+          "100%": {
+            transform: "translate(0px, 0px) scale(1)",
+          },
+        },
+      },
+    },
+    screens: {
+      pc: "1024px",
+      movil: "0px",
+    },
+    fontFamily: {
+      sans: [
+        "Inter",
+        "system-ui",
+        "-apple-system",
+        "BlinkMacSystemFont",
+        "Segoe UI",
+        "Roboto",
+        "Helvetica Neue",
+        "Arial",
+        "Noto Sans",
+        "sans-serif",
+        "Apple Color Emoji",
+        "Segoe UI Emoji",
+        "Segoe UI Symbol",
+        "Noto Color Emoji",
+      ],
+    },
+  },
+  plugins: [require("tw-elements/dist/plugin.cjs")],
+};
