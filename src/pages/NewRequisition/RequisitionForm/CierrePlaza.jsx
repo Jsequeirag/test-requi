@@ -35,7 +35,7 @@ export default function CierrePlaza() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
             name={"requisitionTypeId"}
             id={"motivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""} // Usamos 'value' y un fallback a ""
@@ -53,7 +53,7 @@ export default function CierrePlaza() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=5`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=5`}
             name={"deliverableType"}
             id={"deliverableType"} // Añadido ID
             value={formValues.deliverableType || ""} // Add this line
@@ -74,7 +74,7 @@ export default function CierrePlaza() {
             )}
           </label>
           <AsyncSelectFreeText
-            url={`https://localhost:7040/GetProjectsByExactus`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
             name={"project"}
             id={"project"}
             value={formValues?.project || ""}
