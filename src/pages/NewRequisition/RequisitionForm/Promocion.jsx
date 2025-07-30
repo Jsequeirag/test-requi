@@ -166,6 +166,7 @@ export default function Promocion() {
             }
             onChange={(e) => {
               setFormValues({
+                ...formValues,
                 [e.target.name]: e.target.value,
               });
             }}

@@ -133,6 +133,7 @@ function Requisitions() {
     isSuccess: requestIsSuccess,
     isPending: requestIsPending,
     refetch: refetchRequests,
+    isFetching,
   } = useApiGet(
     ["RequestByUser", currentPage, pageSize],
     () =>
@@ -142,8 +143,9 @@ function Requisitions() {
         pageSize
       ),
     {
-      enabled: true,
-      keepPreviousData: true, // Mantiene datos previos mientras carga nuevos
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      keepPreviousData: true,
     }
   );
 
@@ -182,17 +184,34 @@ function Requisitions() {
     setExpandedRequest(expandedRequest === requestId ? null : requestId);
   };
 
-  const setRequestStatus = (statusId) => {
-    return statusId === 0 ? "En proceso" : "Completado";
-  };
-
   // Información de paginación para mostrar
   const startRecord = requestData ? (currentPage - 1) * pageSize + 1 : 0;
   const endRecord = requestData
     ? Math.min(currentPage * pageSize, requestData.totalRecords)
     : 0;
   const totalRecords = requestData ? requestData.totalRecords : 0;
+  useEffect(() => {
+    console.log(
+      "useEffect en RequisitionsPage se ha ejecutado. location.state en efecto:",
+      location.state
+    );
+    console.log("refetchRequests:", refetchRequests);
 
+    // Si pasamos un valor único como Date.now(), solo necesitamos que el state exista
+    // o que tenga la propiedad 'refresh' (si es que no es 0 o null)
+    if (location.state && location.state.refresh) {
+      // Esto seguirá funcionando bien
+      console.log(
+        "Detectado estado de refresh. Forzando recarga de requisiciones..."
+      );
+      refetchRequests();
+    }
+
+    // Asegurarte de una carga inicial si no hay state de refresh (ej. al cargar la página directamente)
+    // Puedes llamar a refetchRequests() aquí si quieres que siempre recargue al montar
+    // o si el state de refresh no viene. Si ya lo tienes, esta línea es redundante.
+    // refetchRequests();
+  }, [location.state, refetchRequests]);
   return (
     <Layout>
       <div className="m-4 ">
@@ -241,7 +260,7 @@ function Requisitions() {
 
           {/* Contenedor principal de las requisiciones */}
           <div className="space-y-4 p-4">
-            {!requestIsPending ? (
+            {!requestIsPending && !isFetching ? (
               <>
                 {requestIsSuccess && requestData && requestData.data ? (
                   requestData.data.length > 0 ? (

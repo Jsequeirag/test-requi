@@ -3,7 +3,7 @@ import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js"; // Se mantiene por si formValues.requestTypeId se setea externamente y se usa aquí
-
+import AsyncSelectFreeText from "../../../components/AsyncComponents/AsyncSelectFreeText.jsx";
 export default function CierrePlaza() {
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
@@ -65,28 +65,23 @@ export default function CierrePlaza() {
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="projectName" // ID corregido y único
+            htmlFor="project"
           >
-            Nombre de proyecto <span className="text-red-500">*</span>{" "}
-            {/* Asterisco de requerido */}
+            Proyecto
+            {(formValues?.requisitionTypeId === 5 ||
+              formValues?.requisitionTypeId === 12) && (
+              <span className="text-red-500">*</span>
+            )}
           </label>
-          <input
-            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            type="text"
-            name="projectName"
-            id="projectName" // Añadido ID
-            placeholder="Nombre de proyecto"
-            value={formValues.projectName || ""} // Asegúrate de que el valor se controle
-            onChange={(e) => {
-              // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
-              setFormValues({
-                [e.target.name]: e.target.value,
-              });
-            }}
-            autoComplete="off"
-            required // Asumiendo que es requerido
+          <AsyncSelectFreeText
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
+            name={"project"}
+            id={"project"}
+            value={formValues?.project || ""}
+            className="w-full text-base"
+            required={true}
+            placeholder="Lista desplegable de los proyectos únicos de exactus"
+            disabled={formValues.requisitionTypeId === 11}
           />
         </div>
         {/* Campo 4: R Form */}
@@ -135,7 +130,11 @@ export default function CierrePlaza() {
             type="date"
             name="officialSavingDate"
             placeholder="Oficial del Saving"
-            value={formValues.officialSavingDate || ""} // Asegúrate de que el valor se controle
+            value={
+              formValues.officialSavingDate
+                ? formValues.officialSavingDate.split("T")[0]
+                : new Date().toISOString().split("T")[0]
+            } // Asegúrate de que el valor se controle
             onChange={(e) => {
               // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
               setFormValues({

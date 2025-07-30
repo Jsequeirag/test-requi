@@ -97,7 +97,7 @@ export default function AsyncSelect({
           (item) => String(item.id) === String(propValue)
         );
       }
-
+      setFormValues({ [name]: selectedItem.id || selectedItem[customIdParam] });
       if (selectedItem) {
         setSearchText(
           customNameParam ? selectedItem[customNameParam] : selectedItem.name

@@ -87,7 +87,10 @@ function NewRequisition() {
         className: "bg-green-600 text-white",
         progressClassName: "bg-white",
       });
-      navigate("/requisitions", { replace: true, state: { refresh: true } });
+      navigate("/requisitions", {
+        replace: true,
+        state: { refresh: Date.now() },
+      }); // <--- CAMBIO AQUÍ
     },
     (e) => {
       console.error("Error al crear la solicitud:", e);
@@ -121,7 +124,10 @@ function NewRequisition() {
         className: "bg-green-600 text-white",
         progressClassName: "bg-white",
       });
-      navigate("/requisitions");
+      navigate("/requisitions", {
+        replace: true,
+        state: { refresh: Date.now() },
+      }); // <--- CAMBIO AQUÍ
     },
     (e) => {
       console.error("Error al actualizar la solicitud:", e);
@@ -298,6 +304,7 @@ function NewRequisition() {
                 </div>
                 Tipo de solicitud
               </h2>
+              {/*debe de esta en actualizar  */}
               <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
                 {(location.state?.action === "update" &&
                   location.state?.hasPrevRequisition &&
@@ -321,7 +328,7 @@ function NewRequisition() {
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-100 dark:focus:ring-blue-400 dark:focus:border-blue-400"
                         name="requiresReplacement"
-                        value={formValues.requiresReplacement || ""}
+                        value={formValues?.requiresReplacement}
                         required
                         onChange={(e) =>
                           setFormValues({
