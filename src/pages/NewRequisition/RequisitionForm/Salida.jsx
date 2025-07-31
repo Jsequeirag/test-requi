@@ -1,5 +1,6 @@
 import React from "react";
 import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
+import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview.jsx";
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
@@ -17,8 +18,7 @@ export default function Salida() {
   return (
     <>
       <h1 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-200">
-        Salida de Empleado {formValues?.requisitionSubtype}{" "}
-        {formValues?.personalEmail}
+        Salida de Empleado
       </h1>
 
       {/* ESTE ES EL ÚNICO CONTENEDOR PRINCIPAL DEL GRID */}
@@ -34,7 +34,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
+            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
             name={"requisitionTypeId"}
             id={"requisitionMotivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""}
@@ -51,7 +51,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
+            url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtypeId || ""}
@@ -71,7 +71,7 @@ export default function Salida() {
               : "Carta de Renuncia"}{" "}
             <span className="text-red-500">*</span>{" "}
           </label>
-          <input
+          {/* <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400
@@ -105,6 +105,17 @@ export default function Salida() {
             }}
             accept=".pdf, image/*"
             autoComplete="off"
+          />*/}
+          <FileUploadWithPreview
+            name="attachmentBase64"
+            onFileChange={(data) => {
+              setFormValues({
+                attachmentBase64: data,
+              });
+            }}
+            accept=".pdf, image/*"
+            id="attachmentBase64"
+            value={formValues?.attachmentBase64 || ""}
           />
         </div>
         {/* Campo 3: Tipo de Despido */}
@@ -118,7 +129,7 @@ export default function Salida() {
               : "Tipo de Renuncia"}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
+            url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtype || ""}

@@ -72,7 +72,7 @@ export default function Promocion() {
             Carta de Promoción
             {/* Asterisco de requerido */}
           </label>
-          <input
+          {/* <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400
@@ -110,6 +110,17 @@ export default function Promocion() {
             }}
             accept=".pdf, image/*"
             autoComplete="off"
+          />*/}
+          <FileUploadWithPreview
+            name="attachmentBase64"
+            onFileChange={(data) => {
+              setFormValues({
+                attachmentBase64: data,
+              });
+            }}
+            accept=".pdf, image/*"
+            id="attachmentBase64"
+            value={formValues?.attachmentBase64 || ""}
           />
         </div>
 

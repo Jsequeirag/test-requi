@@ -97,11 +97,19 @@ export default function AsyncSelect({
           (item) => String(item.id) === String(propValue)
         );
       }
-      setFormValues({ [name]: selectedItem.id || selectedItem[customIdParam] });
+
       if (selectedItem) {
+        setFormValues({
+          [name]: customIdParam ? selectedItem[customIdParam] : selectedItem.id,
+        });
+
         setSearchText(
           customNameParam ? selectedItem[customNameParam] : selectedItem.name
         );
+      } else {
+        // opción opcional: dejar el texto vacío si no se encuentra el item
+        setSearchText("");
+        console.warn("Item no encontrado para el valor:", propValue);
       }
     } else if (!propValue) {
       setSearchText("");
