@@ -317,7 +317,7 @@ function NewRequisition() {
                         htmlFor="requiresReplacement"
                         className="block text-gray-800 dark:text-gray-200 text-lg font-semibold mb-2"
                       >
-                        Requiere reemplazo {formValues.requiresReplacement}
+                        Requiere reemplazo
                         <span className="text-red-500 font-bold dark:text-red-400">
                           *
                         </span>

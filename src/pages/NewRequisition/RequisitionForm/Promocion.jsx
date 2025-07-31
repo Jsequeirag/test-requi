@@ -4,6 +4,7 @@ import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
 import { convertirBase64 } from "../../../utils/Base64.js";
 import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
+import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview.jsx";
 export default function Promocion() {
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
