@@ -1,5 +1,4 @@
 import React from "react";
-import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
