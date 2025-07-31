@@ -4,7 +4,7 @@ import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
 import { convertirBase64 } from "../../../utils/Base64.js";
-
+import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
 export default function Promocion() {
   //GLOBAL
   const formValues = formStore((state) => state.formValues);

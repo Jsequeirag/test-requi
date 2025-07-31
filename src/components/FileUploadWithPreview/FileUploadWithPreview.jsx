@@ -78,26 +78,17 @@ const FileUploadWithPreview = ({
         setPreviewData(base64);
 
         // Llamar al callback del padre
-        onFileChange({
-          [name]: base64,
-          file: archivoSeleccionado,
-        });
+        onFileChange(base64);
       } catch (error) {
         console.error("Error al convertir a Base64:", error);
         setSelectedFile(null);
         setPreviewData(null);
-        onFileChange({
-          [name]: null,
-          file: null,
-        });
+        onFileChange(null);
       }
     } else {
       setSelectedFile(null);
       setPreviewData(null);
-      onFileChange({
-        [name]: null,
-        file: null,
-      });
+      onFileChange(null);
     }
     setIsLoading(false);
   };
