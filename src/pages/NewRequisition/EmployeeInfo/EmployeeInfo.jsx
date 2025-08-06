@@ -53,30 +53,36 @@ export default function EmployeeInfo() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="employeeId"
           >
-            Nombre <span className="text-red-500 font-bold">*</span>
+            Nombre{" "}
+            <span className="text-red-500 font-bold">
+              {/*Si es promocion no se debe mostrar el */}
+              {formValues?.requestTypeId === 3 ? "" : "*"}
+            </span>
           </label>
           <AsyncSelect
             url={`https://localhost:7040/getEmployeesByDepartmentAndBoss/${employeeId}`}
             name={"employeeId"}
             customNameParam="nombre"
-            required={true}
+            //para promocion no debe ser obligatorio
+            required={formValues?.requestTypeId === 3 ? false : true}
             value={formValues?.employeeId || ""}
             className="w-full text-base"
           />
-          {!formValues?.employeeId && (
+          {/*si es promocion no activarlo*/}
+          {formValues?.requestTypeId !== 3 && (
             <p className="mt-1 text-xs text-red-600 flex items-center dark:text-red-500">
               <Info className="w-3 h-3 mr-1" /> Este campo es requerido.
             </p>
           )}
         </div>
 
-        {/* Campo 2: ID Empleado Exactus */}
+        {/* Campo 2: Exactus ID */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="idExactus"
           >
-            ID Empleado Exactus
+            Exactus ID
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -93,13 +99,13 @@ export default function EmployeeInfo() {
           />
         </div>
 
-        {/* Campo 3: # POS_COD */}
+        {/* Campo 3: # Código de Posición */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="posCod"
           >
-            # POS_COD
+            # Código de Posición
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -227,7 +233,7 @@ export default function EmployeeInfo() {
             id="departamento" // ID corregido
             type="text"
             name="departamento" // Name corregido
-            value={employeeSelected?.departamento || ""}
+            value={employeeSelected?.descrip_Area || ""}
             autoComplete="off"
             // Se elimina onChange en inputs deshabilitados
           />

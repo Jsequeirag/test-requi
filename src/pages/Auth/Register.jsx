@@ -1,7 +1,7 @@
-import { React, useState } from "react";
+import React, { useState, useEffect } from "react"; // Add useEffect here
 import { useNavigate } from "react-router-dom";
 
-import TextButton from "../../components/Button/TextButton";
+import TextButton from "../../components/Button/TextButton"; // This import is not used in the provided code, consider removing if not needed.
 import { motion } from "framer-motion";
 import { useApiSend } from "../../api/config/customHooks";
 import { Register as registerUser } from "../../api/urls/auth";
@@ -76,16 +76,315 @@ const SpinnerIcon = ({ className }) => (
   </svg>
 );
 
+// Iconos para el saludo dinámico con animaciones mejoradas (Copiados del componente Login)
+const SunIcon = ({ className }) => (
+  <motion.svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="#F59E0B"
+    animate={{
+      rotate: [0, 360],
+      scale: [1, 1.1, 1],
+    }}
+    transition={{
+      rotate: {
+        type: "tween",
+        duration: 20,
+        repeat: Infinity,
+        ease: "linear",
+      },
+      scale: {
+        type: "tween",
+        duration: 2,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    }}
+  >
+    {/* Rayos del sol */}
+    <g stroke="#FCD34D" strokeWidth={2}>
+      <path
+        strokeLinecap="round"
+        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707"
+      />
+    </g>
+
+    {/* Sol central */}
+    <circle
+      cx="12"
+      cy="12"
+      r="4"
+      strokeWidth={2}
+      stroke="#F59E0B"
+      fill="#FCD34D"
+    />
+
+    {/* Círculo interno para más profundidad */}
+    <circle
+      cx="12"
+      cy="12"
+      r="2.5"
+      strokeWidth={1.5}
+      stroke="#F59E0B"
+      fill="#FEF3C7"
+    />
+  </motion.svg>
+);
+
+const CloudSunIcon = ({ className }) => (
+  <motion.svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="currentColor"
+    animate={{
+      y: [0, -4, 0],
+      rotate: [0, 2, -2, 0],
+    }}
+    transition={{
+      type: "tween",
+      y: {
+        duration: 5,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+      rotate: {
+        duration: 8,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    }}
+  >
+    {/* Rayos del sol - con diferentes longitudes */}
+    <motion.g
+      className="opacity-85"
+      stroke="#FCD34D"
+      animate={{ rotate: [0, 360] }}
+      transition={{
+        duration: 30,
+        repeat: Infinity,
+        ease: "linear",
+      }}
+    >
+      <path strokeLinecap="round" strokeWidth={2} d="M12 1v3" />
+      <path strokeLinecap="round" strokeWidth={1.5} d="M21 9h-2.5" />
+      <path strokeLinecap="round" strokeWidth={1.5} d="M5.5 9H3" />
+      <path
+        strokeLinecap="round"
+        strokeWidth={1.5}
+        d="M18.36 3.64l-1.41 1.41"
+      />
+      <path strokeLinecap="round" strokeWidth={1.5} d="M5.64 3.64l1.41 1.41" />
+      <path
+        strokeLinecap="round"
+        strokeWidth={1.5}
+        d="M18.36 14.36l-1.41-1.41"
+      />
+      <path strokeLinecap="round" strokeWidth={1.5} d="M5.64 14.36l1.41-1.41" />
+      <path strokeLinecap="round" strokeWidth={1} d="M12 15v2" />
+    </motion.g>
+
+    {/* Sol - con gradiente visual y brillo */}
+    <motion.g
+      animate={{
+        scale: [1, 1.08, 1],
+        opacity: [0.9, 1, 0.9],
+      }}
+      transition={{
+        duration: 4,
+        repeat: Infinity,
+        ease: "easeInOut",
+      }}
+    >
+      {/* Resplandor del sol */}
+      <circle
+        cx="12"
+        cy="9"
+        r="4.5"
+        strokeWidth={0.5}
+        stroke="#FEF3C7"
+        fill="none"
+        className="opacity-30"
+      />
+
+      {/* Sol principal */}
+      <circle
+        cx="12"
+        cy="9"
+        r="3.5"
+        strokeWidth={2}
+        stroke="#F59E0B"
+        fill="#FEF3C7"
+      />
+
+      {/* Núcleo del sol */}
+      <circle
+        cx="12"
+        cy="9"
+        r="2.2"
+        strokeWidth={1.5}
+        stroke="#F59E0B"
+        fill="#FCD34D"
+      />
+
+      {/* Brillo central */}
+      <circle
+        cx="11.5"
+        cy="8.5"
+        r="0.8"
+        fill="#FEF3C7"
+        stroke="none"
+        className="opacity-70"
+      />
+    </motion.g>
+
+    {/* Nube - con mejor volumen y sombras */}
+    <motion.g
+      animate={{
+        x: [0, 3, 0],
+        scale: [1, 1.03, 1],
+        y: [0, -1, 0],
+      }}
+      transition={{
+        x: {
+          duration: 6,
+          repeat: Infinity,
+          ease: "easeInOut",
+        },
+        scale: {
+          duration: 5,
+          repeat: Infinity,
+          ease: "easeInOut",
+        },
+        y: {
+          duration: 4,
+          repeat: Infinity,
+          ease: "easeInOut",
+        },
+      }}
+    >
+      {/* Sombra de la nube */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        stroke="#D1D5DB"
+        fill="#F9FAFB"
+        d="M3.2 17.2a3 3 0 013-3h1a5 5 0 019.5-1.5A4 4 0 0119.2 20.2H6.2a3 3 0 01-3-3z"
+        className="opacity-40"
+      />
+
+      {/* Nube principal */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        stroke="#9CA3AF"
+        fill="white"
+        d="M3 17a3 3 0 013-3h1a5 5 0 019.5-1.5A4 4 0 0119 20H6a3 3 0 01-3-3z"
+      />
+
+      {/* Volumen y textura */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={1}
+        stroke="#E5E7EB"
+        fill="none"
+        d="M8 18c2-0.3 4-0.3 6 0M6.5 16.8c1.5-0.2 3-0.2 4.5 0M13.5 16.8c1.5-0.2 3-0.2 4.5 0"
+        className="opacity-50"
+      />
+
+      {/* Highlights en la nube */}
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={0.8}
+        stroke="#F3F4F6"
+        fill="none"
+        d="M7 15.5c1-0.3 2-0.3 3 0M14 15.5c1-0.3 2-0.3 3 0"
+        className="opacity-60"
+      />
+    </motion.g>
+  </motion.svg>
+);
+const MoonIcon = ({ className }) => (
+  <motion.svg
+    className={className}
+    fill="none"
+    viewBox="0 0 24 24"
+    stroke="#6B7280"
+    animate={{
+      rotate: [0, 10, -10, 0],
+      scale: [1, 1.05, 1],
+      opacity: [0.8, 1, 0.8],
+    }}
+    transition={{
+      type: "tween",
+      rotate: {
+        duration: 6,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+      scale: {
+        duration: 4,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+      opacity: {
+        duration: 3,
+        repeat: Infinity,
+        ease: "easeInOut",
+      },
+    }}
+  >
+    {/* Luna principal - media luna */}
+    <path
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      strokeWidth={2}
+      stroke="#6B7280"
+      fill="#E5E7EB"
+      d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+    />
+  </motion.svg>
+);
+
 export default function Register() {
   const { isPending, error, mutateAsync } = useApiSend(registerUser);
   //global
   const [formValues, setFormValues] = useState({});
   const [userExisted, setUserExisted] = useState();
   const [focusedField, setFocusedField] = useState(null);
-  const registerValues = RegisterStore((state) => state.registerValues);
+  const registerValues = RegisterStore((state) => state.registerValues); // eslint-disable-line no-unused-vars
   const setRegisterValues = RegisterStore((state) => state.setRegisterValues);
   //router
   const navigate = useNavigate();
+
+  // --- Sección de Saludos ---
+  const [greeting, setGreeting] = useState({ message: "", icon: SunIcon });
+
+  // Función para obtener el saludo según la hora
+  const getGreeting = () => {
+    const nowInCostaRica = new Date();
+    const currentHourCR = nowInCostaRica.getHours();
+
+    if (currentHourCR >= 5 && currentHourCR < 12) {
+      return { message: "Buenos días", icon: SunIcon };
+    } else if (currentHourCR >= 12 && currentHourCR < 18) {
+      return { message: "Buenas tardes", icon: CloudSunIcon };
+    } else {
+      return { message: "Buenas noches", icon: MoonIcon };
+    }
+  };
+
+  // Actualizar el saludo cuando se monta el componente
+  useEffect(() => {
+    setGreeting(getGreeting());
+  }, []);
+  // --- Fin Sección de Saludos ---
+
   //onSubmit
   const onSubmit = async (e) => {
     e.preventDefault();
@@ -178,6 +477,26 @@ export default function Register() {
     },
   };
 
+  // --- Nueva variante para el saludo (copiada del componente Login) ---
+  const greetingVariants = {
+    hidden: {
+      opacity: 0,
+      y: -20,
+      scale: 0.8,
+    },
+    visible: {
+      opacity: 1,
+      y: 0,
+      scale: 1,
+      transition: {
+        delay: 1.0,
+        duration: 0.6,
+        ease: [0.25, 0.46, 0.45, 0.94],
+      },
+    },
+  };
+  // --- Fin Nueva variante ---
+
   return (
     <motion.div
       className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden"
@@ -214,6 +533,60 @@ export default function Register() {
           <div className="bg-gradient-to-r from-[#bdab78]/40 to-[#a38e67]/40 backdrop-blur-md px-8 py-10 text-center relative border-b border-white/20">
             <div className="absolute inset-0 bg-black/10"></div>
             <motion.div className="relative z-10" variants={logoVariants}>
+              {/* Saludo dinámico (Agregado del componente Login) */}
+              <motion.div
+                className="mb-6 flex items-center justify-center gap-3"
+                variants={greetingVariants}
+              >
+                <motion.div
+                  className="p-3 bg-white/30 backdrop-blur-md rounded-full border border-white/40 shadow-lg"
+                  whileHover={{
+                    scale: 1.15,
+                    rotate: 15,
+                    boxShadow: "0 10px 30px rgba(0, 0, 0, 0.2)",
+                  }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  animate={{
+                    boxShadow: [
+                      "0 5px 15px rgba(0, 0, 0, 0.1)",
+                      "0 8px 25px rgba(0, 0, 0, 0.15)",
+                    ],
+                  }}
+                  style={{
+                    transition: {
+                      boxShadow: {
+                        type: "tween",
+                        duration: 2,
+                        repeat: Infinity,
+                        ease: "easeInOut",
+                      },
+                    },
+                  }}
+                >
+                  <greeting.icon className="w-7 h-7 text-gray-800 drop-shadow-lg stroke-2" />
+                </motion.div>
+                <motion.p
+                  className="text-lg font-semibold text-gray-800 drop-shadow-lg"
+                  animate={{
+                    opacity: [0.7, 1, 0.7],
+                    textShadow: [
+                      "0 2px 4px rgba(0, 0, 0, 0.1)",
+                      "0 4px 8px rgba(0, 0, 0, 0.2)",
+                      "0 2px 4px rgba(0, 0, 0, 0.1)",
+                    ],
+                  }}
+                  transition={{
+                    type: "tween",
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: "easeInOut",
+                  }}
+                >
+                  {greeting.message}
+                </motion.p>
+              </motion.div>
+              {/* Fin Saludo dinámico */}
+
               {/* Logo */}
               <motion.div
                 className="w-20 h-20 bg-white/20 backdrop-blur-md rounded-2xl mx-auto mb-4 flex items-center justify-center shadow-lg border border-white/30"
@@ -295,7 +668,7 @@ export default function Register() {
                     type="number"
                     name="employeeId"
                     id="employeeId"
-                    placeholder="Ejemplo: 741676"
+                    placeholder="Ingresa tu usuario, ejemplo: 718956"
                     className={`w-full pl-12 pr-4 py-4 bg-white/20 backdrop-blur-md border-2 rounded-xl font-medium text-black/70 placeholder-black/50 
                       transition-all duration-300 focus:outline-none focus:bg-white/25 focus:shadow-lg border-white/30
                       ${

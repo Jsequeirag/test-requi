@@ -87,13 +87,29 @@ export default function AsyncSelect({
   // Efecto para inicializar searchText cuando los datos se cargan o propValue cambia
   useEffect(() => {
     if (isSuccess && data && propValue) {
-      const selectedItem = data.find(
-        (item) => String(item.id) === String(propValue)
-      );
+      let selectedItem;
+      if (customIdParam) {
+        selectedItem = data.find(
+          (item) => String(item[customIdParam]) === String(propValue)
+        );
+      } else {
+        selectedItem = data.find(
+          (item) => String(item.id) === String(propValue)
+        );
+      }
+
       if (selectedItem) {
+        setFormValues({
+          [name]: customIdParam ? selectedItem[customIdParam] : selectedItem.id,
+        });
+
         setSearchText(
           customNameParam ? selectedItem[customNameParam] : selectedItem.name
         );
+      } else {
+        // opción opcional: dejar el texto vacío si no se encuentra el item
+        setSearchText("");
+        console.warn("Item no encontrado para el valor:", propValue);
       }
     } else if (!propValue) {
       setSearchText("");

@@ -6,6 +6,10 @@ import { useApiGet } from "../../../api/config/customHooks.js";
 import TextButton from "../../../components/Button/TextButton";
 import { ToastContainer, toast } from "react-toastify";
 import { getRequestType } from "../../../api/urls/Request.js";
+import {
+  getEmployeesbyBoss,
+  getEmployees,
+} from "../../../api/urls/Employee.js";
 import LoadingModal from "../../../components/LoadingModal/LoadingModal";
 import { useNavigate } from "react-router-dom";
 import { getLocalStorageKeyValue } from "../../../utils/localstore";
@@ -104,6 +108,7 @@ export default function RDetailMovimientoLateral() {
       />
       <h1 className="text-2xl">Detalles de la Acción</h1> {/*renuncia */}
       <div className="flex">
+        {/*
         <div className="flex-1 m-5">
           <label
             className="block text-black text-lg font-bold mb-2"
@@ -127,7 +132,8 @@ export default function RDetailMovimientoLateral() {
             </option>
             <option value={true}>Sí</option> <option value={false}>No</option>
           </select>
-        </div>
+        </div> */}
+        {/*
         <div className="flex-1 m-5">
           <label
             className="block text-black text-lg font-bold mb-2"
@@ -136,7 +142,7 @@ export default function RDetailMovimientoLateral() {
             Nuevo encargado
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
+            url={`https://localhost:7040/getEmployees`}
             name={"newDominoEffectManager"}
             disabled={
               formValues.changeManager === false ||
@@ -145,8 +151,8 @@ export default function RDetailMovimientoLateral() {
             customNameParam={"nombre"}
             value={formValues.newDominoEffectManager || ""} // Add this line
           />
-        </div>
-        <div className="flex-1 m-5">
+        </div */}
+        {/*<div className="flex-1 m-5">
           <label
             className="block text-black text-lg font-bold mb-2"
             htmlFor="RequiresReplacement"
@@ -167,9 +173,10 @@ export default function RDetailMovimientoLateral() {
             <option value={true}>Sí</option> <option value={false}>No</option>
           </select>
         </div>
+        */}
       </div>
       <div className="flex">
-        <div className="flex-1 m-5">
+        {/*    <div className="flex-1 m-5">
           <label
             className="block text-black text-lg font-bold mb-2"
             htmlFor="HiringProcess"
@@ -190,7 +197,42 @@ export default function RDetailMovimientoLateral() {
             <option value={true}>Sí</option> <option value={false}>No</option>
           </select>
         </div>
-      </div>{" "}
+        */}
+      </div>
+      <div className="flex">
+        <div className="w-[100%] m-5">
+          <label
+            className="block text-black text-lg font-bold mb-2"
+            htmlFor="HiringProcess"
+          >
+            Nuevo Supervisor
+          </label>
+          <div className=""></div>
+          <div className="">
+            {
+              <>
+                <AsyncSelect
+                  url={`https://localhost:7040/getEmployeesBySupervisorRole`}
+                  name={"asignEmployees"}
+                  customNameParam={"nombre"}
+                  disabled={!employeesData?.length > 0}
+                  value={formValues.asignEmployees || ""}
+                  required={!formValues.requiresReplacement !== "true"}
+                />
+              </>
+            }
+          </div>
+
+          <>
+            {employeesData?.length > 0 && (
+              <p className="text-blue-600 mt-1">
+                <b>Personal a cargo</b>, por favor seleccione un nuevo
+                supervisor para el personal
+              </p>
+            )}
+          </>
+        </div>
+      </div>
       <div className="flex w-100 justify-center">
         <TextButton
           text={

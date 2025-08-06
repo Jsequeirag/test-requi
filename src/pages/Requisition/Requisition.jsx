@@ -17,7 +17,7 @@ function Requisition() {
           <div className="flex items-center border-b p-4 mx-2">
             <TextButton
               onClick={() => {
-                navigate("/home");
+                navigate("/supervisor");
               }}
               text={"Atras"}
             />
@@ -43,7 +43,6 @@ function Requisition() {
                   id=""
                 >
                   {" "}
-                  <option selected>Seleccionar una opción</option>
                   <option value="FR">Sálida</option>
                   <option value="DE">Entrada</option>
                 </select>
@@ -121,7 +120,7 @@ function Requisition() {
                   className="block text-black text-lg font-bold mb-2"
                   htmlFor="userName"
                 >
-                  # POS_COD
+                  # Código de Posición
                 </label>
                 <input
                   className=" border rounded-sm w-full py-2 px-3 text-grey-darker text-lg  bg-slate-100 focus:outline-none "
@@ -238,7 +237,6 @@ function Requisition() {
                   name=""
                   id=""
                 >
-                  <option selected>Seleccionar una opción</option>
                   <option value="FR" selected>
                     Despido
                   </option>
@@ -277,7 +275,6 @@ function Requisition() {
                   name=""
                   id=""
                 >
-                  <option selected>Seleccionar una opción</option>
                   <option value="FR" selected>
                     Rform
                   </option>
@@ -316,7 +313,6 @@ function Requisition() {
                   name=""
                   id=""
                 >
-                  <option selected>Seleccionar una opción</option>
                   <option value="FR" selected>
                     Sí
                   </option>{" "}
@@ -441,7 +437,6 @@ function Requisition() {
                   id=""
                 >
                   {" "}
-                  <option selected>Seleccionar una opción</option>
                   <option value="FR" selected>
                     Motivo A
                   </option>

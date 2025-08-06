@@ -1,127 +1,184 @@
-import { React, useEffect } from "react";
+import React, { useEffect } from "react";
 import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
 import formStore from "../../../../stores/FormStore.js";
-import { useApiGet } from "../../../api/config/customHooks.js";
-import { useNavigate } from "react-router-dom";
+import { useApiGet, useApiSend } from "../../../api/config/customHooks.js";
+import { useNavigate, useLocation } from "react-router-dom";
 import TextButton from "../../../components/Button/TextButton";
-import { useApiSend } from "../../../api/config/customHooks";
 import { createRequests, updateRequests } from "../../../api/urls/Request";
 import { getLocalStorageKeyValue } from "../../../utils/localstore";
 import { ToastContainer, toast } from "react-toastify";
 import { getEmployeesbyBoss } from "../../../api/urls/Employee.js";
 import LoadingModal from "../../../components/LoadingModal/LoadingModal";
-import { useLocation } from "react-router-dom";
+
+// Ensure you have react-toastify and tailwindcss installed.
+// npm install react-toastify
+// npm install -D tailwindcss postcss autoprefixer
+// npx tailwindcss init -p
+// Then configure your tailwind.config.js to scan your files.
+// Also, import 'react-toastify/dist/ReactToastify.css' in your main App.js or index.js
+
 export default function RDetailSalida({ closeModel }) {
-  //GLOBAL
+  // GLOBAL STATE
   const formValues = formStore((state) => state.formValues);
   const setFormValues = formStore((state) => state.setFormValues);
-  //reacty-router-dom
-  const navigate = useNavigate();
-  // ========== 📍 Location ==========
-  const location = useLocation();
-  //localstorage
-  const userLogged = getLocalStorageKeyValue("requitool-employeeInfo", "id");
-  //submit
-  const {
-    mutateAsync: createRequest,
-    isPending: isPendingCreateRequest,
-    isLoading: isLoadingCreateRequest,
-  } = useApiSend(
-    createRequests,
-    () => {
-      toast.success("Solicitud creada", {
-        className: "bg-grey-800",
-        progressClassName: "bg-white",
-      });
-      navigate("/requisitions");
-    },
-    (e) => {
-      console.log(e);
-      toast.error("Inconveniente Creando la solicitud", {
-        className: "bg-grey-800",
-        progressClassName: "bg-white",
-      });
-    }
-  );
-  const {
-    mutateAsync: updateRequest,
-    isPending: isPendingUpdateRequest,
-    isLoading: isLoadingUpdateRequest,
-  } = useApiSend(
-    updateRequests,
-    () => {
-      toast.success("Solicitud creada", {
-        className: "bg-grey-800",
-        progressClassName: "bg-white",
-      });
-      navigate("/requisitions");
-    },
-    (e) => {
-      console.log(e);
-      toast.error("Inconveniente Creando la solicitud", {
-        className: "bg-grey-800",
-        progressClassName: "bg-white",
-      });
-    }
-  );
-  //onSubmit
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    if (location.state?.action === "update") {
-      return await updateRequest({
-        ...formValues,
-        ["userId"]: userLogged,
-      });
-    }
-    return await createRequest({
-      ...formValues,
-      ["userId"]: userLogged,
-    });
-  };
+  const resetForm = formStore((state) => state.resetForm); // Assuming you have a resetForm action in your store
 
-  var {
+  // REACT-ROUTER-DOM HOOKS
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // LOCAL STORAGE
+  const userLogged = getLocalStorageKeyValue("requitool-employeeInfo", "id");
+
+  // API SEND HOOKS (for creating/updating requests)
+  const { mutateAsync: createRequest, isPending: isPendingCreateRequest } =
+    useApiSend(
+      createRequests,
+      () => {
+        toast.success("Solicitud creada exitosamente.", {
+          className: "bg-green-600 text-white",
+          progressClassName: "bg-white",
+          icon: "🚀",
+        });
+        navigate("/requisitions");
+        resetForm();
+      },
+      (e) => {
+        console.error("Error creating request:", e);
+        toast.error(
+          "Inconveniente creando la solicitud. Por favor, intente de nuevo.",
+          {
+            className: "bg-red-600 text-white",
+            progressClassName: "bg-white",
+            icon: "🚨",
+          }
+        );
+      }
+    );
+
+  const { mutateAsync: updateRequest, isPending: isPendingUpdateRequest } =
+    useApiSend(
+      updateRequests,
+      () => {
+        toast.success("Solicitud actualizada exitosamente.", {
+          className: "bg-green-600 text-white",
+          progressClassName: "bg-white",
+          icon: "✨",
+        });
+        navigate("/requisitions");
+        resetForm();
+      },
+      (e) => {
+        console.error("Error updating request:", e);
+        toast.error(
+          "Inconveniente actualizando la solicitud. Por favor, intente de nuevo.",
+          {
+            className: "bg-red-600 text-white",
+            progressClassName: "bg-white",
+            icon: "🚨",
+          }
+        );
+      }
+    );
+
+  // API GET HOOK (for employees by boss)
+  const {
     data: employeesData,
-    isSuccess: employeesByBossIsSuccess,
-    isLoading,
+    isLoading: isLoadingEmployeesByBoss,
+    isError: isErrorEmployeesByBoss,
+    error: employeesByBossError,
   } = useApiGet(
-    ["employeesByBoss"],
+    ["employeesByBoss", formValues?.employeeId],
     () => getEmployeesbyBoss(formValues?.employeeId),
     {
-      // <- SOLO ejecuta si hay ID
+      enabled: !!formValues?.employeeId,
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
+      onError: (e) => {
+        console.error("Error fetching employees by boss:", e);
+      },
     }
   );
 
+  // Derive state for conditional rendering and disabling
+  const isUpdateAction = location.state?.action === "update";
+  const requiresReplacement = formValues.requiresReplacement === "true";
+  const requiresHiringProcess = formValues.hiringProcess === "true";
+  const showHiringProcessFields = requiresReplacement;
+  const showNewSupervisorField =
+    requiresReplacement && employeesData?.length > 0;
+  const isSubmitting = isPendingCreateRequest || isPendingUpdateRequest;
+
+  // Handler for form submission
+  const onSubmit = async (e) => {
+    e.preventDefault();
+
+    const payload = {
+      ...formValues,
+      userId: userLogged,
+    };
+
+    if (isUpdateAction) {
+      await updateRequest(payload);
+    } else {
+      await createRequest(payload);
+    }
+  };
+
+  // Effect to reset relevant fields when 'requiresReplacement' changes
+  useEffect(() => {
+    if (!requiresReplacement) {
+      setFormValues((prev) => ({
+        ...prev,
+        hiringProcess: "",
+        processType: "",
+        asignEmployees: "",
+      }));
+    }
+  }, [requiresReplacement, setFormValues]);
+
   return (
-    <form onSubmit={onSubmit}>
+    <form
+      onSubmit={onSubmit}
+      className="p-6 bg-white rounded-lg shadow-xl max-w-4xl mx-auto my-8 dark:bg-gray-800"
+    >
       <ToastContainer position="bottom-right" theme="dark" />
+
+      {/* Loading Modal */}
       <LoadingModal
-        openModal={isPendingCreateRequest || isPendingUpdateRequest}
+        openModal={isSubmitting}
         text={
-          location.state?.action === "update"
-            ? "Actualizando solicitud"
-            : "Creando solicitud"
+          isUpdateAction ? "Actualizando solicitud..." : "Creando solicitud..."
         }
       />
-      <h1 className="text-2xl">Detalles de la Acción</h1>
-      {/*renuncia */}
-      <div className="flex">
-        <div className="flex-1 m-5">
+
+      <h1 className="text-3xl font-bold text-gray-800 mb-8 text-center border-b pb-4 dark:text-gray-100 dark:border-gray-700">
+        Detalles de la Acción
+      </h1>
+
+      {/* Main Grid Container for Form Fields */}
+      {/* Consistent with Salida component: 1 col on mobile, 2 on md, 3 on lg */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+        {/* Field: Requiere reemplazo */}
+        {/*<div>
           <label
-            className="block text-black text-lg font-bold mb-2"
-            htmlFor="RequiresReplacement"
+            htmlFor="requiresReplacement"
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
           >
-            Requiere reemplazo
+            Requiere reemplazo{" "}
+            <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <select
-            className="shadow border rounded-sm w-full py-2 px-3 text-grey-darker text-lg focus:coutline-input"
+            id="requiresReplacement"
+            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
+                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-100 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             name="requiresReplacement"
-            value={formValues.requiresReplacement} // Add this line
+            value={formValues.requiresReplacement || ""}
             required
             onChange={(e) =>
               setFormValues({
-                ...formValues, // It's good practice to spread the previous state
+                ...formValues,
                 [e.target.name]: e.target.value,
               })
             }
@@ -130,23 +187,32 @@ export default function RDetailSalida({ closeModel }) {
             <option value="true">Sí</option>
             <option value="false">No</option>
           </select>
-        </div>{" "}
-        <div className="flex-1 m-5">
+        </div>*/}
+        {/* Field: Requiere proceso de contratación */}
+        {/*<div
+          className={
+            !showHiringProcessFields ? "opacity-50 pointer-events-none" : ""
+          }
+        >
           <label
-            className="block text-black text-lg font-bold mb-2"
-            htmlFor="HiringProcess"
+            htmlFor="hiringProcess"
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
           >
-            Requiere proceso de contratación
+            Requiere proceso de contratación{" "}
+            <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <select
-            className="shadow border rounded-sm w-full py-2 px-3 text-grey-darker text-lg focus:coutline-input"
-            disabled={formValues.requiresReplacement !== "true"}
+            id="hiringProcess"
+            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
+                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-100 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             name="hiringProcess"
-            required
-            value={formValues.hiringProcess} // Add this line
+            required={showHiringProcessFields}
+            value={formValues.hiringProcess || ""}
+            disabled={!showHiringProcessFields}
             onChange={(e) =>
               setFormValues({
-                ...formValues, // It's good practice to spread the previous state
+                ...formValues,
                 [e.target.name]: e.target.value,
               })
             }
@@ -155,68 +221,127 @@ export default function RDetailSalida({ closeModel }) {
             <option value="true">Sí</option>
             <option value="false">No</option>
           </select>
-        </div>
-        <div className="flex-1 m-5">
+        </div>*/}
+        {/* Field: Tipo de proceso */}
+        {/* <div
+          className={
+            !showHiringProcessFields || !requiresHiringProcess
+              ? "opacity-50 pointer-events-none"
+              : ""
+          }
+        >
           <label
-            className="block text-black text-lg font-bold mb-2"
-            htmlFor="HiringProcess"
+            htmlFor="processType"
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
           >
-            Tipo de proceso
+            Tipo de proceso{" "}
+            <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
-          <div className="">
-            <>
-              <AsyncSelect
-                url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=4`}
-                name={"processType"}
-                disabled={formValues.requiresReplacement !== "true"}
-                value={formValues.processType || ""}
-                required={!formValues.requiresReplacement !== "true"}
-              />
-            </>
-          </div>
-        </div>
-      </div>{" "}
-      <div className="flex">
-        <div className="w-[75%] m-5">
+          <AsyncSelect
+            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=4`}
+            name={"processType"}
+            id={"processType"}
+            disabled={!showHiringProcessFields || !requiresHiringProcess}
+            value={formValues.processType || ""}
+            required={showHiringProcessFields && requiresHiringProcess}
+            placeholder={
+              !showHiringProcessFields || !requiresHiringProcess
+                ? "Selección deshabilitada"
+                : "Seleccione un tipo de proceso"
+            }
+            className="w-full text-base" // Consistent with Salida
+          />
+        </div>*/}
+        {/* Field: Nuevo Supervisor (conditionally rendered and styled) */}
+        <div
+          className={`lg:col-span-3 ${
+            !showNewSupervisorField && isLoadingEmployeesByBoss
+              ? "opacity-50 pointer-events-none"
+              : ""
+          }`}
+        >
           <label
-            className="block text-black text-lg font-bold mb-2"
-            htmlFor="HiringProcess"
+            htmlFor="asignEmployees"
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
           >
             Nuevo Supervisor
+            <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
-          <div className="">
-            {
-              <>
-                <AsyncSelect
-                  url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
-                  name={"asignEmployees"}
-                  customNameParam={"nombre"}
-                  disabled={!employeesData?.length > 0}
-                  value={formValues.asignEmployees || ""}
-                  required={!formValues.requiresReplacement !== "true"}
-                />
-              </>
-            }
+          <div className="relative">
+            {isLoadingEmployeesByBoss && (
+              <div className="absolute inset-y-0 right-0 pr-3 flex items-center top-0 bottom-0">
+                <svg
+                  className="animate-spin h-5 w-5 text-gray-400"
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                >
+                  <circle
+                    className="opacity-25"
+                    cx="12"
+                    cy="12"
+                    r="10"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                  ></circle>
+                  <path
+                    className="opacity-75"
+                    fill="currentColor"
+                    d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                  ></path>
+                </svg>
+              </div>
+            )}
+            <AsyncSelect
+              url={`https://localhost:7040/getEmployeesBySupervisorRole`}
+              name={"asignEmployees"}
+              id={"asignEmployees"}
+              customNameParam={"nombre"}
+              disabled={showNewSupervisorField}
+              value={formValues.asignEmployees || ""}
+              required={showNewSupervisorField}
+              placeholder={
+                isLoadingEmployeesByBoss
+                  ? "Cargando posibles supervisores..."
+                  : showNewSupervisorField
+                  ? "Seleccione un nuevo supervisor"
+                  : "No hay personal para reasignar o no requiere reemplazo"
+              }
+              className="w-full text-base" // Consistent with Salida
+            />
           </div>
 
-          <>
-            {employeesData?.length > 0 && (
-              <p className="text-blue-600 mt-1">
-                <b>Personal a cargo</b>, por favor seleccione un nuevo
-                supervisor para el personal
+          {employeesData?.length > 0 && (
+            <p className="text-blue-600 text-sm mt-3 dark:text-blue-400">
+              <b>Personal a cargo:</b> Se ha detectado personal bajo el empleado
+              saliente. Por favor, seleccione un nuevo supervisor para este
+              personal.
+            </p>
+          )}
+          {requiresReplacement &&
+            !isLoadingEmployeesByBoss &&
+            !employeesData?.length &&
+            formValues?.employeeId && (
+              <p className="text-orange-500 text-sm mt-3 dark:text-orange-300">
+                No se encontró personal directo a cargo del empleado saliente.
               </p>
             )}
-          </>
+          {isErrorEmployeesByBoss && (
+            <p className="text-red-500 text-sm mt-3 dark:text-red-400">
+              Error al cargar personal a cargo:{" "}
+              {employeesByBossError?.message || "Detalles desconocidos."}
+            </p>
+          )}
         </div>
       </div>
-      <div className="flex w-100 justify-center">
+
+      {/* Form Submission Button */}
+      <div className="flex justify-center mt-10">
         <TextButton
-          text={
-            location.state?.action === "update"
-              ? "Actualizar solicitud"
-              : "Crear solicitud"
-          }
+          text={isUpdateAction ? "Actualizar Solicitud" : "Crear Solicitud"}
           type={"submit"}
+          disabled={isSubmitting}
+          className="px-8 py-3 bg-blue-600 text-white font-semibold rounded-lg shadow-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200 ease-in-out disabled:bg-gray-400 disabled:cursor-not-allowed dark:bg-blue-700 dark:hover:bg-blue-800 dark:focus:ring-blue-600"
         />
       </div>
     </form>
