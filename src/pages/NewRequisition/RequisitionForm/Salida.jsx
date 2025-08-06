@@ -5,7 +5,7 @@ import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
 import { convertirBase64 } from "../../../utils/Base64.js";
-
+import Tooltip from "../../../components/Tooltip";
 export default function Salida() {
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
@@ -246,13 +246,23 @@ export default function Salida() {
         </div>
         {/* Campo 6: Fecha Oficial de Salida */}
         <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="officialEmployeeDepartureDate" // ID único
-          >
-            Fecha Oficial de Salida <span className="text-red-500">*</span>{" "}
-            {/* Asterisco de requerido */}
-          </label>
+          <div className="flex">
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
+              htmlFor="officialEmployeeDepartureDate" // ID único
+            >
+              Fecha Oficial de Salida <span className="text-red-500">*</span>{" "}
+              {/* Asterisco de requerido */}
+            </label>
+
+            <Tooltip
+              text={
+                formValues?.requisitionTypeId === 4
+                  ? "Fecha oficial que indica la Carta de Despido"
+                  : "Fecha oficial que indica  la Carta de Renuncia"
+              }
+            />
+          </div>
           <input
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -278,18 +288,21 @@ export default function Salida() {
         </div>{" "}
         {/* Campo 7: Fecha Real de Salida */}
         <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="employeeDepartureDate" // ID único
-          >
-            Fecha Real de Salida <span className="text-red-500">*</span>{" "}
-            {/* Asterisco de requerido */}
-          </label>
+          <div className="flex ">
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
+              htmlFor="employeeDepartureDate" // ID único
+            >
+              Fecha Real de Salida <span className="text-red-500">*</span>{" "}
+              {/* Asterisco de requerido */}
+            </label>
+            <Tooltip text={"Último día laboral del empleado"} />
+          </div>
           <input
             required
-            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
+                     bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             type="date"
             id="employeeDepartureDate" // ID único
             name="employeeDepartureDate"
@@ -310,13 +323,18 @@ export default function Salida() {
         </div>
         {/* Campo 8: Fecha Entrega de Equipo */}
         <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="returnWorkEquipmentDate" // ID único
-          >
-            Fecha Entrega de Equipo <span className="text-red-500">*</span>{" "}
-            {/* Asterisco de requerido */}
-          </label>
+          <div className="flex">
+            {" "}
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
+              htmlFor="returnWorkEquipmentDate" // ID único
+            >
+              Fecha Entrega de Equipo al superior encargado
+              <span className="text-red-500">*</span>
+              {/* Asterisco de requerido */}
+            </label>{" "}
+            <Tooltip text={"Fecha en la que el colaborar entrega el equipo"} />
+          </div>
           <input
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -406,9 +424,13 @@ export default function Salida() {
             Nueva Empresa
           </label>
           <input
-            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
+            ${
+              formValues?.requisitionTypeId === 4
+                ? "bg-gray-100 cursor-not-allowed"
+                : "bg-white"
+            } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             type="text"
             name="joinNewCompany" // Nombre corregido
             id="joinNewCompany" // ID corregido
