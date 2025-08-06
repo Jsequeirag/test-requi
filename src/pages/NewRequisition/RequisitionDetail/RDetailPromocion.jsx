@@ -107,7 +107,7 @@ export default function RDetailPromocion() {
       />
       <h1 className="text-2xl">Detalles de la Acción</h1> {/*renuncia */}
       <div className="flex">
-        {/*<div className="flex-1 m-5">
+        <div className="flex-1 m-5">
           <label
             className="block text-black text-lg font-bold mb-2"
             htmlFor="ChangeManager"
@@ -117,7 +117,6 @@ export default function RDetailPromocion() {
           <select
             className="shadow  border rounded-sm w-full py-2 px-3 text-grey-darker text-lg focus:coutline-input"
             name="ChangeManager"
-            value={formValues.ChangeManager || ""} // Add this line
             onChange={(e) =>
               setFormValues({
                 [e.target.name]: e.target.value,
@@ -129,8 +128,8 @@ export default function RDetailPromocion() {
             </option>
             <option value={true}>Sí</option> <option value={false}>No</option>
           </select>
-        </div>*/}
-        {/*<div className="flex-1 m-5">
+        </div>
+        <div className="flex-1 m-5">
           <label
             className="block text-black text-lg font-bold mb-2"
             htmlFor="userName"
@@ -144,8 +143,7 @@ export default function RDetailPromocion() {
             value={formValues.newDominoEffectManager || ""}
           />
         </div>
-        */}
-        {/*<div className="flex-1 m-5">
+        <div className="flex-1 m-5">
           <label
             className="block text-black text-lg font-bold mb-2"
             htmlFor="RequiresReplacement"
@@ -168,10 +166,10 @@ export default function RDetailPromocion() {
             <option value="true">Sí</option>
             <option value="false">No</option>
           </select>
-        </div>*/}
+        </div>
       </div>
       <div className="flex">
-        {/*div className=" m-5">
+        <div className=" m-5">
           <label
             className="block text-black text-lg font-bold mb-2"
             htmlFor="HiringProcess"
@@ -195,7 +193,7 @@ export default function RDetailPromocion() {
             <option value="true">Sí</option>
             <option value="false">No</option>
           </select>
-        </div>*/}
+        </div>
 
         <div className="flex">
           <div className="w-[100%] m-5">
@@ -232,6 +230,11 @@ export default function RDetailPromocion() {
           </div>
         </div>
       </div>
+      <p className="text-red-600 text-xl">
+        Nota: 1-preguntar sobre los empleados de los otros departamento(Para
+        enviar correo), 2- Ocupa comfirmar cambios en exactus antes de proseguir
+        con la requisiciones
+      </p>
       <div className="flex w-100 justify-center">
         <TextButton
           text={

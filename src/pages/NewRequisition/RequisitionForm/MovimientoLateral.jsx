@@ -25,24 +25,42 @@ export default function MovimientoLateral() {
       {/* ESTE ES EL ÚNICO CONTENEDOR PRINCIPAL DEL GRID */}
       {/* Se asegura 1 columna en móvil, 2 en mediano y 3 en grande */}
       <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
+        {/* Campo 1: Motivo */}
+        <div>
+          <label
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+            htmlFor="motivo" // ID corregido y único
+          >
+            Motivo{" "}
+            {/* Add * here if needed, e.g., <span className="text-red-500">*</span> */}
+          </label>
+          <AsyncSelect
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
+            name={"requisitionTypeId"}
+            id={"motivo"} // Añadido ID
+            value={formValues?.requisitionTypeId || ""} // Usamos 'value' y un fallback a ""
+            className="w-full text-base"
+            // required={true} // Uncomment and set to true if this field is mandatory
+          />
+        </div>
         {/* Campo 2: Fecha Oficial del Movimiento */}
         {/* Eliminado el div `flex` anidado innecesario */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="movementDate" // ID corregido y más descriptivo
+            htmlFor="movementOfficialDate" // ID corregido y más descriptivo
           >
             Fecha Oficial del Movimiento <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
           <input
-            id="movementDate" // ID corregido
+            id="movementOfficialDate" // ID corregido
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="date"
-            name="movementDate" // Nombre del campo en formValues
+            name="createdDate" // Nombre del campo en formValues
             placeholder="Fecha oficial del Movimiento"
             onChange={(e) => {
               // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
@@ -52,9 +70,7 @@ export default function MovimientoLateral() {
             }}
             autoComplete="off"
             value={
-              formValues.movementDate
-                ? formValues.movementDate.split("T")[0]
-                : new Date().toISOString().split("T")[0]
+              formValues.createdDate ? formValues.createdDate.split("T")[0] : ""
             }
           />
         </div>{" "}

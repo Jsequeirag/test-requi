@@ -1,6 +1,6 @@
 import React from "react";
 import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
-import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview.jsx";
+import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview .jsx";
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
@@ -13,7 +13,6 @@ export default function Salida() {
 
   //API - Keeping the call as formValues?.requestTypeId is used in AsyncSelect URLs
   useApiGet(["RequestType"], getRequestType);
-  // API GET HOOK (for employees by boss)
 
   return (
     <>
@@ -34,7 +33,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
             name={"requisitionTypeId"}
             id={"requisitionMotivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""}
@@ -51,11 +50,11 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
+            url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
               formValues?.requisitionTypeId || ""
             }`}
-            value={formValues?.requisitionSubtypeId || ""}
-            name={"requisitionSubtypeId"}
+            value={formValues?.requisitionSubtype || ""}
+            name={"requisitionSubtype"}
             id={"RequisitionSubtypeSelect"} // Añadido ID
             className="w-full text-base"
           />
@@ -69,12 +68,12 @@ export default function Salida() {
             {formValues?.requisitionTypeId === 4
               ? "Carta de Despido"
               : "Carta de Renuncia"}{" "}
-            <span className="text-red-500">*</span>{" "}
+            Número de teléfono <span className="text-red-500">*</span>{" "}
           </label>
-          {/* <input
+          <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400
                        file:mr-4 file:py-2 file:px-4
                        file:rounded-md file:border-0 file:text-sm file:font-semibold
                        file:bg-blue-50 file:text-blue-700
@@ -105,17 +104,32 @@ export default function Salida() {
             }}
             accept=".pdf, image/*"
             autoComplete="off"
-          />*/}
+          />
           <FileUploadWithPreview
             name="attachmentBase64"
-            onFileChange={(data) => {
-              setFormValues({
-                attachmentBase64: data,
-              });
+            onFileChange={async (e) => {
+              const archivoSeleccionado = e.target.files[0];
+              if (archivoSeleccionado) {
+                try {
+                  const base64 = await convertirBase64(archivoSeleccionado);
+                  // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
+                  setFormValues({
+                    [e.target.name]: base64,
+                  });
+                } catch (error) {
+                  console.error("Error al convertir a Base64:", error);
+                  setFormValues({
+                    [e.target.name]: null,
+                  });
+                }
+              } else {
+                setFormValues({
+                  [e.target.name]: null,
+                });
+              }
             }}
             accept=".pdf, image/*"
             id="attachmentBase64"
-            value={formValues?.attachmentBase64 || ""}
           />
         </div>
         {/* Campo 3: Tipo de Despido */}
@@ -128,19 +142,20 @@ export default function Salida() {
               ? "Tipo de Despido"
               : "Tipo de Renuncia"}
           </label>
-          <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
-              formValues?.requisitionTypeId || ""
-            }`}
-            value={formValues?.requisitionSubtype || ""}
-            name={"requisitionSubtype"}
-            id={"dismissalType"} // Añadido ID
-            className="w-full text-base"
-          />
-        </div>*/}
-        {/* Campo : RForm */}
-        {/* 
-        <div>
+          <>
+            <AsyncSelect
+              url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId= ${
+                formValues?.requisitionTypeId || ""
+              }`}
+              value={formValues?.requisitionSubtype || ""}
+              name={"requisitionSubtype"}
+              disabled={formValues?.requisitionTypeId !== 4}
+            />
+          </>
+        </div>
+      </div>
+      <div className="flex">
+        <div className="flex-1 m-5">
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="rForm" // ID único
@@ -150,7 +165,7 @@ export default function Salida() {
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             disabled={formValues?.requisitionSubtype !== 1} // Mantener lógica de deshabilitado
             id="rForm" // ID único
             name="rForm"
@@ -181,7 +196,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             name="trialPeriod"
             id="trialPeriod" // Añadido ID
             value={
@@ -219,7 +234,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             name="rehirable"
             id="rehirable" // Añadido ID
             value={
@@ -257,7 +272,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="date"
             id="officialEmployeeDepartureDate" // ID único
             name="officialEmployeeDepartureDate"
@@ -289,7 +304,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="date"
             id="employeeDepartureDate" // ID único
             name="employeeDepartureDate"
@@ -321,7 +336,7 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="date"
             name="returnWorkEquipmentDate"
             id="returnWorkEquipmentDate" // ID único
@@ -353,17 +368,16 @@ export default function Salida() {
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="number"
             name="phoneNumber"
             id="phoneNumber" // ID único
             placeholder="Número de Teléfono"
             onChange={(e) => {
-              e.target.value.length <= 8 &&
-                // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
-                setFormValues({
-                  [e.target.name]: e.target.value,
-                });
+              // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
+              setFormValues({
+                [e.target.name]: e.target.value,
+              });
             }}
             autoComplete="off"
             value={formValues.phoneNumber || ""}
@@ -375,13 +389,13 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="personalEmail" // ID único
           >
-            Correo Personal
+            Correo Personal Número de teléfono{" "}
             <span className="text-red-500">*</span>{" "}
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="email"
             name="personalEmail"
             id="personalEmail" // ID único
@@ -408,7 +422,7 @@ export default function Salida() {
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="text"
             name="joinNewCompany" // Nombre corregido
             id="joinNewCompany" // ID corregido
@@ -434,7 +448,7 @@ export default function Salida() {
           <textarea
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400 h-[200px]"
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400 h-[200px]"
             placeholder="Comentario"
             name="comment"
             id="comment" // Añadido ID

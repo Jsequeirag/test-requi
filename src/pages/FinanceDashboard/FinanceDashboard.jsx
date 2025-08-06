@@ -15,14 +15,14 @@ export default function FinanceDasahboard() {
     {
       title: "Solicitudes",
       description: "Aquí podras ver información de las solicitudes",
-      path: "/financeRequests",
+      path: "/FinanceRequests",
       requestCount: 4,
     },
   ];
   return (
     <Layout>
       {/* Main content area with padding and centering */}
-      <div className=" flex flex-col items-center justify-center p-8 min-h-[calc(100vh-64px)]">
+      <div className="flex flex-col items-center justify-center p-8 min-h-[calc(100vh-64px)]">
         {/* Adjust min-h if your Layout has a fixed header/footer */}
         {/* Page Title - Large and bold, similar to macOS app titles */}
         <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-10 tracking-tight">

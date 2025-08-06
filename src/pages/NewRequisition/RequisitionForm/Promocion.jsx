@@ -1,10 +1,10 @@
 import React from "react";
+import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
 import { convertirBase64 } from "../../../utils/Base64.js";
-import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
-import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview.jsx";
+
 export default function Promocion() {
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
@@ -23,15 +23,32 @@ export default function Promocion() {
       {/* Se asegura 1 columna en móvil, 2 en mediano y 3 en grande */}
       <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
         {/* Campo 1: Motivo */}
+        <div>
+          <label
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+            htmlFor="motivo" // ID corregido y único
+          >
+            Motivo <span className="text-red-500">*</span>{" "}
+            {/* Asterisco de requerido */}
+          </label>
+          <AsyncSelect
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}`}
+            name={"requisitionTypeId"}
+            id={"motivo"} // Añadido ID
+            value={formValues?.requisitionTypeId || ""} // Usamos 'value' y un fallback a ""
+            className="w-full text-base"
+            required // Añadido required si este campo debe ser obligatorio
+          />
+        </div>
 
         {/* Campo 2: Level Up */}
-        {/*
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="levelUp" // ID corregido y único
           >
             Level Up <span className="text-red-500">*</span>{" "}
+            {/* Asterisco de requerido */}
           </label>
           <select
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -53,8 +70,9 @@ export default function Promocion() {
                 [e.target.name]: e.target.value === "true", // Convertir a booleano si es necesario
               })
             }
+            required // Añadido required si este campo debe ser obligatorio
           >
-        
+            {/* Si necesitas un placeholder, puedes añadir una opción deshabilitada */}
             <option value="" disabled>
               Seleccionar una opción
             </option>
@@ -62,17 +80,17 @@ export default function Promocion() {
             <option value={false}>No</option>
           </select>
         </div>
- */}
+
         {/* Campo 3: Carta de Promocion */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="promotionLetterAttachment" // ID más descriptivo
           >
-            Carta de Promoción
+            Carta de Promocion <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
-          {/* <input
+          <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400
@@ -89,17 +107,15 @@ export default function Promocion() {
               if (archivoSeleccionado) {
                 try {
                   const base64 = await convertirBase64(archivoSeleccionado);
-                  // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
                   setFormValues({
                     [e.target.name]: base64,
                   });
                 } catch (error) {
                   console.error("Error al convertir a Base64:", error);
                   // Opcional: manejar el error en el UI
-                  setFormValues((prevFormValues) => ({
-                    ...prevFormValues,
+                  setFormValues({
                     [e.target.name]: null, // Limpiar el campo si hay error
-                  }));
+                  });
                 }
               } else {
                 // Si el usuario cancela la selección, asegúrate de limpiar el valor
@@ -110,17 +126,7 @@ export default function Promocion() {
             }}
             accept=".pdf, image/*"
             autoComplete="off"
-          />*/}
-          <FileUploadWithPreview
-            name="attachmentBase64"
-            onFileChange={(data) => {
-              setFormValues({
-                attachmentBase64: data,
-              });
-            }}
-            accept=".pdf, image/*"
-            id="attachmentBase64"
-            value={formValues?.attachmentBase64 || ""}
+            required // Añadido required si este campo debe ser obligatorio
           />
         </div>
 
@@ -128,22 +134,21 @@ export default function Promocion() {
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="promotionDate"
+            htmlFor="recordDate"
           >
             Fecha Oficial del Movimiento (Fecha efectiva){" "}
+            <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            id="promotionDate"
+            id="recordDate"
             type="date"
-            name="promotionDate"
+            name="recordDate"
             value={
-              formValues.promotionDate
-                ? formValues.promotionDate.split("T")[0]
-                : new Date().toISOString().split("T")[0]
+              formValues.recordDate ? formValues.recordDate.split("T")[0] : ""
             }
             onChange={(e) => {
               setFormValues({
@@ -151,6 +156,7 @@ export default function Promocion() {
               });
             }}
             autoComplete="off"
+            required // Añadido required si este campo debe ser obligatorio
           />
         </div>
 
@@ -158,30 +164,30 @@ export default function Promocion() {
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="movementDate" // Corregido a "MovementDate" si es un error de tipeo original
+            htmlFor="promotionMoth" // Corregido a "promotionMonth" si es un error de tipeo original
           >
-            Ventana de Promoción <span className="text-red-500">*</span>{" "}
+            Ventana de Promocion <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            id="movementMonth" // Corregido a "movementMonth"
+            id="promotionMoth" // Corregido a "promotionMonth"
             type="date"
-            name="movementDate" // Corregido a "MovementDate"
+            name="promotionMoth" // Corregido a "promotionMonth"
             value={
-              formValues.movementDate
-                ? formValues.movementDate.split("T")[0]
-                : new Date().toISOString().split("T")[0]
+              formValues.promotionMoth
+                ? formValues.promotionMoth.split("T")[0]
+                : ""
             }
             onChange={(e) => {
               setFormValues({
-                ...formValues,
                 [e.target.name]: e.target.value,
               });
             }}
             autoComplete="off"
+            required // Añadido required si este campo debe ser obligatorio
           />
         </div>
 
@@ -191,7 +197,9 @@ export default function Promocion() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="promotionJustification"
           >
-            Justificación de Promoción (Ingles) {/* Asterisco de requerido */}
+            Justificación de Promocion (Ingles){" "}
+            <span className="text-red-500">*</span>{" "}
+            {/* Asterisco de requerido */}
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -199,7 +207,7 @@ export default function Promocion() {
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             id="promotionJustification"
             name="promotionJustification"
-            placeholder="Justificación de Promoción"
+            placeholder="Justificación de Promocion"
             value={formValues.promotionJustification || ""} // Asegura que el valor se controle, y usa el nombre consistente
             onChange={(e) => {
               setFormValues({
@@ -207,6 +215,7 @@ export default function Promocion() {
               });
             }}
             autoComplete="off"
+            required // Añadido required si este campo debe ser obligatorio
           />
         </div>
 

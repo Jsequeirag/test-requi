@@ -27,7 +27,7 @@ export default function PayrollDashboard() {
         {/* Page Title - Large and bold, similar to macOS app titles */}
         <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-10 tracking-tight">
           Panel de Nóminas
-        </h1>
+        </h1>{" "}
         <div className="flex flex-wrap justify-center gap-8">
           {options.map((option, index) => (
             <MenuCard

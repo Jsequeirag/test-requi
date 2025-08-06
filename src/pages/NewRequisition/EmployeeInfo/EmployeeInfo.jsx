@@ -53,36 +53,30 @@ export default function EmployeeInfo() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="employeeId"
           >
-            Nombre{" "}
-            <span className="text-red-500 font-bold">
-              {/*Si es promocion no se debe mostrar el */}
-              {formValues?.requestTypeId === 3 ? "" : "*"}
-            </span>
+            Nombre <span className="text-red-500 font-bold">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesByDepartmentAndBoss/${employeeId}`}
+            url={`https://localhost:7040/getEmployeesByDepartmentAndBoss/${employeeId}`}
             name={"employeeId"}
             customNameParam="nombre"
-            //para promocion no debe ser obligatorio
-            required={formValues?.requestTypeId === 3 ? false : true}
+            required={true}
             value={formValues?.employeeId || ""}
             className="w-full text-base"
           />
-          {/*si es promocion no activarlo*/}
-          {formValues?.requestTypeId !== 3 && (
+          {!formValues?.employeeId && (
             <p className="mt-1 text-xs text-red-600 flex items-center dark:text-red-500">
               <Info className="w-3 h-3 mr-1" /> Este campo es requerido.
             </p>
           )}
         </div>
 
-        {/* Campo 2: Exactus ID */}
+        {/* Campo 2: ID Empleado Exactus */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="idExactus"
           >
-            Exactus ID
+            ID Empleado Exactus
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -99,13 +93,13 @@ export default function EmployeeInfo() {
           />
         </div>
 
-        {/* Campo 3: # Código de Posición */}
+        {/* Campo 3: # POS_COD */}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="posCod"
           >
-            # Código de Posición
+            # POS_COD
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base

@@ -109,6 +109,32 @@ export default function RoleEmployee() {
         />
       ),
     },
+    {
+      name: "Asignar/designar Permiso",
+      center: true,
+      cell: (employee) => (
+        <IconButton
+          bgColor={`bg-blue-500`}
+          hoverBgColor={`hover:bg-blue-500`}
+          hoverTextColor={`hover:text-black`}
+          otherProperties="w-auto my-1"
+          icon={faUserLock}
+          onClick={(e) => {
+            setModalState({
+              isOpen: true,
+              content: (
+                <SelectPermissionEmployee
+                  setEmployeeModal={(val) =>
+                    setModalState({ isOpen: val, content: null })
+                  }
+                />
+              ),
+            });
+            employee.id;
+          }}
+        />
+      ),
+    },
   ];
   //search
   const [filterText, setFilterText] = useState("");

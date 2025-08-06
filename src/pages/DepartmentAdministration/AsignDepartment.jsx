@@ -28,6 +28,7 @@ export default function AsignDepartment({
       setUserDepartments([
         ...userDepartmentsGlobal,
         {
+          userId: employeeId,
           descriptionDepartamento,
           employeeId: userSelected.id,
         },

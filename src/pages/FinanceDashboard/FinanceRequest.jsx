@@ -4,17 +4,7 @@ import RequestItem from "./FinanceRequestItem"; // Asegúrate de que la ruta sea
 import TextButton from "../../components/Button/TextButton";
 import Layout from "../../components/Layout/Layout";
 import { useNavigate } from "react-router-dom";
-import {
-  ChevronLeft,
-  Info,
-  Layers,
-  User,
-  FileText,
-  CheckCircle,
-  Briefcase,
-  ClipboardList,
-  XCircle,
-} from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 const FinanceRequest = () => {
   const navigate = new useNavigate();
   const [childRequestsData, setChildRequestsData] = useState([]);

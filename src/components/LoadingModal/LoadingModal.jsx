@@ -24,7 +24,7 @@ export default function LoadingModal({ openModal, text = "Cargando..." }) {
     //   y evitando posibles problemas de accesibilidad o renderizado cuando está oculto.
     <div
       className={`
-        fixed inset-0 z-50 flex items-center justify-center rounded-lg
+        fixed inset-0 z-50 flex items-center justify-center
         transition-opacity duration-300 ease-out
         ${openModal ? "opacity-100 visible" : "opacity-0 invisible"}
        bg-gray-900/5

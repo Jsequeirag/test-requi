@@ -60,7 +60,7 @@ const Pagination = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between   bg-white/30 dark:bg-gray-900/40  border border-gray-200   dark:border-gray-700 px-4 py-3 border-t">
+    <div className="flex items-center justify-between bg-white px-4 py-3 border-t">
       <div className="flex items-center space-x-2">
         <span className="text-sm text-gray-700">Mostrar</span>
         <select
@@ -76,7 +76,7 @@ const Pagination = ({
         <span className="text-sm text-gray-700">por página</span>
       </div>
 
-      <div className="flex items-center space-x-1 roun">
+      <div className="flex items-center space-x-1">
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
@@ -133,7 +133,6 @@ function Requisitions() {
     isSuccess: requestIsSuccess,
     isPending: requestIsPending,
     refetch: refetchRequests,
-    isFetching,
   } = useApiGet(
     ["RequestByUser", currentPage, pageSize],
     () =>
@@ -143,9 +142,8 @@ function Requisitions() {
         pageSize
       ),
     {
-      refetchOnWindowFocus: false,
-      refetchOnReconnect: false,
-      keepPreviousData: true,
+      enabled: true,
+      keepPreviousData: true, // Mantiene datos previos mientras carga nuevos
     }
   );
 
@@ -184,42 +182,25 @@ function Requisitions() {
     setExpandedRequest(expandedRequest === requestId ? null : requestId);
   };
 
+  const setRequestStatus = (statusId) => {
+    return statusId === 0 ? "En proceso" : "Completado";
+  };
+
   // Información de paginación para mostrar
   const startRecord = requestData ? (currentPage - 1) * pageSize + 1 : 0;
   const endRecord = requestData
     ? Math.min(currentPage * pageSize, requestData.totalRecords)
     : 0;
   const totalRecords = requestData ? requestData.totalRecords : 0;
-  useEffect(() => {
-    console.log(
-      "useEffect en RequisitionsPage se ha ejecutado. location.state en efecto:",
-      location.state
-    );
-    console.log("refetchRequests:", refetchRequests);
 
-    // Si pasamos un valor único como Date.now(), solo necesitamos que el state exista
-    // o que tenga la propiedad 'refresh' (si es que no es 0 o null)
-    if (location.state && location.state.refresh) {
-      // Esto seguirá funcionando bien
-      console.log(
-        "Detectado estado de refresh. Forzando recarga de requisiciones..."
-      );
-      refetchRequests();
-    }
-
-    // Asegurarte de una carga inicial si no hay state de refresh (ej. al cargar la página directamente)
-    // Puedes llamar a refetchRequests() aquí si quieres que siempre recargue al montar
-    // o si el state de refresh no viene. Si ya lo tienes, esta línea es redundante.
-    // refetchRequests();
-  }, [location.state, refetchRequests]);
   return (
     <Layout>
       <div className="m-4 ">
-        <div className="border-b   bg-white/30 dark:bg-gray-900/40  border border-gray-200   dark:border-gray-700 rounded-md h-full">
+        <div className="border-b bg-white rounded-sm h-full">
           <div className="flex items-center border-b p-4 mx-2 justify-between">
             <div className="flex items-center p-4 mx-2">
               <a
-                href="/supervisor"
+                href="/home"
                 className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group"
               >
                 <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-0.5 transition-transform" />
@@ -247,7 +228,7 @@ function Requisitions() {
 
           {/* Información de paginación */}
           {requestIsSuccess && requestData && (
-            <div className="flex justify-between items-center p-4 bg-gray-50 text-sm text-gray-600 rounded-md mx-4">
+            <div className="flex justify-between items-center p-4 bg-gray-50 text-sm text-gray-600">
               <div>
                 Mostrando {startRecord} a {endRecord} de {totalRecords}{" "}
                 requisiciones
@@ -260,7 +241,7 @@ function Requisitions() {
 
           {/* Contenedor principal de las requisiciones */}
           <div className="space-y-4 p-4">
-            {!requestIsPending && !isFetching ? (
+            {!requestIsPending ? (
               <>
                 {requestIsSuccess && requestData && requestData.data ? (
                   requestData.data.length > 0 ? (
@@ -268,18 +249,18 @@ function Requisitions() {
                       <div key={request.id} className="border rounded-md">
                         {/* Header de la requisición - siempre visible */}
                         <div className="flex items-center bg-slate-50 p-4 rounded-md justify-between">
+                          <p>
+                            <strong>Solicitud:</strong> {request.id}
+                          </p>
                           <span
                             className={`p-2 rounded-md font-semibold text-black ${
-                              request.state === "Completado"
+                              request.state === "pendiente"
                                 ? "bg-yellow-400"
                                 : "bg-blue-400"
                             }`}
                           >
                             {request.state}
                           </span>
-                          <p className="text-sm">
-                            <strong>Solicitud:</strong> {request.id}
-                          </p>
                           <p className="text-sm">
                             <strong>Fecha:</strong>{" "}
                             {new Date(request.createdDate).toLocaleString()}
@@ -350,7 +331,7 @@ function Requisitions() {
                               {request.requisitions.map((req, idx) => (
                                 <div
                                   key={req.id}
-                                  className="flex-shrink-0 min-w-[24rem] relative flex flex-col items-center z-10 cursor-pointer"
+                                  className="flex-shrink-0 min-w-[24rem] relative flex flex-col items-center z-10"
                                 >
                                   {/* Punto */}
                                   <div className="flex flex-col items-center mb-4 relative">
@@ -377,44 +358,43 @@ function Requisitions() {
                                   <div
                                     className={`bg-white border rounded-lg ${
                                       idx === 0 ? "shadow-md" : ""
-                                    } p-6 w-full hover:shadow-lg transition-shadow `}
+                                    } p-6 w-full hover:shadow-lg transition-shadow ${
+                                      req?.infoEmpleadoAkilesDto
+                                        ?.descrip_Departamento ===
+                                      employeeLoggedDeparment
+                                        ? "cursor-pointer"
+                                        : "cursor-not-allowed"
+                                    }`}
                                     //si el usuario logueado el del mismo departamento del empleado asociado a la Requisición
                                     onClick={() => {
-                                      /*
                                       if (
                                         req?.infoEmpleadoAkilesDto
                                           ?.descrip_Departamento ===
                                         employeeLoggedDeparment
                                       ) {
-                                        setFormValues(req);*/
-                                      navigate("/newRequisition", {
-                                        state: {
-                                          request: request,
-                                          requisition: req,
-                                          hasPrevRequisition: request
-                                            ?.requisitions[idx + 1]
-                                            ? true
-                                            : false,
-                                          prevRequisition:
-                                            request.requisitions.length > 1
-                                              ? request.requisitions[idx + 1]
-                                              : null,
-                                          action: "update",
-                                        },
-                                      });
+                                        setFormValues(req);
+                                        navigate("/newRequisition", {
+                                          state: {
+                                            requisition: req,
+                                            action: "update",
+                                          },
+                                        });
+                                      }
                                     }}
                                   >
                                     <div className="flex">
+                                      <p className="text-gray-600 text-sm font-bold py-1 mr-2">
+                                        {req.state === "Pendiente" &&
+                                          "Finanzas"}
+                                      </p>
                                       <p
                                         className={`text-black font-bold py-1 px-2 rounded-full text-xs ${
-                                          req.state === "Completado"
-                                            ? "bg-green-400"
-                                            : "bg-gray-400"
+                                          req.state === "Pendiente"
+                                            ? "bg-yellow-400"
+                                            : "bg-blue-400"
                                         }`}
                                       >
-                                        {req.state === "En Proceso"
-                                          ? "Incompleto"
-                                          : req.state}
+                                        {req.state}
                                       </p>
                                     </div>
                                     <h3 className="font-semibold text-xl mb-1">
