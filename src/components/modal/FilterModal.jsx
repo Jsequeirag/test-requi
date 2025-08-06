@@ -41,7 +41,6 @@ export default function OrderDetailsModal({
                   id=""
                 >
                   {" "}
-                  <option>Seleccionar una opción</option>
                   <option value="FR">En curso</option>
                   <option value="DE">Finalizado</option>
                 </select>{" "}

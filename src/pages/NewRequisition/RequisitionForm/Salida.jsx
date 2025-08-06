@@ -199,9 +199,7 @@ export default function Salida() {
             }}
           >
             {/* Solo una opción puede ser 'selected' inicialmente, si no, es mejor omitirlo y dejar que el estado lo controle */}
-            <option value="" disabled>
-              Seleccionar una opción
-            </option>
+
             <option value={true}>Sí</option>
             <option value={false}>No</option>
           </select>
@@ -237,9 +235,7 @@ export default function Salida() {
             }}
           >
             {/* Solo una opción puede ser 'selected' inicialmente, si no, es mejor omitirlo y dejar que el estado lo controle */}
-            <option value="" disabled>
-              Seleccionar una opción
-            </option>
+
             <option value={true}>Sí</option>
             <option value={false}>No</option>
           </select>
@@ -329,7 +325,7 @@ export default function Salida() {
               className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
               htmlFor="returnWorkEquipmentDate" // ID único
             >
-              Fecha Entrega de Equipo al superior encargado
+              Fecha Entrega de Equipo
               <span className="text-red-500">*</span>
               {/* Asterisco de requerido */}
             </label>{" "}

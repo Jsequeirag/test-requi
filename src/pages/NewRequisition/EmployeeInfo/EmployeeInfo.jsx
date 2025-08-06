@@ -233,7 +233,7 @@ export default function EmployeeInfo() {
             id="departamento" // ID corregido
             type="text"
             name="departamento" // Name corregido
-            value={employeeSelected?.descrip_Area || ""}
+            value={employeeSelected?.descrip_Centro_Costo || ""}
             autoComplete="off"
             // Se elimina onChange en inputs deshabilitados
           />

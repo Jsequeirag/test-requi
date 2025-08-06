@@ -5,6 +5,7 @@ import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
 import { convertirBase64 } from "../../../utils/Base64.js";
 import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview.jsx";
+import Tooltip from "../../../components/Tooltip";
 export default function Promocion() {
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
@@ -160,9 +161,10 @@ export default function Promocion() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="movementDate" // Corregido a "MovementDate" si es un error de tipeo original
           >
-            Ventana de Promoción <span className="text-red-500">*</span>{" "}
-            {/* Asterisco de requerido */}
+            Ventana de Promoción <span className="text-red-500">*</span>
+            {/*Abril Julio y Octubre*/}
           </label>
+
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm

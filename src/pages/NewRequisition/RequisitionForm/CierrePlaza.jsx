@@ -115,14 +115,16 @@ export default function CierrePlaza() {
         </div>
         {/* Campo 5: Fecha Oficial del Ahorro */}
         <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="officialSavingDate" // ID corregido y único
-          >
-            Fecha Oficial del Ahorro <span className="text-red-500">*</span>{" "}
-            {/* Asterisco de requerido */}
-          </label>
-          <Tooltip text={"El primer día que la plaza se cierra"} />
+          <div className="flex">
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
+              htmlFor="officialSavingDate" // ID corregido y único
+            >
+              Fecha Oficial del Ahorro <span className="text-red-500">*</span>{" "}
+              {/* Asterisco de requerido */}
+            </label>
+            <Tooltip text={"El primer día luego de que la plaza se cierra"} />
+          </div>
           <input
             id="officialSavingDate"
             required
