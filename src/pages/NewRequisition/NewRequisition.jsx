@@ -337,6 +337,7 @@ function NewRequisition() {
                           })
                         }
                       >
+                        <option selected disabled value=""></option>
                         <option value="true">Sí</option>
                         <option value="false">No</option>
                       </select>
