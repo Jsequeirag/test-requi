@@ -569,14 +569,13 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="careerSettingsId"
               >
-                Career Settings ID{" "}
+                Career Settings ID
                 {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  (formValues.requisitionTypeId === 5 &&
-                    formValues.recruitmentProccess === 14) ||
-                  formValues.requisitionTypeId === 12
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -594,9 +593,8 @@ export default function Entrada() {
                 value={formValues.careerSettingsId || ""}
                 type="number"
                 disabled={
-                  (formValues.requisitionTypeId === 5 &&
-                    formValues.recruitmentProccess === 14) ||
-                  formValues.requisitionTypeId === 12
+                  formValues.requisitionTypeId === 5 &&
+                  formValues.recruitmentProccess === 14
                 }
               />
             </div>

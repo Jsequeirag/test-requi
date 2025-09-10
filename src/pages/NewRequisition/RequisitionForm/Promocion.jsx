@@ -5,6 +5,7 @@ import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
 import { convertirBase64 } from "../../../utils/Base64.js";
 import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview.jsx";
+
 import Tooltip from "../../../components/Tooltip";
 export default function Promocion() {
   //GLOBAL
@@ -13,6 +14,30 @@ export default function Promocion() {
 
   //API - Keeping the call as formValues?.requestTypeId is used in AsyncSelect URL
   useApiGet(["RequestType"], getRequestType);
+  const allowedMonths = [
+    { value: "04", label: "Abril" },
+    { value: "07", label: "Julio" },
+    { value: "10", label: "Octubre" },
+  ]; // Obtener el año actual
+  const currentYear = new Date().getFullYear();
+
+  // Manejar cambio de mes
+  const handleMonthChange = (e) => {
+    const selectedMonth = e.target.value;
+    // Crear una fecha por defecto (primer día del mes seleccionado)
+    const newDate = new Date(currentYear, selectedMonth - 1, 1)
+      .toISOString()
+      .split("T")[0];
+    setFormValues({
+      ...formValues,
+      movementDate: newDate,
+    });
+  };
+
+  // Obtener el mes actual del formValues para pre-seleccionar
+  const selectedMonth = formValues.movementDate
+    ? formValues.movementDate.split("-")[1]
+    : "04"; // Por defecto, abril
 
   return (
     <>
@@ -127,13 +152,17 @@ export default function Promocion() {
 
         {/* Campo 4: Fecha Oficial del Movimiento (Fecha efectiva) */}
         <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="promotionDate"
-          >
-            Fecha Oficial del Movimiento (Fecha efectiva){" "}
-            {/* Asterisco de requerido */}
-          </label>
+          <div className="flex">
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
+              htmlFor="promotionDate"
+            >
+              Fecha del Movimiento {/* Asterisco de requerido */}
+            </label>
+            <Tooltip
+              text={"Fecha real en la que la persona ocupa su nueva posición"}
+            />
+          </div>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -152,39 +181,39 @@ export default function Promocion() {
               });
             }}
             autoComplete="off"
-          />
+          />{" "}
         </div>
 
         {/* Campo 5: Ventana de Promocion */}
         <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="movementDate" // Corregido a "MovementDate" si es un error de tipeo original
-          >
-            Ventana de Promoción <span className="text-red-500">*</span>
-            {/*Abril Julio y Octubre*/}
-          </label>
-
-          <input
+          <div className="flex">
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
+              htmlFor="movementDate" // Corregido a "MovementDate" si es un error de tipeo original
+            >
+              Fecha de Promoción <span className="text-red-500">*</span>
+              {/*Abril Julio y Octubre*/}
+            </label>{" "}
+            <Tooltip
+              text={"Fechas oficiales de promoción aprobadas por el Grupo"}
+            />
+          </div>
+          <select
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            id="movementMonth" // Corregido a "movementMonth"
-            type="date"
-            name="movementDate" // Corregido a "MovementDate"
-            value={
-              formValues.movementDate
-                ? formValues.movementDate.split("T")[0]
-                : new Date().toISOString().split("T")[0]
-            }
-            onChange={(e) => {
-              setFormValues({
-                ...formValues,
-                [e.target.name]: e.target.value,
-              });
-            }}
+                 bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                 dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
+            id="movementMonth"
+            name="movementDate"
+            value={selectedMonth}
+            onChange={handleMonthChange}
             autoComplete="off"
-          />
+          >
+            {allowedMonths.map((month) => (
+              <option key={month.value} value={month.value}>
+                {month.label}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Campo 6: Justificación de Promocion (Ingles) */}

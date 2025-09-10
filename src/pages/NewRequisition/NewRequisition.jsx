@@ -288,7 +288,7 @@ function NewRequisition() {
             <TextButton text={"Atrás"} className="p-0 text-lg font-medium" />
           </a>
           <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">
-            Formulario de Requisición {/*JSON.stringify(formValues)*/}
+            Formulario de Requisición{JSON.stringify(formValues)}
           </h1>
           <div className="w-auto"></div>
         </div>

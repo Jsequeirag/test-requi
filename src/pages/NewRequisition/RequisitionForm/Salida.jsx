@@ -206,6 +206,48 @@ export default function Salida() {
         </div>
         {/* Campo 5: Recontratable */}
         <div>
+          <div className="flex">
+            <label
+              className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
+              htmlFor="officialEmployeeDepartureDate" // ID único
+            >
+              R-Form{" "}
+              {formValues?.requisitionTypeId === 4 &&
+                formValues?.trialPeriod === false && (
+                  <span className="text-red-500">*</span>
+                )}
+              {/* Asterisco de requerido */}
+            </label>
+          </div>
+          <input
+            required
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
+                       ${
+                         formValues?.requisitionTypeId !== 4 ||
+                         formValues?.trialPeriod !== false
+                           ? "bg-gray-100 cursor-not-allowed"
+                           : "bg-white"
+                       }
+                       text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+            type="text"
+            id="rForm" // ID único
+            name="rForm"
+            placeholder="R-Form"
+            onChange={(e) => {
+              setFormValues({
+                [e.target.name]: e.target.value,
+              });
+            }}
+            autoComplete="off"
+            value={formValues.rForm ? formValues.rForm : ""}
+            disabled={
+              formValues?.requisitionTypeId !== 4 ||
+              formValues?.trialPeriod !== false
+            }
+          />
+        </div>
+        <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="rehirable" // ID único
@@ -368,7 +410,7 @@ export default function Salida() {
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            type="number"
+            type="text"
             name="phoneNumber"
             id="phoneNumber" // ID único
             placeholder="Número de Teléfono"

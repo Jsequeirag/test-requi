@@ -427,6 +427,7 @@ function Requisitions() {
                                     </p>
                                     <p className="text-gray-600 text-sm ">
                                       {req?.infoEmpleadoAkilesDto?.nombre &&
+                                        req.state === "Completado" &&
                                         `Empleado: ${req?.infoEmpleadoAkilesDto?.nombre}`}
                                     </p>
                                     <p className="text-gray-600 text-sm ">
