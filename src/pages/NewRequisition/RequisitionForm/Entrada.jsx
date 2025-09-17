@@ -101,7 +101,7 @@ export default function Entrada() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="motivo" // ID corregido y único
           >
-            Proceso
+            Origen de la Contratación
             <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
@@ -142,7 +142,7 @@ export default function Entrada() {
               formValues.requisitionTypeId === ""
             }
             onChange={(e) => {
-              formValues.requisitionTypeId === 5 &&
+              formValues.requisitionTypeId === 5`` &&
                 setFormValues({
                   ...formValues,
                   [e.target.name]: e.target.value,
