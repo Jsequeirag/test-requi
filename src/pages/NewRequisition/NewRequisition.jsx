@@ -481,19 +481,19 @@ function NewRequisition() {
                           className="block text-gray-700 text-lg font-semibold mb-2 dark:text-gray-300"
                           htmlFor="RecruitmentProcess" // ID corregido y único
                         >
-                          Proceso de contratación{" "}
+                          Proceso de contratación
                           <span className="text-red-500">*</span>{" "}
                           {/* Asterisco de requerido */}
                         </label>
                         <AsyncSelect
-                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=6`}
-                          name={"recruitmentProccess"}
-                          id={"motivo"} // Añadido ID
+                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
+                          name={"requisitionSubtypeId"}
+                          id={"requisitionSubtypeId"} // Añadido ID
                           value={
                             location.state?.action === "update" &&
                             location.state.hasPrevRequisition
-                              ? 15
-                              : formValues?.recruitmentProccess || ""
+                              ? 55
+                              : formValues?.requisitionSubtypeId || ""
                           } // Usamos 'value' y un fallback a ""
                           className="w-full text-base"
                           required // Añadido required si este campo debe ser obligatorio
@@ -506,15 +506,15 @@ function NewRequisition() {
                           className="block text-gray-700 text-lg font-semibold mb-2 dark:text-gray-300"
                           htmlFor="RecruitmentProcess" // ID corregido y único
                         >
-                          Proceso de contratación{" "}
+                          Proceso de contratación
                           <span className="text-red-500">*</span>{" "}
                           {/* Asterisco de requerido */}
                         </label>
                         <AsyncSelect
-                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=6`}
-                          name={"recruitmentProccess"}
-                          id={"motivo"} // Añadido ID
-                          value={formValues?.recruitmentProccess || ""} // Usamos 'value' y un fallback a ""
+                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
+                          id={"requisitionSubtypeId"} // Añadido ID
+                          name={"requisitionSubtypeId"}
+                          value={formValues?.requisitionSubtypeId || ""} // Usamos 'value' y un fallback a ""
                           className="w-full text-base"
                           required // Añadido required si este campo debe ser obligatorio
                         />

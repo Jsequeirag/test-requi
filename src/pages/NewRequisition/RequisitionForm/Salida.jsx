@@ -51,7 +51,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtypeId || ""}
@@ -410,7 +410,7 @@ export default function Salida() {
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            type="text"
+            type="number"
             name="phoneNumber"
             id="phoneNumber" // ID único
             placeholder="Número de Teléfono"

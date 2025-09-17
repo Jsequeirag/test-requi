@@ -4,7 +4,7 @@ export const getRequestType = () =>
 
 export const getRequisitionSubtypeByRequisitionTypeId = (RequisitionTypeId) =>
   request({
-    url: `/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${RequisitionTypeId}`,
+    url: `/getRequisitionSubtypeByRequisitionTypeId/${RequisitionTypeId}`,
     method: "GET",
   });
 export const getRequestByUserId = (userId, pageNumber = 1, pageSize = 10) =>

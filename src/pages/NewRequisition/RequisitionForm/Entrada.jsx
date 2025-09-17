@@ -99,6 +99,24 @@ export default function Entrada() {
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+            htmlFor="motivo" // ID corregido y único
+          >
+            Proceso
+            <span className="text-red-500">*</span>{" "}
+            {/* Asterisco de requerido */}
+          </label>
+          <AsyncSelect
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=9`}
+            name={"process"}
+            id={"process"} // Añadido ID
+            value={formValues?.process || ""} // Usamos 'value' y un fallback a ""
+            className="w-full text-base"
+            required // Añadido required si este campo debe ser obligatorio
+          />
+        </div>
+        <div>
+          <label
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="tForm" // ID único y corregido
           >
             TForm <span className="text-red-500">*</span>
@@ -106,6 +124,7 @@ export default function Entrada() {
           <input
             className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        ${
+                         formValues.process !== 21 ||
                          formValues.requisitionTypeId === 12 ||
                          formValues.requisitionTypeId === 11 ||
                          formValues.requisitionTypeId === ""
@@ -117,6 +136,7 @@ export default function Entrada() {
             name="tForm"
             placeholder="TForm"
             disabled={
+              formValues.process !== 21 ||
               formValues.requisitionTypeId === 12 ||
               formValues.requisitionTypeId === 11 ||
               formValues.requisitionTypeId === ""

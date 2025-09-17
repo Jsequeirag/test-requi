@@ -69,7 +69,7 @@ export default function EmployeeInfo() {
             className="w-full text-base"
           />
           {/*si es promocion no activarlo*/}
-          {formValues?.requestTypeId !== 3 && (
+          {!formValues?.employeeId && (
             <p className="mt-1 text-xs text-red-600 flex items-center dark:text-red-500">
               <Info className="w-3 h-3 mr-1" /> Este campo es requerido.
             </p>
