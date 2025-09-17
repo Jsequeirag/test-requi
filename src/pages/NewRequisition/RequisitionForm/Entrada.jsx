@@ -142,7 +142,7 @@ export default function Entrada() {
               formValues.requisitionTypeId === ""
             }
             onChange={(e) => {
-              formValues.requisitionTypeId === 5`` &&
+              formValues.requisitionTypeId === 5 &&
                 setFormValues({
                   ...formValues,
                   [e.target.name]: e.target.value,
@@ -151,6 +151,7 @@ export default function Entrada() {
             autoComplete="off"
             value={formValues.tForm || ""}
             required={formValues.requisitionTypeId === 5}
+            type="number"
           />
         </div>
         {/*INFORMACION DEL EMPLEADO */}
