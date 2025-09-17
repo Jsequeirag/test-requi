@@ -472,7 +472,7 @@ export default function Entrada() {
                     // Se elimina onChange en inputs deshabilitados
                   />
                 </div>{" "}
-                <div>
+                {/*<div>
                   <label
                     className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                     htmlFor="departamento"
@@ -492,7 +492,7 @@ export default function Entrada() {
                     autoComplete="off"
                     // Se elimina onChange en inputs deshabilitados
                   />
-                </div>
+                </div>*/}
               </>
             )}
             {formValues?.requisitionTypeId === 11 && (
