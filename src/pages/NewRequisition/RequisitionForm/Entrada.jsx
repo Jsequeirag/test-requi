@@ -300,14 +300,14 @@ export default function Entrada() {
                   />
                 </div>
 
-                {/* Campo 7: Perfil SOD */}
+                {/* 
                 <div>
                   <label
                     className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                     htmlFor="sodMatrix" // ID único y corregido
                   >
                     Perfil SOD <span className="text-red-500">*</span>
-                    {/* Asterisco de requerido */}
+                
                   </label>
                   <AsyncSelect
                     url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getMatriz`}
@@ -318,7 +318,7 @@ export default function Entrada() {
                     disabled={formValues?.requisitionTypeId === 11}
                     required
                   />
-                </div>
+                </div>*/}
               </>
             ) : (
               <>
