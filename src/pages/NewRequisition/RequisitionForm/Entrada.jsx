@@ -112,6 +112,11 @@ export default function Entrada() {
             value={formValues?.process || ""} // Usamos 'value' y un fallback a ""
             className="w-full text-base"
             required // Añadido required si este campo debe ser obligatorio
+            disabled={
+              formValues.requisitionTypeId === 12 ||
+              formValues.requisitionTypeId === 11 ||
+              formValues.requisitionTypeId === ""
+            }
           />
         </div>
         <div>
@@ -153,12 +158,100 @@ export default function Entrada() {
             required={formValues.requisitionTypeId === 5}
             type="number"
           />
+        </div>{" "}
+        {/* Campo 2: Periodo */}
+        <div>
+          <label
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+            htmlFor="period"
+          >
+            Tipo de Temporalidad
+            {formValues?.requisitionTypeId === 12 && (
+              <span className="text-red-500"> *</span>
+            )}
+          </label>
+
+          <AsyncSelect
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=10`}
+            id={"typeTemporality"}
+            name="typeTemporality"
+            value={formValues?.typeTemporality || ""}
+            className="w-full text-base"
+            required={true}
+            disabled={
+              formValues.requisitionTypeId === 11 ||
+              formValues.requisitionTypeId === 5
+            }
+          />
+        </div>
+        <div>
+          <label
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+            htmlFor="period"
+          >
+            Fecha Estimada de Salida
+            {formValues?.estimatedDepartureDate === 12 && (
+              <span className="text-red-500"> *</span>
+            )}
+          </label>
+
+          <input
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base 
+                bg-white
+             text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+            id="estimatedDepartureDate"
+            name="estimatedDepartureDate"
+            required
+            placeholder="Fecha Estimada de Salida"
+            onChange={(e) => {
+              setFormValues({
+                ...formValues,
+                [e.target.name]: e.target.value,
+              });
+            }}
+            autoComplete="off"
+            value={
+              formValues.estimatedDepartureDate
+                ? formValues.estimatedDepartureDate.split("T")[0]
+                : new Date().toISOString().split("T")[0]
+            }
+            type="date"
+          />
+        </div>
+        <div>
+          <label
+            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+            htmlFor="period"
+          >
+            Fecha Estimada de Regreso
+          </label>{" "}
+          <input
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base   bg-white  text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+            id="estimatedReturnDate"
+            name="estimatedReturnDate"
+            placeholder="Fecha Estimada de Regreso"
+            onChange={(e) => {
+              setFormValues({
+                ...formValues,
+                [e.target.name]: e.target.value,
+              });
+            }}
+            autoComplete="off"
+            value={
+              formValues.estimatedReturnDate
+                ? formValues.estimatedReturnDate.split("T")[0]
+                : new Date().toISOString().split("T")[0]
+            }
+            type="date"
+          />
         </div>
         {/*INFORMACION DEL EMPLEADO */}
         <div className={`col-span-3`}>
           <h1 className="text-2xl font-semibold text-gray-800  dark:text-gray-200">
             Informacion de Empleado
-          </h1>{" "}
+          </h1>
           {formValues.requisitionTypeId === 11 && (
             <h1 className="mt-2 text-lg font-semibold">
               Empleado de la requisición anterior
@@ -472,28 +565,6 @@ export default function Entrada() {
                     // Se elimina onChange en inputs deshabilitados
                   />
                 </div>{" "}
-                {/*
-                <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="departamento"
-                  >
-                    Perfil SOD
-                  </label>
-                  <input
-                    className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-gray-100 text-gray-600 cursor-not-allowed
-                       focus:outline-none focus:ring-0 focus:border-gray-300 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-400"
-                    disabled
-                    id="perfilSOD" // ID corregido
-                    type="text"
-                    name="perfilSOD" // Name corregido
-                    value={employeeSelected?.gerente || ""}
-                    autoComplete="off"
-                    // Se elimina onChange en inputs deshabilitados
-                  />
-                </div>*/}
               </>
             )}
             {formValues?.requisitionTypeId === 11 && (
@@ -728,7 +799,6 @@ export default function Entrada() {
                   formValues.requisitionTypeId === 5 &&
                   formValues.recruitmentProccess === 14
                 }
-                X
               />
             </div>
           </div>

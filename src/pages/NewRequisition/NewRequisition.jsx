@@ -514,7 +514,11 @@ function NewRequisition() {
                           url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
                           id={"requisitionSubtypeId"} // Añadido ID
                           name={"requisitionSubtypeId"}
-                          value={formValues?.requisitionSubtypeId || ""} // Usamos 'value' y un fallback a ""
+                          value={
+                            formValues?.requisitionTypeId === 12
+                              ? 53
+                              : formValues?.requisitionSubtypeId || ""
+                          }
                           className="w-full text-base"
                           required // Añadido required si este campo debe ser obligatorio
                         />

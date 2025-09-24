@@ -230,21 +230,41 @@ function Requisitions() {
               </a>
               <h1 className="px-9 text-3xl p-4">Lista de Requisiciones</h1>
             </div>
-
-            <div className="flex items-center space-x-3">
-              <IconButton
-                bgColor="bg-gray-500 hover:bg-gray-600"
-                icon={faFilter}
-                onClick={() => navigate("/priceListform")}
-              />
-              <IconButton
-                bgColor="bg-blue-500 hover:bg-blue-600"
-                icon={faPlusCircle}
-                onClick={() => navigate("/priceListform")}
-              />
-            </div>
           </div>
+          <div className="flex items-center space-x-3 m-4">
+            <select
+              name="state"
+              className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+              <option value="">Select State</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+              <option value="pending">Pending</option>
+            </select>
 
+            <input
+              type="text"
+              name="id"
+              placeholder="Enter ID"
+              className="border border-gray-300 rounded-md p-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <input
+              type="date"
+              name="startDate"
+              className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <input
+              type="date"
+              name="endDate"
+              className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition duration-200">
+              Buscar
+            </button>
+          </div>
           {/* Información de paginación */}
           {requestIsSuccess && requestData && (
             <div className="flex justify-between items-center p-4 bg-gray-50 text-sm text-gray-600 rounded-md mx-4">
@@ -425,11 +445,19 @@ function Requisitions() {
                                         ? `${req.requestType.name}  `
                                         : "Por definir"}
                                     </p>
-                                    <p className="text-gray-600 text-sm ">
-                                      {req?.infoEmpleadoAkilesDto?.nombre &&
-                                        req.state === "Completado" &&
-                                        `Empleado: ${req?.infoEmpleadoAkilesDto?.nombre}`}
-                                    </p>
+                                    {req?.externalEmployee ? (
+                                      <p className="text-gray-600 text-sm ">
+                                        {req?.externalEmployee?.fullname &&
+                                          req.state === "Completado" &&
+                                          `Empleado: ${req?.externalEmployee?.fullname}`}
+                                      </p>
+                                    ) : (
+                                      <p className="text-gray-600 text-sm ">
+                                        {req?.infoEmpleadoAkilesDto?.nombre &&
+                                          req.state === "Completado" &&
+                                          `Empleado: ${req?.infoEmpleadoAkilesDto?.nombre}`}
+                                      </p>
+                                    )}
                                     <p className="text-gray-600 text-sm ">
                                       {req?.infoEmpleadoAkilesDto &&
                                         `Departamento:
