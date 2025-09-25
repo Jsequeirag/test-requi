@@ -19,7 +19,7 @@ export default function AsyncModal({
   const handleConfirm = async () => {
     console.log(request);
     console.log(data);
-    /* mutateAsync(data)
+    mutateAsync(data)
       .then(async (res) => {
         console.log(res);
         setOpenModal(false);
@@ -27,7 +27,7 @@ export default function AsyncModal({
       .catch((err) => {
         console.log(err);
         setOpenModal(false);
-      });*/
+      });
     // Cierra el modal después de confirmar
   };
 

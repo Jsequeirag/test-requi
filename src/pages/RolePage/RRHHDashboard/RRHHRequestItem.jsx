@@ -8,7 +8,7 @@ import {
 } from "@fortawesome/free-solid-svg-icons";
 import AsyncModal from "../../../components/AsyncComponents/AsyncModal"; // Asegúrate de que esta ruta sea correcta
 import { setStateRequestRoleFlow } from "../../../api/urls/RequestRoleFlow";
-
+import { updateStateRequestRoleFlow } from "../../../api/urls/RequestRoleFlow";
 export default function RRHHRequestItem({
   request,
   expandedRequest,
@@ -16,8 +16,10 @@ export default function RRHHRequestItem({
 }) {
   const today = new Date().toLocaleDateString();
   const [modalState, setModalState] = useState(false);
-  const [modalMessage, setModalMessage] = useState("");
 
+  const [modalMessage, setModalMessage] = useState("");
+  const [requestState, setRequestState] = useState("");
+  const [requisitionId, setRequisitionId] = useState("");
   const handleApprove = () => {
     // Aquí iría la lógica para aprobar la solicitud
     setModalState(true);
@@ -35,7 +37,7 @@ export default function RRHHRequestItem({
         setOpenModal={setModalState}
         message={modalMessage}
         openModal={modalState}
-        request={setStateRequestRoleFlow}
+        request={() => updateStateRequestRoleFlow(requisitionId, requestState)}
         data={request}
       />
 
@@ -94,7 +96,9 @@ export default function RRHHRequestItem({
               {/* Botón Aprobar */}
               <button
                 onClick={() => {
-                  setModalMessage(`Desea aprobar la Solicitud ${request.id}`),
+                  setRequisitionId(request.id),
+                    setRequestState(1),
+                    setModalMessage(`Desea aprobar la Solicitud ${request.id}`),
                     handleApprove();
                 }}
                 className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium"
@@ -107,6 +111,11 @@ export default function RRHHRequestItem({
               <button
                 onClick={() => {
                   setModalMessage(`Desea rechazar la Solicitud ${request.id}`),
+                    setRequisitionId(request.id),
+                    setRequestState(2),
+                    setModalMessage(
+                      `Desea rechazar la Solicitud ${request.id}`
+                    ),
                     handleReject();
                 }}
                 className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium"

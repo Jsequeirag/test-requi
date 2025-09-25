@@ -110,7 +110,7 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
     isSuccess,
   } = useApiGet(
     ["GetRequestsFromRequestRoleFlow", currentPage, pageSize],
-    () => getRequestsFromRequestRoleFlow(5, currentPage, pageSize),
+    () => getRequestsFromRequestRoleFlow(8, currentPage, pageSize),
     {
       refetchOnWindowFocus: false,
       refetchOnReconnect: false,
@@ -242,24 +242,49 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
                   )}
 
                   <div className="flex flex-col flex-grow truncate">
-                    <span
-                      className={`font-semibold text-base truncate ${
-                        selectedParentId === parent.id
-                          ? "text-white"
-                          : "text-gray-800 dark:text-gray-200"
-                      }`}
-                    >
-                      {parent.displayId || parent.id}
-                    </span>
-                    <span
-                      className={`text-xs ${
-                        selectedParentId === parent.id
-                          ? "text-blue-100"
-                          : "text-gray-500 dark:text-gray-400"
-                      }`}
-                    >
-                      {formatIsoDateToYYYYMMDD(parent.createdDate)}
-                    </span>
+                    <div className="flex items-center justify-between mb-1">
+                      <span
+                        className={`font-semibold text-base truncate ${
+                          selectedParentId === parent.id
+                            ? "text-white"
+                            : "text-gray-800 dark:text-gray-200"
+                        }`}
+                      >
+                        {parent.displayId || parent.id}
+                      </span>
+                      <span
+                        className={`font-semibold text-base truncate ${
+                          selectedParentId === parent.id
+                            ? "text-white"
+                            : "text-gray-800 dark:text-gray-200"
+                        }`}
+                      >
+                        {parent.state}
+                      </span>
+                    </div>
+                    <div className="flex justify-between">
+                      <span
+                        className={`text-xs ${
+                          selectedParentId === parent.id
+                            ? "text-blue-100"
+                            : "text-gray-500 dark:text-gray-400"
+                        }`}
+                      >
+                        {formatIsoDateToYYYYMMDD(parent.createdDate)}
+                      </span>{" "}
+                    </div>
+                    <div>
+                      {" "}
+                      <span
+                        className={`font-bold${
+                          selectedParentId === parent.id
+                            ? "text-blue-100"
+                            : "text-gray-500 dark:text-gray-400"
+                        }`}
+                      >
+                        {parent.user.name}
+                      </span>
+                    </div>
                   </div>
                   <FontAwesomeIcon
                     icon={

@@ -9,3 +9,8 @@ export const setStateRequestRoleFlow = (roleId) =>
     url: `/setStateRequestRoleFlow/${roleId}`,
     method: "post",
   });
+export const updateStateRequestRoleFlow = (requisitionId, state) =>
+  request({
+    url: `/updateStateRequestRoleFlow/${requisitionId}/${state}`,
+    method: "post",
+  });

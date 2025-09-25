@@ -106,7 +106,7 @@ export default function Entrada() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=9`}
+            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=9`}
             name={"process"}
             id={"process"} // Añadido ID
             value={formValues?.process || ""} // Usamos 'value' y un fallback a ""
@@ -172,7 +172,7 @@ export default function Entrada() {
           </label>
 
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=10`}
+            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=10`}
             id={"typeTemporality"}
             name="typeTemporality"
             value={formValues?.typeTemporality || ""}
@@ -310,7 +310,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesBySupervisorRole`}
+                    url={`https://localhost:7040/getEmployeesBySupervisorRole`}
                     name={"supervisor"}
                     id={"supervisor"}
                     value={formValues?.supervisor || ""}
@@ -334,7 +334,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetGrades`}
+                    url={`https://localhost:7040/GetGrades`}
                     name={"grade"}
                     id={"grade"}
                     value={formValues?.grade || ""}
@@ -357,7 +357,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelectFreeText
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
+                    url={`https://localhost:7040/GetProjectsByExactus`}
                     name={"project"}
                     id={"project"}
                     value={formValues?.project || ""}
@@ -380,7 +380,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getDepartments`}
+                    url={`https://localhost:7040/getDepartments`}
                     name={"department"}
                     id={"department"}
                     customNameParam={"descriptionDepartamento"}
@@ -403,7 +403,7 @@ export default function Entrada() {
                 
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getMatriz`}
+                    url={`https://localhost:7040/getMatriz`}
                     name={"sodMatrix"}
                     id={"sodMatrix"} // Añadido ID
                     value={formValues.sodMatrix || ""}
@@ -423,7 +423,7 @@ export default function Entrada() {
                     Nombre
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
+                    url={`https://localhost:7040/getEmployees`}
                     name={"employeeId"}
                     customNameParam="nombre"
                     //para promocion no debe ser obligatorio

@@ -92,12 +92,17 @@ export default function PayrollRequestItem({
           {request?.state !== "aprobado" ? (
             <>
               {/* Botón Aprobar */}
+              {/* Botón Aprobar */}
               <button
+                disabled={!request?.enabled}
                 onClick={() => {
                   setModalMessage(`Desea aprobar la Solicitud ${request.id}`),
                     handleApprove();
                 }}
-                className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium"
+                className="flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium
+    bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 
+    focus:ring-opacity-75 active:scale-95 transition-all duration-200
+    disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
               >
                 <FontAwesomeIcon icon={faCheck} className="mr-2 text-base" />
                 <span>Aprobar</span>
@@ -105,11 +110,15 @@ export default function PayrollRequestItem({
 
               {/* Botón Rechazar */}
               <button
+                disabled={!request?.enabled}
                 onClick={() => {
                   setModalMessage(`Desea rechazar la Solicitud ${request.id}`),
                     handleReject();
                 }}
-                className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium"
+                className="flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium
+    bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 
+    focus:ring-opacity-75 active:scale-95 transition-all duration-200
+    disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
               >
                 <FontAwesomeIcon icon={faXmark} className="mr-2 text-base" />
                 <span>Rechazar</span>
@@ -118,7 +127,6 @@ export default function PayrollRequestItem({
           ) : (
             // Si el estado es "aprobado", puedes mostrar un botón deshabilitado o solo el botón de detalles
             <button
-              disabled
               className="flex items-center bg-gray-300 text-gray-600 px-4 py-2 rounded-lg cursor-not-allowed text-sm font-medium"
               onClick={() => {
                 setModalMessage(
@@ -134,6 +142,7 @@ export default function PayrollRequestItem({
 
           {/* Botón de expandir/colapsar con icono integrado */}
           <button
+            disabled={!request?.enabled}
             onClick={() => handleExpand(request?.id)}
             className="flex items-center bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500  border border-gray-300"
           >

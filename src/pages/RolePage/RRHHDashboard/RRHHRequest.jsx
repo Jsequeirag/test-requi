@@ -4,17 +4,7 @@ import RequestItem from "./RRHHRequestItem"; // Asegúrate de que la ruta sea co
 import TextButton from "../../../components/Button/TextButton";
 import Layout from "../../../components/Layout/Layout";
 import { useNavigate } from "react-router-dom";
-import {
-  ChevronLeft,
-  Info,
-  Layers,
-  User,
-  FileText,
-  CheckCircle,
-  Briefcase,
-  ClipboardList,
-  XCircle,
-} from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 export default function RRHHRequest() {
   const navigate = new useNavigate();
   const [childRequestsData, setChildRequestsData] = useState([]);
