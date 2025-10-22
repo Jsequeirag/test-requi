@@ -2,39 +2,43 @@ import { create } from "zustand";
 
 export const getInitialThemeColorNumber = () => {
   if (typeof window !== "undefined") {
-    // Asegura que estemos en el navegador
     const storedTheme = localStorage.getItem("requitool-themeColorNumber");
-    alert(storedTheme);
     if (storedTheme !== null) {
-      // Intenta parsear a número. Si falla, usa 0 (o un valor por defecto seguro)
       const parsed = parseInt(storedTheme, 10);
       if (!isNaN(parsed) && parsed >= 0 && parsed < 10) {
-        // Valida que sea un número válido dentro del rango
         return parsed;
       }
     }
   }
-  // Si no hay nada en localStorage o es inválido, devuelve un número aleatorio por defecto
-  // Genera un número aleatorio inicial si no hay nada guardado
-  return Math.floor(Math.random() * 10); // Asume que tienes 10 temas (0-9)
+  return Math.floor(Math.random() * 10);
 };
 
-const websiteConfig = create((set) => ({
+// 🌐 idioma inicial
+export const getInitialLanguage = () => {
+  if (typeof window !== "undefined") {
+    const storedLang = localStorage.getItem("requi-language");
+    if (storedLang === "en" || storedLang === "es") return storedLang;
+  }
+  return "es"; // por defecto español
+};
+
+const websiteConfig = create((set, get) => ({
   shrinkMenu: false,
   darkMode: {},
   setDarkMode: {},
   registerValues: {},
-  themeColorNumber: 0,
+
+  // 🌈 Tema
+  themeColorNumber: getInitialThemeColorNumber(),
   setThemeColorNumber: (number) => {
     set((state) => {
-      // Valida el número antes de guardar
       if (number >= 0 && number < state.themeColors.length) {
         if (typeof window !== "undefined") {
-          localStorage.setItem("requitool-themeColorNumber", number.toString()); // Guarda en localStorage
+          localStorage.setItem("requitool-themeColorNumber", number.toString());
         }
         return { themeColorNumber: number };
       }
-      return {}; // No actualiza si el número es inválido
+      return {};
     });
   },
   setRandomThemeColorNumber: () => {
@@ -45,26 +49,41 @@ const websiteConfig = create((set) => ({
         localStorage.setItem(
           "requitool-themeColorNumber",
           randomIndex.toString()
-        ); // Guarda en localStorage
+        );
       }
       return { themeColorNumber: randomIndex };
     });
   },
-  setRegisterValues: (value) => {
-    set(() => ({
-      registerValues: value,
-    }));
+
+  // 🧾 Registro
+  setRegisterValues: (value) => set({ registerValues: value }),
+  setShrinkMenu: (bool) => set({ shrinkMenu: bool }),
+
+  // 🌐 Idioma
+  language: getInitialLanguage(),
+  setLanguage: (lang) => {
+    if (lang === "es" || lang === "en") {
+      if (typeof window !== "undefined") {
+        localStorage.setItem("requi-language", lang);
+      }
+      set({ language: lang });
+    }
   },
-  setShrinkMenu: (bool) => {
-    set(() => ({
-      shrinkMenu: bool,
-    }));
+  toggleLanguage: () => {
+    const current = get().language;
+    const newLang = current === "es" ? "en" : "es";
+    if (typeof window !== "undefined") {
+      localStorage.setItem("requi-language", newLang);
+    }
+    set({ language: newLang });
   },
+
+  // 🎨 Paleta de colores
   themeColors: [
     {
       bgColor: "bg-gray-100 dark:bg-gray-900",
       accentColor: "bg-gray-500 dark:bg-gray-300",
-      hoverColor: "hover:bg-gray-100 dark:hover:bg-gray-500", // Un poco más oscuro/claro para hover
+      hoverColor: "hover:bg-gray-100 dark:hover:bg-gray-500",
     },
     {
       bgColor: "bg-blue-100 dark:bg-blue-800",
@@ -83,8 +102,8 @@ const websiteConfig = create((set) => ({
     },
     {
       bgColor: "bg-teal-100 dark:bg-teal-900",
-      accentColor: "bg-teal-600 dark:bg-teal-100 ",
-      hoverColor: "hover:bg-teal-100  dark:hover:bg-teal-900",
+      accentColor: "bg-teal-600 dark:bg-teal-100",
+      hoverColor: "hover:bg-teal-100 dark:hover:bg-teal-900",
     },
     {
       bgColor: "bg-cyan-100 dark:bg-cyan-900",
@@ -98,4 +117,5 @@ const websiteConfig = create((set) => ({
     },
   ],
 }));
+
 export default websiteConfig;
