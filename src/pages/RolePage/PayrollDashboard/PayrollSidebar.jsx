@@ -22,7 +22,7 @@ const SidebarPagination = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between px-2 py-3 border-t border-gray-200 dark:border-gray-700 mt-4 ">
+    <div className="flex items-center justify-between px-2 py-3 border-t border-gray-200 dark:border-gray-700 mt-4">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1 || isLoading}
@@ -180,7 +180,7 @@ export default function PayrollSidebar({
   const totalRecords = requestData ? requestData.totalRecords : 0;
 
   return (
-    <div className="bg-white/30 dark:bg-gray-900/40   backdrop-blur-md shadow-lg p-5 w-72 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto flex flex-col">
+    <div className="bg-white/30 dark:bg-gray-900/40 backdrop-blur-md shadow-lg p-5 w-72 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 flex flex-col">
       {/* Header */}
       <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-700 mb-4">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">
@@ -203,7 +203,7 @@ export default function PayrollSidebar({
       )}
 
       {/* Lista de solicitudes */}
-      <nav className="flex-grow">
+      <nav className="flex-1 overflow-y-auto">
         <ul>
           {isFetching ? (
             <RequestRoleSkn />
@@ -274,12 +274,11 @@ export default function PayrollSidebar({
                         }`}
                       >
                         {formatIsoDateToYYYYMMDD(parent.createdDate)}
-                      </span>{" "}
+                      </span>
                     </div>
                     <div>
-                      {" "}
                       <span
-                        className={`font-bold${
+                        className={`font-bold ${
                           selectedParentId === parent.id
                             ? "text-blue-100"
                             : "text-gray-500 dark:text-gray-400"
@@ -314,7 +313,7 @@ export default function PayrollSidebar({
       </nav>
 
       {/* Controles de paginación */}
-      <div className="mt-auto">
+      <div className="mt-4">
         <SidebarPagination
           currentPage={currentPage}
           totalPages={totalPages}

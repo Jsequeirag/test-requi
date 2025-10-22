@@ -9,8 +9,8 @@ export const setStateRequestRoleFlow = (roleId) =>
     url: `/setStateRequestRoleFlow/${roleId}`,
     method: "post",
   });
-export const updateStateRequestRoleFlow = (requisitionId, state) =>
+export const updateStateRequestRoleFlow = (workflowId, requisitionId, state) =>
   request({
-    url: `/updateStateRequestRoleFlow/${requisitionId}/${state}`,
+    url: `/updateStateRequestRoleFlow/${workflowId}/${requisitionId}/${state}`,
     method: "post",
   });

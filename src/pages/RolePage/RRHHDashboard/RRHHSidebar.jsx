@@ -177,7 +177,7 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
   const totalRecords = requestData ? requestData.totalRecords : 0;
 
   return (
-    <div className="bg-white/30 dark:bg-gray-900/40   backdrop-blur-md shadow-lg p-5 w-72 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 h-full overflow-y-auto flex flex-col">
+    <div className="bg-white/30 dark:bg-gray-900/40   backdrop-blur-md shadow-lg p-5 w-72 flex-shrink-0 border-r border-gray-200 dark:border-gray-800 overflow-y-auto flex flex-col">
       {/* Header */}
       <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-700 mb-4">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100 tracking-tight">

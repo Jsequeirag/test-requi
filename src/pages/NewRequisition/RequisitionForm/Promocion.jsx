@@ -7,7 +7,9 @@ import { convertirBase64 } from "../../../utils/Base64.js";
 import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview.jsx";
 
 import Tooltip from "../../../components/Tooltip";
+import websiteConfigStore from "../../../../stores/WebsiteConfig";
 export default function Promocion() {
+  const language = websiteConfigStore((s) => s.language);
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
   const setFormValues = formStore((state) => state.setFormValues);
@@ -50,93 +52,7 @@ export default function Promocion() {
       <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
         {/* Campo 1: Motivo */}
 
-        {/* Campo 2: Level Up */}
-        {/*
         <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="levelUp" // ID corregido y único
-          >
-            Level Up <span className="text-red-500">*</span>{" "}
-          </label>
-          <select
-            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            name="levelUp"
-            id="levelUp" // Añadido ID
-            value={
-              formValues.levelUp === true
-                ? "true"
-                : formValues.levelUp === false
-                ? "false"
-                : ""
-            } // Asegúrate de que el valor se controle
-            onChange={(e) =>
-              setFormValues({
-                // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
-
-                [e.target.name]: e.target.value === "true", // Convertir a booleano si es necesario
-              })
-            }
-          >
-        
-            <option value="" disabled>
-              Seleccionar una opción
-            </option>
-            <option value={true}>Sí</option>
-            <option value={false}>No</option>
-          </select>
-        </div>
- */}
-        {/* Campo 3: Carta de Promocion */}
-        <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="promotionLetterAttachment" // ID más descriptivo
-          >
-            Carta de Promoción
-            {/* Asterisco de requerido */}
-          </label>
-          {/* <input
-            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400
-                       file:mr-4 file:py-2 file:px-4
-                       file:rounded-md file:border-0 file:text-sm file:font-semibold
-                       file:bg-blue-50 file:text-blue-700
-                       hover:file:bg-blue-100" // Estilos mejorados para input type="file"
-            id="promotionLetterAttachment" // ID más descriptivo
-            type="file"
-            name="attachmentBase64"
-            placeholder="Adjuntar archivo"
-            onChange={async (e) => {
-              const archivoSeleccionado = e.target.files[0];
-              if (archivoSeleccionado) {
-                try {
-                  const base64 = await convertirBase64(archivoSeleccionado);
-                  // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
-                  setFormValues({
-                    [e.target.name]: base64,
-                  });
-                } catch (error) {
-                  console.error("Error al convertir a Base64:", error);
-                  // Opcional: manejar el error en el UI
-                  setFormValues((prevFormValues) => ({
-                    ...prevFormValues,
-                    [e.target.name]: null, // Limpiar el campo si hay error
-                  }));
-                }
-              } else {
-                // Si el usuario cancela la selección, asegúrate de limpiar el valor
-                setFormValues({
-                  [e.target.name]: null,
-                });
-              }
-            }}
-            accept=".pdf, image/*"
-            autoComplete="off"
-          />*/}
           <FileUploadWithPreview
             name="attachmentBase64"
             onFileChange={(data) => {
@@ -157,10 +73,14 @@ export default function Promocion() {
               className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
               htmlFor="promotionDate"
             >
-              Fecha del Movimiento {/* Asterisco de requerido */}
+              {language === "es" ? "Fecha del Movimiento" : "Movement Date"}
             </label>
             <Tooltip
-              text={"Fecha real en la que la persona ocupa su nueva posición"}
+              text={
+                language === "es"
+                  ? "Fecha real en la que la persona ocupa su nueva posición"
+                  : "Effective date the person starts their new position"
+              }
             />
           </div>
           <input
@@ -169,7 +89,7 @@ export default function Promocion() {
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             id="promotionDate"
             type="date"
-            name="promotionDate"
+            name={language === "es" ? "Fecha de Promoción" : "Promotion Date"}
             value={
               formValues.promotionDate
                 ? formValues.promotionDate.split("T")[0]
@@ -191,11 +111,15 @@ export default function Promocion() {
               className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
               htmlFor="movementDate" // Corregido a "MovementDate" si es un error de tipeo original
             >
-              Fecha de Promoción <span className="text-red-500">*</span>
-              {/*Abril Julio y Octubre*/}
+              {language === "es" ? " Fecha de Promoción" : "Promotion Date"}
+              <span className="text-red-500">*</span>
             </label>{" "}
             <Tooltip
-              text={"Fechas oficiales de promoción aprobadas por el Grupo"}
+              text={
+                language === "es"
+                  ? "Fechas oficiales de promoción aprobadas por el Grupo"
+                  : "Official promotion dates approved by the Group"
+              }
             />
           </div>
           <select
@@ -216,44 +140,19 @@ export default function Promocion() {
           </select>
         </div>
 
-        {/* Campo 6: Justificación de Promocion (Ingles) */}
-        {/*<div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="promotionJustification"
-          >
-            Justificación de Promoción (Ingles)  
-          </label>
-          <input
-            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            id="promotionJustification"
-            name="promotionJustification"
-            placeholder="Justificación de Promoción"
-            value={formValues.promotionJustification || ""} // Asegura que el valor se controle, y usa el nombre consistente
-            onChange={(e) => {
-              setFormValues({
-                [e.target.name]: e.target.value,
-              });
-            }}
-            autoComplete="off"
-          />
-        </div>*/}
-
         {/* Campo 7: Comentario (ocupa las 3 columnas en pantallas grandes) */}
         <div className="lg:col-span-3">
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="comment" // ID único
+            htmlFor={language === "es" ? "Comentario" : "comment"}
           >
-            Comentario
+            {language === "es" ? "Comentario" : "Comments"}{" "}
           </label>
           <textarea
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400 h-[200px]"
-            placeholder="Comentario"
+            placeholder={language === "es" ? "Comentario" : "comment"}
             name="comment"
             id="comment" // Añadido ID
             onChange={(e) => {

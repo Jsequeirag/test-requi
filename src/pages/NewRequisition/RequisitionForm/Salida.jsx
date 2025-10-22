@@ -1,12 +1,14 @@
-import React from "react";
 import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
 import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview.jsx";
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
-import { convertirBase64 } from "../../../utils/Base64.js";
 import Tooltip from "../../../components/Tooltip";
+import { RequisitionType } from "../../../contants/requisitionType.js";
+import { RequestType } from "../../../contants/requestType.js";
+import websiteConfigStore from "../../../../stores/WebsiteConfig.js";
 export default function Salida() {
+  const language = websiteConfigStore((s) => s.language);
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
   const setFormValues = formStore((state) => state.setFormValues);
@@ -18,7 +20,7 @@ export default function Salida() {
   return (
     <>
       <h1 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-200">
-        Salida de Empleado
+        {language === "es" ? "Salida" : "Leaver"}
       </h1>
 
       {/* ESTE ES EL ÚNICO CONTENEDOR PRINCIPAL DEL GRID */}
@@ -30,12 +32,13 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="requisitionMotivo" // ID único
           >
-            Motivo{" "}
+            {language === "es" ? "Tipo" : "Type"}
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
+            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
             name={"requisitionTypeId"}
+            customNameParam={language === "es" ? "name" : "nameEn"}
             id={"requisitionMotivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""}
             className="w-full text-base"
@@ -47,15 +50,17 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="dismissalType" // ID único
           >
-            Razón{" "}
+            {" "}
+            {language === "es" ? "Razón" : "Reason"}
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${
+            url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId/${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtypeId || ""}
             name={"requisitionSubtypeId"}
+            customNameParam={language === "es" ? "name" : "nameEn"}
             id={"RequisitionSubtypeSelect"} // Añadido ID
             className="w-full text-base"
           />
@@ -66,46 +71,16 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="resignationLetterAttachment" // ID único
           >
-            {formValues?.requisitionTypeId === 4
-              ? "Carta de Despido"
-              : "Carta de Renuncia"}{" "}
+            {formValues?.requisitionTypeId === RequisitionType.Despido
+              ? language === "es"
+                ? "Carta de Despido"
+                : "Dismissal Letter"
+              : language === "es"
+              ? "Carta de Renuncia"
+              : "Resignation Letter"}
             <span className="text-red-500">*</span>{" "}
           </label>
-          {/* <input
-            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400
-                       file:mr-4 file:py-2 file:px-4
-                       file:rounded-md file:border-0 file:text-sm file:font-semibold
-                       file:bg-blue-50 file:text-blue-700
-                       hover:file:bg-blue-100" // Estilos mejorados para input type="file"
-            id="resignationLetterAttachment" // ID único
-            type="file"
-            name="attachmentBase64"
-            onChange={async (e) => {
-              const archivoSeleccionado = e.target.files[0];
-              if (archivoSeleccionado) {
-                try {
-                  const base64 = await convertirBase64(archivoSeleccionado);
-                  // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
-                  setFormValues({
-                    [e.target.name]: base64,
-                  });
-                } catch (error) {
-                  console.error("Error al convertir a Base64:", error);
-                  setFormValues({
-                    [e.target.name]: null,
-                  });
-                }
-              } else {
-                setFormValues({
-                  [e.target.name]: null,
-                });
-              }
-            }}
-            accept=".pdf, image/*"
-            autoComplete="off"
-          />*/}
+
           <FileUploadWithPreview
             name="attachmentBase64"
             onFileChange={(data) => {
@@ -118,63 +93,14 @@ export default function Salida() {
             value={formValues?.attachmentBase64 || ""}
           />
         </div>
-        {/* Campo 3: Tipo de Despido */}
-        {/* <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="dismissalType" // ID único
-          >
-            {formValues?.requisitionTypeId === 4
-              ? "Tipo de Despido"
-              : "Tipo de Renuncia"}
-          </label>
-          <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId?RequisitionTypeId=${
-              formValues?.requisitionTypeId || ""
-            }`}
-            value={formValues?.requisitionSubtype || ""}
-            name={"requisitionSubtype"}
-            id={"dismissalType"} // Añadido ID
-            className="w-full text-base"
-          />
-        </div>*/}
-        {/* Campo : RForm */}
-        {/* 
-        <div>
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="rForm" // ID único
-          >
-            RForm
-          </label>
-          <input
-            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
-            disabled={formValues?.requisitionSubtype !== 1} // Mantener lógica de deshabilitado
-            id="rForm" // ID único
-            name="rForm"
-            value={
-              formValues?.requisitionSubtype === 1 ? formValues.rForm || "" : ""
-            }
-            placeholder="RForm"
-            onChange={(e) => {
-              // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
-              setFormValues((prevFormValues) => ({
-                ...prevFormValues,
-                [e.target.name]: e.target.value,
-              }));
-            }}
-            autoComplete="off"
-          />
-        </div>
-*/}
         <div>
           <label
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="rehirable" // ID único
           >
-            Periodo de prueba <span className="text-red-500">*</span>{" "}
+            {" "}
+            {language === "es" ? "Periodo de prueba" : "Trieal Period"}
+            <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
           <select
@@ -200,7 +126,9 @@ export default function Salida() {
           >
             {/* Solo una opción puede ser 'selected' inicialmente, si no, es mejor omitirlo y dejar que el estado lo controle */}
 
-            <option value={true}>Sí</option>
+            <option value={true}>
+              <option value={true}> {language === "es" ? "Sí" : "Yes"}</option>
+            </option>
             <option value={false}>No</option>
           </select>
         </div>
@@ -212,7 +140,7 @@ export default function Salida() {
               htmlFor="officialEmployeeDepartureDate" // ID único
             >
               R-Form{" "}
-              {formValues?.requisitionTypeId === 4 &&
+              {formValues?.requisitionTypeId === RequisitionType.Despido &&
                 formValues?.trialPeriod === false && (
                   <span className="text-red-500">*</span>
                 )}
@@ -222,14 +150,14 @@ export default function Salida() {
           <input
             required
             className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       ${
-                         formValues?.requisitionTypeId !== 4 ||
-                         formValues?.trialPeriod !== false
-                           ? "bg-gray-100 cursor-not-allowed"
-                           : "bg-white"
-                       }
-                       text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+                 ${
+                   formValues?.requisitionTypeId !== RequisitionType.Despido ||
+                   formValues?.trialPeriod !== false
+                     ? "bg-gray-100 cursor-not-allowed"
+                     : "bg-white"
+                 }
+                 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                 dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             type="text"
             id="rForm" // ID único
             name="rForm"
@@ -242,7 +170,7 @@ export default function Salida() {
             autoComplete="off"
             value={formValues.rForm ? formValues.rForm : ""}
             disabled={
-              formValues?.requisitionTypeId !== 4 ||
+              formValues?.requisitionTypeId !== RequisitionType.Despido ||
               formValues?.trialPeriod !== false
             }
           />
@@ -252,7 +180,8 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="rehirable" // ID único
           >
-            Recontratable <span className="text-red-500">*</span>{" "}
+            {language === "es" ? "Recontratable" : "Rehirable"}
+            <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
           <select
@@ -278,7 +207,7 @@ export default function Salida() {
           >
             {/* Solo una opción puede ser 'selected' inicialmente, si no, es mejor omitirlo y dejar que el estado lo controle */}
 
-            <option value={true}>Sí</option>
+            <option value={true}> {language === "es" ? "Sí" : "Yes"}</option>
             <option value={false}>No</option>
           </select>
         </div>
@@ -289,15 +218,22 @@ export default function Salida() {
               className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
               htmlFor="officialEmployeeDepartureDate" // ID único
             >
-              Fecha Oficial de Salida <span className="text-red-500">*</span>{" "}
+              {language === "es"
+                ? " Fecha Oficial de Salida"
+                : "Official Departure Date"}
+              <span className="text-red-500">*</span>{" "}
               {/* Asterisco de requerido */}
             </label>
 
             <Tooltip
               text={
-                formValues?.requisitionTypeId === 4
-                  ? "Fecha oficial que indica la Carta de Despido"
-                  : "Fecha oficial que indica  la Carta de Renuncia"
+                formValues?.requisitionTypeId === RequisitionType.Despido
+                  ? language === "es"
+                    ? "Fecha oficial que indica la Carta de Despido"
+                    : "Official date indicated in the Dismissal Letter"
+                  : language === "es"
+                  ? "Fecha oficial que indica la Carta de Renuncia"
+                  : "Official date indicated in the Resignation Letter"
               }
             />
           </div>
@@ -323,7 +259,7 @@ export default function Salida() {
                 : ""
             }
           />
-        </div>{" "}
+        </div>
         {/* Campo 7: Fecha Real de Salida */}
         <div>
           <div className="flex ">
@@ -331,10 +267,19 @@ export default function Salida() {
               className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
               htmlFor="employeeDepartureDate" // ID único
             >
-              Fecha Real de Salida <span className="text-red-500">*</span>{" "}
+              {language === "es"
+                ? "Fecha Oficial de Salida"
+                : "Real Departure Date"}
+              <span className="text-red-500">*</span>{" "}
               {/* Asterisco de requerido */}
             </label>
-            <Tooltip text={"Último día laboral del empleado"} />
+            <Tooltip
+              text={
+                language === "es"
+                  ? "Último día laboral del empleado"
+                  : "Employee's last working day"
+              }
+            />
           </div>
           <input
             required
@@ -362,16 +307,23 @@ export default function Salida() {
         {/* Campo 8: Fecha Entrega de Equipo */}
         <div>
           <div className="flex">
-            {" "}
             <label
               className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
               htmlFor="returnWorkEquipmentDate" // ID único
             >
-              Fecha Entrega de Equipo
+              {language === "es"
+                ? "Fecha Entrega de Equipo"
+                : "Equipment Delivery Date"}
               <span className="text-red-500">*</span>
               {/* Asterisco de requerido */}
-            </label>{" "}
-            <Tooltip text={"Fecha en la que el colaborar entrega el equipo"} />
+            </label>
+            <Tooltip
+              text={
+                language === "es"
+                  ? "Fecha en la que el colaborador entrega el equipo"
+                  : "Date on which the employee returns the equipment"
+              }
+            />
           </div>
           <input
             required
@@ -402,7 +354,8 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="phoneNumber" // ID único
           >
-            Número de teléfono <span className="text-red-500">*</span>{" "}
+            {language === "es" ? "Número de teléfono" : "Phone Number"}
+            <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
           <input
@@ -413,7 +366,9 @@ export default function Salida() {
             type="number"
             name="phoneNumber"
             id="phoneNumber" // ID único
-            placeholder="Número de Teléfono"
+            placeholder={
+              language === "es" ? "Número de teléfono" : "Phone Number"
+            }
             onChange={(e) => {
               e.target.value.length <= 8 &&
                 // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
@@ -431,7 +386,8 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="personalEmail" // ID único
           >
-            Correo Personal
+            {" "}
+            {language === "es" ? "Correo Personal" : "E-mail"}
             <span className="text-red-500">*</span>{" "}
           </label>
           <input
@@ -441,7 +397,7 @@ export default function Salida() {
             type="email"
             name="personalEmail"
             id="personalEmail" // ID único
-            placeholder="Correo Personal"
+            placeholder={language === "es" ? "Correo Personal" : "E-mail"}
             required
             onChange={(e) => {
               // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
@@ -459,20 +415,20 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="joinNewCompany" // ID corregido de "Companny" a "Company"
           >
-            Nueva Empresa
+            {language === "es" ? "Nueva Empresa" : "New Company"}
           </label>
           <input
             className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-            ${
-              formValues?.requisitionTypeId === 4
-                ? "bg-gray-100 cursor-not-allowed"
-                : "bg-white"
-            } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+  ${
+    formValues?.requisitionTypeId === RequisitionType.Despido
+      ? "bg-gray-100 cursor-not-allowed"
+      : "bg-white"
+  } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+             dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             type="text"
             name="joinNewCompany" // Nombre corregido
             id="joinNewCompany" // ID corregido
-            placeholder="Nueva empresa"
+            placeholder={language === "es" ? "Nueva Empresa" : "New Company"}
             onChange={(e) => {
               // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
               setFormValues({
@@ -481,8 +437,8 @@ export default function Salida() {
             }}
             autoComplete="off"
             value={formValues.joinNewCompany || ""}
-            required={formValues?.requisitionTypeId === 4} //4===despido
-            disabled={formValues?.requisitionTypeId === 4} //4===despido
+            required={formValues?.requisitionTypeId === RequisitionType.Despido} // Despido
+            disabled={formValues?.requisitionTypeId === RequisitionType.Despido} // Despido
           />
         </div>
         {/* Campo 13: Comentario (ocupa las 3 columnas en pantallas grandes) */}
@@ -491,13 +447,13 @@ export default function Salida() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="comment" // ID único
           >
-            Comentario
+            {language === "es" ? "Comentario" : "Comments"}
           </label>
           <textarea
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
                        bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400 h-[200px]"
-            placeholder="Comentario"
+            placeholder={language === "es" ? "Comentario" : "Comments"}
             name="comment"
             id="comment" // Añadido ID
             onChange={(e) => {

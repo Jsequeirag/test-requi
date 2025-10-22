@@ -8,6 +8,8 @@ import { Info } from "lucide-react"; // Importa el icono Info
 import { getEmployeeById } from "../../../api/urls/Employee";
 import { useApiGet } from "../../../api/config/customHooks";
 import { useLocation } from "react-router-dom";
+import { RequisitionType } from "../../../contants/requisitionType.js";
+
 export default function Entrada() {
   const location = useLocation();
   const employeeSelected = formStore((state) => state.employeeSelected);
@@ -53,14 +55,15 @@ export default function Entrada() {
             htmlFor="period"
           >
             Periodo
-            {formValues?.requisitionTypeId === 12 && (
+            {formValues?.requisitionTypeId === RequisitionType.Temporal && (
               <span className="text-red-500"> *</span>
             )}
           </label>
           <select
             className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
     ${
-      formValues.requisitionTypeId === 5 || formValues.requisitionTypeId === 11
+      formValues.requisitionTypeId === RequisitionType.NuevaPosicion ||
+      formValues.requisitionTypeId === RequisitionType.Reemplazo
         ? "bg-gray-100 cursor-not-allowed"
         : "bg-white"
     } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -74,8 +77,8 @@ export default function Entrada() {
             }}
             required
             disabled={
-              formValues.requisitionTypeId === 11 ||
-              formValues.requisitionTypeId === 5
+              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
+              formValues.requisitionTypeId === RequisitionType.NuevaPosicion
             }
           >
             <option selected value="" disabled>
@@ -106,15 +109,15 @@ export default function Entrada() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=9`}
+            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=9`}
             name={"process"}
             id={"process"} // Añadido ID
             value={formValues?.process || ""} // Usamos 'value' y un fallback a ""
             className="w-full text-base"
             required // Añadido required si este campo debe ser obligatorio
             disabled={
-              formValues.requisitionTypeId === 12 ||
-              formValues.requisitionTypeId === 11 ||
+              formValues.requisitionTypeId === RequisitionType.Temporal ||
+              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
               formValues.requisitionTypeId === ""
             }
           />
@@ -128,26 +131,28 @@ export default function Entrada() {
           </label>
           <input
             className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       ${
-                         formValues.process !== 21 ||
-                         formValues.requisitionTypeId === 12 ||
-                         formValues.requisitionTypeId === 11 ||
-                         formValues.requisitionTypeId === ""
-                           ? "bg-gray-100 cursor-not-allowed"
-                           : "bg-white"
-                       } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                      ${
+                        formValues.process !== 21 ||
+                        formValues.requisitionTypeId ===
+                          RequisitionType.Temporal ||
+                        formValues.requisitionTypeId ===
+                          RequisitionType.Reemplazo ||
+                        formValues.requisitionTypeId === ""
+                          ? "bg-gray-100 cursor-not-allowed"
+                          : "bg-white"
+                      } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             id="tForm" // ID único y corregido
             name="tForm"
             placeholder="TForm"
             disabled={
               formValues.process !== 21 ||
-              formValues.requisitionTypeId === 12 ||
-              formValues.requisitionTypeId === 11 ||
+              formValues.requisitionTypeId === RequisitionType.Temporal ||
+              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
               formValues.requisitionTypeId === ""
             }
             onChange={(e) => {
-              formValues.requisitionTypeId === 5 &&
+              formValues.requisitionTypeId === RequisitionType.NuevaPosicion &&
                 setFormValues({
                   ...formValues,
                   [e.target.name]: e.target.value,
@@ -155,7 +160,9 @@ export default function Entrada() {
             }}
             autoComplete="off"
             value={formValues.tForm || ""}
-            required={formValues.requisitionTypeId === 5}
+            required={
+              formValues.requisitionTypeId === RequisitionType.NuevaPosicion
+            }
             type="number"
           />
         </div>{" "}
@@ -166,21 +173,21 @@ export default function Entrada() {
             htmlFor="period"
           >
             Tipo de Temporalidad
-            {formValues?.requisitionTypeId === 12 && (
+            {formValues?.requisitionTypeId === RequisitionType.Temporal && (
               <span className="text-red-500"> *</span>
             )}
           </label>
 
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=10`}
+            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=10`}
             id={"typeTemporality"}
             name="typeTemporality"
             value={formValues?.typeTemporality || ""}
             className="w-full text-base"
             required={true}
             disabled={
-              formValues.requisitionTypeId === 11 ||
-              formValues.requisitionTypeId === 5
+              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
+              formValues.requisitionTypeId === RequisitionType.NuevaPosicion
             }
           />
         </div>
@@ -190,7 +197,7 @@ export default function Entrada() {
             htmlFor="period"
           >
             Fecha Estimada de Salida
-            {formValues?.estimatedDepartureDate === 12 && (
+            {formValues?.requisitionTypeId === RequisitionType.Temporal && (
               <span className="text-red-500"> *</span>
             )}
           </label>
@@ -252,14 +259,14 @@ export default function Entrada() {
           <h1 className="text-2xl font-semibold text-gray-800  dark:text-gray-200">
             Informacion de Empleado
           </h1>
-          {formValues.requisitionTypeId === 11 && (
+          {formValues.requisitionTypeId === RequisitionType.Reemplazo && (
             <h1 className="mt-2 text-lg font-semibold">
               Empleado de la requisición anterior
             </h1>
           )}
           {/* Campo 1: Código de Posición */}{" "}
           <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-6 ">
-            {formValues.requisitionTypeId !== 11 ? (
+            {formValues.requisitionTypeId !== RequisitionType.Reemplazo ? (
               <>
                 <div className="">
                   <label
@@ -267,19 +274,21 @@ export default function Entrada() {
                     htmlFor="positionCode"
                   >
                     Código de Posición{" "}
-                    {(formValues?.requisitionTypeId === 5 ||
-                      formValues?.requisitionTypeId === 12) && (
+                    {(formValues?.requisitionTypeId ===
+                      RequisitionType.NuevaPosicion ||
+                      formValues?.requisitionTypeId ===
+                        RequisitionType.Temporal) && (
                       <span className="text-red-500">*</span>
                     )}
                   </label>
                   <input
                     className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                        ${
-                          formValues.requisitionTypeId === 11
-                            ? "bg-gray-100 cursor-not-allowed"
-                            : "bg-white"
-                        } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+            ${
+              formValues.requisitionTypeId === RequisitionType.Reemplazo
+                ? "bg-gray-100 cursor-not-allowed"
+                : "bg-white"
+            } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+           dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                     id="positionCode"
                     name="positionCode"
                     placeholder="Código de Posición"
@@ -294,9 +303,12 @@ export default function Entrada() {
                     maxLength={8}
                     pattern="[A-Za-z0-9]{1,8}"
                     title="Solo caracteres alfanuméricos, máximo 8 caracteres"
-                    disabled={formValues.requisitionTypeId === 11}
+                    disabled={
+                      formValues.requisitionTypeId === RequisitionType.Reemplazo
+                    }
                   />
                 </div>
+
                 {/* Campo 2: Supervisor */}
                 <div>
                   <label
@@ -304,13 +316,15 @@ export default function Entrada() {
                     htmlFor="supervisor"
                   >
                     Supervisor{" "}
-                    {(formValues?.requisitionTypeId === 5 ||
-                      formValues?.requisitionTypeId === 12) && (
+                    {(formValues?.requisitionTypeId ===
+                      RequisitionType.NuevaPosicion ||
+                      formValues?.requisitionTypeId ===
+                        RequisitionType.Temporal) && (
                       <span className="text-red-500">*</span>
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesBySupervisorRole`}
+                    url={`https://localhost:7040/getEmployeesBySupervisorRole`}
                     name={"supervisor"}
                     id={"supervisor"}
                     value={formValues?.supervisor || ""}
@@ -318,9 +332,12 @@ export default function Entrada() {
                     customNameParam={"nombre"}
                     required={true}
                     placeholder="Lista desplegable de personas con puestos de liderazgo"
-                    disabled={formValues.requisitionTypeId === 11}
+                    disabled={
+                      formValues.requisitionTypeId === RequisitionType.Reemplazo
+                    }
                   />
                 </div>
+
                 {/* Campo 3: Grado */}
                 <div>
                   <label
@@ -328,22 +345,27 @@ export default function Entrada() {
                     htmlFor="grade"
                   >
                     Grado{" "}
-                    {(formValues?.requisitionTypeId === 5 ||
-                      formValues?.requisitionTypeId === 12) && (
+                    {(formValues?.requisitionTypeId ===
+                      RequisitionType.NuevaPosicion ||
+                      formValues?.requisitionTypeId ===
+                        RequisitionType.Temporal) && (
                       <span className="text-red-500">*</span>
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetGrades`}
+                    url={`https://localhost:7040/GetGrades`}
                     name={"grade"}
                     id={"grade"}
                     value={formValues?.grade || ""}
                     className="w-full text-base"
                     required={true}
                     placeholder="Lista desplegable de los grados únicos de exactus"
-                    disabled={formValues.requisitionTypeId === 11}
+                    disabled={
+                      formValues.requisitionTypeId === RequisitionType.Reemplazo
+                    }
                   />
                 </div>
+
                 {/* Campo 4: Proyecto */}
                 <div>
                   <label
@@ -351,36 +373,43 @@ export default function Entrada() {
                     htmlFor="project"
                   >
                     Proyecto{" "}
-                    {(formValues?.requisitionTypeId === 5 ||
-                      formValues?.requisitionTypeId === 12) && (
+                    {(formValues?.requisitionTypeId ===
+                      RequisitionType.NuevaPosicion ||
+                      formValues?.requisitionTypeId ===
+                        RequisitionType.Temporal) && (
                       <span className="text-red-500">*</span>
                     )}
                   </label>
                   <AsyncSelectFreeText
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
+                    url={`https://localhost:7040/GetProjectsByExactus`}
                     name={"project"}
                     id={"project"}
                     value={formValues?.project || ""}
                     className="w-full text-base"
                     required={true}
                     placeholder="Lista desplegable de los proyectos únicos de exactus"
-                    disabled={formValues.requisitionTypeId === 11}
+                    disabled={
+                      formValues.requisitionTypeId === RequisitionType.Reemplazo
+                    }
                   />
                 </div>
+
                 {/* Campo 5: Departamento */}
                 <div>
                   <label
                     className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                     htmlFor="department"
                   >
-                    Nombre del Area{" "}
-                    {(formValues?.requisitionTypeId === 5 ||
-                      formValues?.requisitionTypeId === 12) && (
+                    Nombre del Área{" "}
+                    {(formValues?.requisitionTypeId ===
+                      RequisitionType.NuevaPosicion ||
+                      formValues?.requisitionTypeId ===
+                        RequisitionType.Temporal) && (
                       <span className="text-red-500">*</span>
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getDepartments`}
+                    url={`https://localhost:7040/getDepartments`}
                     name={"department"}
                     id={"department"}
                     customNameParam={"descriptionDepartamento"}
@@ -389,29 +418,12 @@ export default function Entrada() {
                     className="w-full text-base"
                     required={true}
                     placeholder="Lista desplegable de los nombres de las áreas únicas de exactus"
-                    disabled={formValues?.requisitionTypeId === 11}
+                    disabled={
+                      formValues?.requisitionTypeId ===
+                      RequisitionType.Reemplazo
+                    }
                   />
                 </div>
-
-                {/* 
-                <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="sodMatrix" // ID único y corregido
-                  >
-                    Perfil SOD <span className="text-red-500">*</span>
-                
-                  </label>
-                  <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getMatriz`}
-                    name={"sodMatrix"}
-                    id={"sodMatrix"} // Añadido ID
-                    value={formValues.sodMatrix || ""}
-                    className="w-full text-base"
-                    disabled={formValues?.requisitionTypeId === 11}
-                    required
-                  />
-                </div>*/}
               </>
             ) : (
               <>
@@ -423,7 +435,7 @@ export default function Entrada() {
                     Nombre
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
+                    url={`https://localhost:7040/getEmployees`}
                     name={"employeeId"}
                     customNameParam="nombre"
                     //para promocion no debe ser obligatorio
@@ -567,11 +579,6 @@ export default function Entrada() {
                 </div>{" "}
               </>
             )}
-            {formValues?.requisitionTypeId === 11 && (
-              <>
-                <div></div>
-              </>
-            )}
           </div>
           <h1 className="text-lg font-semibold text-gray-800 mb-6 dark:text-gray-200 mt-4">
             Empleado
@@ -583,21 +590,23 @@ export default function Entrada() {
                 htmlFor="fullName"
               >
                 Nombre{" "}
-                {!formValues.requisitionTypeId == 11 ||
-                  !formValues.requisitionTypeId === 12 ||
-                  (!formValues.requisitionTypeId === 5 &&
+                {!formValues.requisitionTypeId == RequisitionType.Reemplazo ||
+                  !formValues.requisitionTypeId === RequisitionType.Temporal ||
+                  (!formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                     !formValues.recruitmentProccess === 14 && (
                       <>{/* <span className="text-red-500">*</span>*/}</>
                     ))}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="fullName"
                 name="fullName"
                 placeholder="Nombre"
@@ -610,14 +619,18 @@ export default function Entrada() {
                 autoComplete="off"
                 value={formValues.fullName || ""}
                 type="text"
-                required={!formValues.requisitionTypeId === 5}
+                required={
+                  !formValues.requisitionTypeId ===
+                  RequisitionType.NuevaPosicion
+                }
                 disabled={
-                  //Si ingreso nuevo y concurso interno no se llena
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                 }
               />
             </div>
+
             {/* Campo 2: Exactus ID */}
             <div>
               <label
@@ -628,12 +641,13 @@ export default function Entrada() {
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="exactusId"
                 name="exactusId"
                 placeholder="Exactus ID"
@@ -651,31 +665,33 @@ export default function Entrada() {
                 pattern="[0-9]{1,6}"
                 title="Solo números, máximo 6 caracteres"
                 disabled={
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                 }
               />
             </div>
-            {/* Campo 3: Carrer Settings ID */}
+
+            {/* Campo 3: Career Settings ID */}
             <div>
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="careerSettingsId"
               >
                 Career Settings ID
-                {/* <span className="text-red-500">*</span>*/}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="careerSettingsId"
                 name="careerSettingsId"
-                placeholder="Carrer Settings ID"
+                placeholder="Career Settings ID"
                 onChange={(e) => {
                   setFormValues({
                     ...formValues,
@@ -686,27 +702,30 @@ export default function Entrada() {
                 value={formValues.careerSettingsId || ""}
                 type="number"
                 disabled={
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                 }
               />
             </div>
+
             {/* Campo 4: Lion Login */}
             <div>
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="lionLogin"
               >
-                Lion Login {/* <span className="text-red-500">*</span>*/}
+                Lion Login
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="lionLogin"
                 name="lionLogin"
                 placeholder="Lion Login"
@@ -722,27 +741,30 @@ export default function Entrada() {
                 pattern="[A-Za-z0-9]+"
                 title="Solo caracteres alfanuméricos"
                 disabled={
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                 }
               />
             </div>
+
             {/* Campo 5: Company Email */}
             <div>
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="companyEmail"
               >
-                Correo empresa {/* <span className="text-red-500">*</span>*/}
+                Correo empresa
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="companyEmail"
                 name="companyEmail"
                 placeholder="Correo empresa"
@@ -758,27 +780,30 @@ export default function Entrada() {
                 pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
                 title="Ingrese un correo electrónico válido"
                 disabled={
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                 }
               />
             </div>
+
             {/* Campo 6: Start Date */}
             <div>
               <label
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="startDate"
               >
-                Fecha de Ingreso {/* <span className="text-red-500">*</span>*/}
+                Fecha de Ingreso
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="startDate"
                 name="startDate"
                 placeholder="Fecha"
@@ -796,7 +821,8 @@ export default function Entrada() {
                 }
                 type="date"
                 disabled={
-                  formValues.requisitionTypeId === 5 &&
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
                 }
               />

@@ -7,9 +7,7 @@ import { getLocalStorageKeyValue } from "../../../utils/localstore";
 import { Info } from "lucide-react"; // Importa el icono Info
 import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx"; // Asegúrate de que el nombre sea correcto
 import { RequestType } from "../../../contants/requestType.js";
-import websiteConfigStore from "../../../../stores/WebsiteConfig";
 export default function EmployeeInfo() {
-  const language = websiteConfigStore((s) => s.language);
   const formValues = formStore((state) => state.formValues);
   const employeeSelected = formStore((state) => state.employeeSelected);
   const setEmployeeSelected = formStore((state) => state.setEmployeeSelected);
@@ -43,9 +41,9 @@ export default function EmployeeInfo() {
 
   return (
     <>
-      {/*<h1 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-200">
+      <h1 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-200">
         Información de Empleado
-      </h1> */}
+      </h1>
 
       {/* ESTE ES EL ÚNICO CONTENEDOR PRINCIPAL DEL GRID */}
       {/* Se configura para 1 columna en móvil, 2 en pantallas medianas (md) y 3 en pantallas grandes (lg) */}
@@ -56,7 +54,7 @@ export default function EmployeeInfo() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="employeeId"
           >
-            {language === "es" ? "Nombre" : "Full Name"}
+            Nombre{" "}
             <span className="text-red-500 font-bold">
               {/*Si es promocion no se debe mostrar el */}
               {formValues?.requestTypeId === RequestType.Promocion ? "" : "*"}
@@ -76,10 +74,7 @@ export default function EmployeeInfo() {
           {/*si es promocion no activarlo*/}
           {!formValues?.employeeId && (
             <p className="mt-1 text-xs text-red-600 flex items-center dark:text-red-500">
-              <Info className="w-3 h-3 mr-1" />
-              {language === "es"
-                ? "Este campo es requerido"
-                : "This field is required"}
+              <Info className="w-3 h-3 mr-1" /> Este campo es requerido.
             </p>
           )}
         </div>
@@ -113,7 +108,7 @@ export default function EmployeeInfo() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="posCod"
           >
-            {language === "es" ? "Código de Posición" : "Position Code"}
+            # Código de Posición
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -159,7 +154,7 @@ export default function EmployeeInfo() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="grado"
           >
-            {language === "es" ? "Grado" : "Grade"}
+            Grado
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -182,7 +177,7 @@ export default function EmployeeInfo() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="proyecto"
           >
-            {language === "es" ? "Proyecto" : "Project"}
+            Proyecto
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -205,7 +200,7 @@ export default function EmployeeInfo() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="fechaIngreso"
           >
-            {language === "es" ? "Fecha de Ingreso" : "Start Date"}
+            Fecha de Ingreso
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
@@ -230,7 +225,7 @@ export default function EmployeeInfo() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="departamento"
           >
-            {language === "es" ? "Departamento" : "Area Name"}
+            Departamento
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base

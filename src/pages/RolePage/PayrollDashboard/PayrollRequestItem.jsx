@@ -7,16 +7,19 @@ import {
   faXmark,
 } from "@fortawesome/free-solid-svg-icons";
 import AsyncModal from "../../../components/AsyncComponents/AsyncModal"; // Asegúrate de que esta ruta sea correcta
-import { setStateRequestRoleFlow } from "../../../api/urls/RequestRoleFlow";
-
-export default function PayrollRequestItem({
-  request,
-  expandedRequest,
-  handleExpand,
-}) {
+import { updateStateRequestRoleFlow } from "../../../api/urls/RequestRoleFlow";
+import { useNavigate } from "react-router-dom";
+export default function PayrollRequestItem({ request, expandedRequest }) {
   const today = new Date().toLocaleDateString();
   const [modalState, setModalState] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
+  const [requestState, setRequestState] = useState("");
+  const [requisitionId, setRequisitionId] = useState("");
+  const [workflowId, setWorkflowId] = useState("");
+  const navigate = useNavigate();
+  const showDetails = (requisition) => {
+    console.log(requisition);
+  };
 
   const handleApprove = () => {
     // Aquí iría la lógica para aprobar la solicitud
@@ -35,7 +38,9 @@ export default function PayrollRequestItem({
         setOpenModal={setModalState}
         message={modalMessage}
         openModal={modalState}
-        request={setStateRequestRoleFlow}
+        request={() =>
+          updateStateRequestRoleFlow(workflowId, requisitionId, requestState)
+        }
         data={request}
       />
 
@@ -65,7 +70,6 @@ export default function PayrollRequestItem({
         </span>
 
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          {" "}
           {/* Color ligeramente más oscuro para etiquetas */}
           <span className="font-semibold">Fecha Creación:</span>{" "}
           {/* Negrita para la etiqueta */}
@@ -77,7 +81,6 @@ export default function PayrollRequestItem({
         </p>
 
         <p className="text-sm text-gray-600 dark:text-gray-400">
-          {" "}
           {/* Color ligeramente más oscuro para etiquetas */}
           <span className="font-semibold">Creador:</span>{" "}
           {/* Negrita para la etiqueta */}
@@ -92,33 +95,33 @@ export default function PayrollRequestItem({
           {request?.state !== "aprobado" ? (
             <>
               {/* Botón Aprobar */}
-              {/* Botón Aprobar */}
               <button
-                disabled={!request?.enabled}
+                disabled={request.requestRoleFlowState === "Completado"}
                 onClick={() => {
-                  setModalMessage(`Desea aprobar la Solicitud ${request.id}`),
+                  setRequisitionId(request.id),
+                    setRequestState(1),
+                    setWorkflowId(request.workflowId),
+                    setModalMessage(`Desea aprobar la Solicitud ${request.id}`),
                     handleApprove();
                 }}
-                className="flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium
-    bg-green-500 hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 
-    focus:ring-opacity-75 active:scale-95 transition-all duration-200
-    disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
+                className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium"
               >
                 <FontAwesomeIcon icon={faCheck} className="mr-2 text-base" />
                 <span>Aprobar</span>
               </button>
-
               {/* Botón Rechazar */}
               <button
-                disabled={!request?.enabled}
+                disabled={request.requestRoleFlowState === "Completado"}
                 onClick={() => {
-                  setModalMessage(`Desea rechazar la Solicitud ${request.id}`),
+                  setRequisitionId(request.id),
+                    setRequestState(2),
+                    setWorkflowId(request.workflowId),
+                    setModalMessage(
+                      `Desea rechazar la Solicitud ${request.id}`
+                    ),
                     handleReject();
                 }}
-                className="flex items-center px-4 py-2 rounded-lg text-white text-sm font-medium
-    bg-red-500 hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 
-    focus:ring-opacity-75 active:scale-95 transition-all duration-200
-    disabled:bg-gray-400 disabled:cursor-not-allowed disabled:hover:bg-gray-400"
+                className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium"
               >
                 <FontAwesomeIcon icon={faXmark} className="mr-2 text-base" />
                 <span>Rechazar</span>
@@ -132,6 +135,7 @@ export default function PayrollRequestItem({
                 setModalMessage(
                   "Desea rechazar la Solicitud # por requestType"
                 ),
+                  setWorkflowId(request.workFlowId),
                   handleReject();
               }}
             >
@@ -142,8 +146,17 @@ export default function PayrollRequestItem({
 
           {/* Botón de expandir/colapsar con icono integrado */}
           <button
-            disabled={!request?.enabled}
-            onClick={() => handleExpand(request?.id)}
+            onClick={() => {
+              navigate("/newRequisition", {
+                state: {
+                  request: request,
+                  requisition: request,
+                  hasPrevRequisition: null,
+                  prevRequisition: null,
+                  action: "update",
+                },
+              });
+            }}
             className="flex items-center bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500  border border-gray-300"
           >
             <span>
@@ -166,41 +179,39 @@ export default function PayrollRequestItem({
                      dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300" // Clases de modo oscuro
         >
           <h4 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-            {" "}
             {/* Título de sección más grande y bold */}
             Detalles de la Solicitud
           </h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-4 text-base">
-            {" "}
             {/* Espaciado mejorado */}
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Tipo de Acción:
-              </strong>{" "}
+              </strong>
               Cambio de supervisor
             </p>
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Fecha:
-              </strong>{" "}
+              </strong>
               {today}
             </p>
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Supervisor Anterior:
-              </strong>{" "}
+              </strong>
               Juan Pérez
             </p>
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Nuevo Supervisor:
-              </strong>{" "}
+              </strong>
               María Gómez
             </p>
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Motivo:
-              </strong>{" "}
+              </strong>
               Reorganización del equipo
             </p>
             {/* Puedes añadir más datos de prueba aquí */}

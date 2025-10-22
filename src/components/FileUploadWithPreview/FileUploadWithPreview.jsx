@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Eye, X, Upload, FileText, Image } from "lucide-react";
-
+import websiteConfigStore from "../../../stores/WebsiteConfig.js";
 const FileUploadWithPreview = ({
   name,
   onFileChange,
@@ -117,7 +117,7 @@ const FileUploadWithPreview = ({
 
   const isImage = selectedFile?.type?.startsWith("image/");
   const isPDF = selectedFile?.type === "application/pdf";
-
+  const language = websiteConfigStore((s) => s.language);
   return (
     <div className={`space-y-3 ${className}`}>
       {/* Input de archivo */}
@@ -202,7 +202,8 @@ const FileUploadWithPreview = ({
             {/* Header del modal */}
             <div className="flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
-                Vista previa: {selectedFile?.name || "Documento"}
+                {language === "es" ? "Vista previa:" : "Preview"}
+                {selectedFile?.name || "Documento"}
               </h3>
               <button
                 onClick={closeModal}

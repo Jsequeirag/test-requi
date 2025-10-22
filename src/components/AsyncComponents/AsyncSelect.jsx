@@ -2,7 +2,7 @@ import { useEffect, useState, useRef } from "react";
 import { useQuery } from "@tanstack/react-query";
 import formStore from "../../../stores/FormStore.js";
 import { X, ChevronDown, Loader2 } from "lucide-react";
-
+import websiteConfigStore from "../../../stores/WebsiteConfig";
 export default function AsyncSelect({
   url = "",
   name = "",
@@ -13,6 +13,7 @@ export default function AsyncSelect({
   valueName = "",
   customIdParam = "",
 }) {
+  const language = websiteConfigStore((s) => s.language);
   const setFormValues = formStore((state) => state.setFormValues);
   const formValues = formStore((state) => state.formValues);
 
@@ -181,10 +182,16 @@ export default function AsyncSelect({
           className="shadow border rounded-md w-full py-2 px-3 text-gray-700 text-lg focus:outline-none focus:ring-2 focus:ring-blue-500 pr-10"
           placeholder={
             isLoadingData
-              ? "Cargando..."
+              ? language === "es"
+                ? "Cargando..."
+                : "Loading..."
               : disabled
-              ? "No Disponible"
-              : "Buscar o seleccionar una opción"
+              ? language === "es"
+                ? "No disponible"
+                : "Not available"
+              : language === "es"
+              ? "Buscar o seleccionar una opción"
+              : "Search or select an option"
           }
           value={searchText}
           onChange={handleSearchInputChange}
@@ -229,7 +236,10 @@ export default function AsyncSelect({
           {isLoadingData ? (
             <li className="px-3 py-2 text-gray-500 flex items-center gap-2">
               <Loader2 className="h-4 w-4 animate-spin" />
-              Cargando opciones...
+
+              {language === "es"
+                ? "Cargando opciones..."
+                : "Loading options..."}
             </li>
           ) : isSuccess && filteredData.length > 0 ? (
             filteredData.map((item) => (
@@ -249,7 +259,9 @@ export default function AsyncSelect({
             ))
           ) : (
             <li className="px-3 py-2 text-gray-500">
-              No se encontraron resultados
+              {language === "es"
+                ? "No se encontraron resultados"
+                : "No results found"}
             </li>
           )}
         </ul>

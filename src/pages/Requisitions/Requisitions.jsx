@@ -12,6 +12,8 @@ import {
   faChevronUp,
   faChevronRight,
   faChevronLeft,
+  faSearch,
+  faRotateLeft,
 } from "@fortawesome/free-solid-svg-icons";
 import { ChevronLeft } from "lucide-react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
@@ -19,7 +21,8 @@ import { useApiGet } from "../../api/config/customHooks";
 import { getRequestByUserId } from "../../api/urls/Request";
 import { getLocalStorageKeyValue } from "../../utils/localstore";
 import RequisitionSkn from "../../components/Skeleton/RequisitionSkn.jsx";
-// Componente de paginación
+import ModalContainer from "../../components/modal/ModalContainer.jsx";
+// ==================== Paginación ====================
 const Pagination = ({
   currentPage,
   totalPages,
@@ -31,7 +34,6 @@ const Pagination = ({
     const delta = 2;
     const range = [];
     const rangeWithDots = [];
-
     for (
       let i = Math.max(2, currentPage - delta);
       i <= Math.min(totalPages - 1, currentPage + delta);
@@ -39,52 +41,45 @@ const Pagination = ({
     ) {
       range.push(i);
     }
-
     if (currentPage - delta > 2) {
       rangeWithDots.push(1, "...");
     } else {
       rangeWithDots.push(1);
     }
-
     rangeWithDots.push(...range);
-
     if (currentPage + delta < totalPages - 1) {
       rangeWithDots.push("...", totalPages);
     } else {
       rangeWithDots.push(totalPages);
     }
-
     return rangeWithDots;
   };
-
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between   bg-white/30 dark:bg-gray-900/40  border border-gray-200   dark:border-gray-700 px-4 py-3 border-t">
+    <div className="flex items-center justify-between bg-white/30 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 px-4 py-3 border-t">
       <div className="flex items-center space-x-2">
-        <span className="text-sm text-gray-700">Mostrar</span>
+        <span className="text-sm text-gray-700">Mostrar</span>{" "}
         <select
           value={pageSize}
           onChange={(e) => onPageSizeChange(Number(e.target.value))}
           className="border rounded px-2 py-1 text-sm"
         >
-          <option value={5}>5</option>
-          <option value={10}>10</option>
-          <option value={20}>20</option>
-          <option value={50}>50</option>
-        </select>
-        <span className="text-sm text-gray-700">por página</span>
-      </div>
-
+          <option value={5}>5</option> <option value={10}>10</option>{" "}
+          <option value={20}>20</option> <option value={50}>50</option>{" "}
+        </select>{" "}
+        <span className="text-sm text-gray-700">por página</span>{" "}
+      </div>{" "}
       <div className="flex items-center space-x-1 roun">
+        {" "}
         <button
           onClick={() => onPageChange(currentPage - 1)}
           disabled={currentPage === 1}
           className="px-3 py-1 text-sm border rounded hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
         >
-          <FontAwesomeIcon icon={faChevronLeft} />
+          {" "}
+          <FontAwesomeIcon icon={faChevronLeft} />{" "}
         </button>
-
         {getVisiblePages().map((page, index) => (
           <button
             key={index}
@@ -98,10 +93,10 @@ const Pagination = ({
                 : "cursor-default"
             }`}
           >
-            {page}
+            {" "}
+            {page}{" "}
           </button>
         ))}
-
         <button
           onClick={() => onPageChange(currentPage + 1)}
           disabled={currentPage === totalPages}
@@ -114,20 +109,36 @@ const Pagination = ({
   );
 };
 
+// ==================== Principal ====================
 function Requisitions() {
+  const [sortOrder, setSortOrder] = useState("desc");
+  const [filterState, setFilterState] = useState("all");
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedRequisition, setSelectedRequisition] = useState(null);
   const employeeLoggedDeparment = getLocalStorageKeyValue(
     "requitool-employeeInfo",
     "descripDepartamento"
   );
 
-  //global
   const formValues = formStore((state) => state.formValues);
   const setFormValues = formStore((state) => state.setFormValues);
+  const navigate = useNavigate();
+  const containerRef = useRef(null);
 
-  // Estados para paginación
+  // Estados principales
   const [currentPage, setCurrentPage] = useState(1);
   const [pageSize, setPageSize] = useState(5);
+  const [expandedRequest, setExpandedRequest] = useState(null);
 
+  // 🔍 Filtros funcionales
+  const [filters, setFilters] = useState({
+    state: "",
+    requestId: "",
+    startDate: "",
+    endDate: "",
+  });
+
+  // ==================== Hook API ====================
   const {
     data: requestData,
     isSuccess: requestIsSuccess,
@@ -135,12 +146,16 @@ function Requisitions() {
     refetch: refetchRequests,
     isFetching,
   } = useApiGet(
-    ["RequestByUser", currentPage, pageSize],
+    ["RequestByUser", currentPage, pageSize, filters],
     () =>
       getRequestByUserId(
         getLocalStorageKeyValue("requitool-employeeInfo", "id"),
         currentPage,
-        pageSize
+        pageSize,
+        filters.state,
+        filters.requestId,
+        filters.startDate,
+        filters.endDate
       ),
     {
       refetchOnWindowFocus: false,
@@ -149,27 +164,47 @@ function Requisitions() {
     }
   );
 
-  const [expandedRequest, setExpandedRequest] = useState(null);
-  const [requi, setRequi] = useState({});
-  const containerRef = useRef(null);
-  const navigate = useNavigate();
+  // ✅ Normalización
+  const normalizedData = requestData?.data
+    ? requestData.data
+    : requestData?.data || requestData;
 
-  // Handlers para paginación
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
-    setExpandedRequest(null); // Colapsa elementos expandidos al cambiar página
-  };
-
-  const handlePageSizeChange = (newPageSize) => {
-    setPageSize(newPageSize);
-    setCurrentPage(1); // Resetea a página 1 cuando cambia el tamaño
-    setExpandedRequest(null);
-  };
-
-  // Cálculo de páginas totales
+  // ==================== Cálculos de paginación ====================
+  const totalRecords = normalizedData?.totalRecords ?? 0;
+  const pageSizeValue = normalizedData?.pageSize ?? pageSize ?? 1;
   const totalPages = requestData
     ? Math.ceil(requestData.totalRecords / requestData.pageSize)
     : 0;
+  const startRecord =
+    totalRecords > 0 ? (currentPage - 1) * pageSizeValue + 1 : 0;
+  const endRecord =
+    totalRecords > 0 ? Math.min(currentPage * pageSizeValue, totalRecords) : 0;
+
+  // ==================== Handlers ====================
+  const handlePageChange = (newPage) => {
+    setCurrentPage(newPage);
+    setExpandedRequest(null);
+  };
+  const handlePageSizeChange = (newPageSize) => {
+    setPageSize(newPageSize);
+    setCurrentPage(1);
+    setExpandedRequest(null);
+  };
+
+  const handleSearch = async () => {
+    setCurrentPage(1);
+    await refetchRequests();
+  };
+
+  const handleReset = async () => {
+    setFilters({ state: "", requestId: "", startDate: "", endDate: "" });
+    setCurrentPage(1);
+    await refetchRequests();
+  };
+
+  const handleExpand = (requestId) => {
+    setExpandedRequest(expandedRequest === requestId ? null : requestId);
+  };
 
   const scroll = (direction) => {
     const container = containerRef.current;
@@ -180,42 +215,71 @@ function Requisitions() {
     });
   };
 
-  const handleExpand = (requestId) => {
-    setExpandedRequest(expandedRequest === requestId ? null : requestId);
-  };
-
-  // Información de paginación para mostrar
-  const startRecord = requestData ? (currentPage - 1) * pageSize + 1 : 0;
-  const endRecord = requestData
-    ? Math.min(currentPage * pageSize, requestData.totalRecords)
-    : 0;
-  const totalRecords = requestData ? requestData.totalRecords : 0;
   useEffect(() => {
-    console.log(
-      "useEffect en RequisitionsPage se ha ejecutado. location.state en efecto:",
-      location.state
-    );
-    console.log("refetchRequests:", refetchRequests);
-
-    // Si pasamos un valor único como Date.now(), solo necesitamos que el state exista
-    // o que tenga la propiedad 'refresh' (si es que no es 0 o null)
     if (location.state && location.state.refresh) {
-      // Esto seguirá funcionando bien
-      console.log(
-        "Detectado estado de refresh. Forzando recarga de requisiciones..."
-      );
       refetchRequests();
     }
-
-    // Asegurarte de una carga inicial si no hay state de refresh (ej. al cargar la página directamente)
-    // Puedes llamar a refetchRequests() aquí si quieres que siempre recargue al montar
-    // o si el state de refresh no viene. Si ya lo tienes, esta línea es redundante.
-    // refetchRequests();
   }, [location.state, refetchRequests]);
+
+  // ==================== Render ====================
   return (
     <Layout>
+      <ModalContainer
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        title={
+          selectedRequisition
+            ? `Requisición #${selectedRequisition.id}`
+            : "Detalles de Requisición"
+        }
+        width="40rem"
+        className="border border-gray-200 bg-white dark:bg-gray-900 text-gray-800 dark:text-gray-200 rounded-xl shadow-lg"
+      >
+        <div className="p-6 space-y-4">
+          <div className="flex justify-between items-center border-b pb-3">
+            <p className="text-lg font-semibold">
+              {selectedRequisition?.requestType?.name || "Tipo no definido"}
+            </p>
+            <span
+              className={`text-xs font-bold px-3 py-1 rounded-full ${
+                selectedRequisition?.state === "Completado"
+                  ? "bg-green-400 text-black"
+                  : "bg-gray-400 text-black"
+              }`}
+            >
+              {selectedRequisition?.state === "En Proceso"
+                ? "Incompleto"
+                : selectedRequisition?.state}
+            </span>
+          </div>
+
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            <strong>Empleado:</strong>{" "}
+            {selectedRequisition?.externalEmployee?.fullname ||
+              selectedRequisition?.infoEmpleadoAkilesDto?.nombre ||
+              "N/A"}
+          </p>
+
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            <strong>Departamento:</strong>{" "}
+            {selectedRequisition?.infoEmpleadoAkilesDto?.descrip_Departamento ||
+              "N/A"}
+          </p>
+
+          <p className="text-sm text-gray-600 dark:text-gray-400">
+            <strong>Fecha de creación:</strong>{" "}
+            {new Date(selectedRequisition?.createdDate).toLocaleString()}
+          </p>
+
+          <div className="pt-4 border-t border-gray-200 dark:border-gray-700">
+            <p className="text-gray-600 dark:text-gray-400 italic">
+              🧱 En desarrollo — próximamente verás los detalles completos aquí.
+            </p>
+          </div>
+        </div>
+      </ModalContainer>
       <div className="m-4 ">
-        <div className="border-b   bg-white/30 dark:bg-gray-900/40  border border-gray-200   dark:border-gray-700 rounded-md h-full">
+        <div className="border-b bg-white/30 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700 rounded-md h-full">
           <div className="flex items-center border-b p-4 mx-2 justify-between">
             <div className="flex items-center p-4 mx-2">
               <a
@@ -231,38 +295,64 @@ function Requisitions() {
               <h1 className="px-9 text-3xl p-4">Lista de Requisiciones</h1>
             </div>
           </div>
+          {/* 🔍 Filtros funcionales */}
           <div className="flex items-center space-x-3 m-4">
             <select
               name="state"
+              value={filters.state}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, state: e.target.value }))
+              }
               className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
-              <option value="">Select State</option>
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-              <option value="pending">Pending</option>
+              <option value="">Todos los estados</option>
+              <option value="0">En proceso</option>
+              <option value="1">Completado</option>
             </select>
 
             <input
               type="text"
               name="id"
-              placeholder="Enter ID"
-              className="border border-gray-300 rounded-md p-2 w-24 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              placeholder="ID de solicitud"
+              value={filters.requestId}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, requestId: e.target.value }))
+              }
+              className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[150px]"
             />
 
             <input
-              type="date"
+              type="datetime-local"
               name="startDate"
+              value={filters.startDate}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, startDate: e.target.value }))
+              }
               className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
             <input
-              type="date"
+              type="datetime-local"
               name="endDate"
+              value={filters.endDate}
+              onChange={(e) =>
+                setFilters((f) => ({ ...f, endDate: e.target.value }))
+              }
               className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
-            <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition duration-200">
-              Buscar
+            {/*   <button
+              onClick={handleSearch}
+              className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
+            >
+              <FontAwesomeIcon icon={faSearch} className="mr-2" /> Buscar
+            </button>
+*/}
+            <button
+              onClick={handleReset}
+              className="flex items-center bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
+            >
+              <FontAwesomeIcon icon={faRotateLeft} className="mr-2" /> Limpiar
             </button>
           </div>
           {/* Información de paginación */}
@@ -270,15 +360,14 @@ function Requisitions() {
             <div className="flex justify-between items-center p-4 bg-gray-50 text-sm text-gray-600 rounded-md mx-4">
               <div>
                 Mostrando {startRecord} a {endRecord} de {totalRecords}{" "}
-                requisiciones
+                solicitudes
               </div>
               <div>
                 Página {currentPage} de {totalPages}
               </div>
             </div>
           )}
-
-          {/* Contenedor principal de las requisiciones */}
+          {/* Contenedor principal */}
           <div className="space-y-4 p-4">
             {!requestIsPending && !isFetching ? (
               <>
@@ -286,7 +375,7 @@ function Requisitions() {
                   requestData.data.length > 0 ? (
                     requestData.data.map((request, index) => (
                       <div key={request.id} className="border rounded-md">
-                        {/* Header de la requisición - siempre visible */}
+                        {/* Header de la requisición */}
                         <div className="flex items-center bg-slate-50 p-4 rounded-md justify-between">
                           <span
                             className={`p-2 rounded-md font-semibold text-black ${
@@ -327,7 +416,7 @@ function Requisitions() {
                           </button>
                         </div>
 
-                        {/* Contenido expandible con animación */}
+                        {/* Contenido expandible */}
                         <div
                           className={`transition-all duration-500 ease-out overflow-hidden ${
                             expandedRequest === request.id
@@ -362,113 +451,167 @@ function Requisitions() {
                                 size="lg"
                               />
                             </button>
+                            {/* Ordenamiento de requisiciones */}
+                            <div className="flex flex-wrap items-center justify-start w-full gap-4 mb-4 px-4">
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-semibold text-gray-600">
+                                  Ordenar por fecha:
+                                </span>
+                                <select
+                                  value={sortOrder}
+                                  onChange={(e) => setSortOrder(e.target.value)}
+                                  className="border border-gray-300 rounded-md p-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  <option value="desc">
+                                    Más recientes primero
+                                  </option>
+                                  <option value="asc">
+                                    Más antiguas primero
+                                  </option>
+                                </select>
+                              </div>
 
+                              <div className="flex items-center space-x-2">
+                                <span className="text-sm font-semibold text-gray-600">
+                                  Filtrar por estado:
+                                </span>
+                                <select
+                                  value={filterState}
+                                  onChange={(e) =>
+                                    setFilterState(e.target.value)
+                                  }
+                                  className="border border-gray-300 rounded-md p-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                                >
+                                  <option value="all">Todos</option>
+                                  <option value="En Proceso">En Proceso</option>
+                                  <option value="Completado">Completado</option>
+                                </select>
+                              </div>
+                            </div>
                             <div
                               ref={containerRef}
                               className="flex w-full overflow-x-auto items-start gap-12 px-12 py-[12px] relative scroll-smooth"
                             >
-                              {request.requisitions.map((req, idx) => (
-                                <div
-                                  key={req.id}
-                                  className="flex-shrink-0 min-w-[24rem] relative flex flex-col items-center z-10 cursor-pointer"
-                                >
-                                  {/* Punto */}
-                                  <div className="flex flex-col items-center mb-4 relative">
-                                    {/* Fecha */}
-                                    <p className="text-sm text-gray-500 mb-1">
-                                      {new Date(
-                                        req.createdDate
-                                      ).toLocaleString()}
-                                    </p>
-
-                                    {/* Punto */}
-                                    <div
-                                      className={`h-4 w-4 rounded-full border-2 border-white shadow-md z-10 ${
-                                        idx === 0 ? "bg-black" : "bg-slate-500"
-                                      }`}
-                                    ></div>
-
-                                    {/* Línea vertical solo en el primero */}
-                                    {idx === 0 && (
-                                      <div className="w-0.5 h-6 bg-black absolute top-full"></div>
-                                    )}
-                                  </div>
-                                  {/* Card */}
+                              {/* Renderizado de requisiciones ordenadas */}
+                              {[...request.requisitions]
+                                .filter((req) =>
+                                  filterState === "all"
+                                    ? true
+                                    : req.state === filterState
+                                )
+                                .sort((a, b) =>
+                                  sortOrder === "asc"
+                                    ? new Date(a.createdDate) -
+                                      new Date(b.createdDate)
+                                    : new Date(b.createdDate) -
+                                      new Date(a.createdDate)
+                                )
+                                .map((req, idx) => (
                                   <div
-                                    className={`bg-white border rounded-lg ${
-                                      idx === 0 ? "shadow-md" : ""
-                                    } p-6 w-full hover:shadow-lg transition-shadow `}
-                                    //si el usuario logueado el del mismo departamento del empleado asociado a la Requisición
-                                    onClick={() => {
-                                      /*
-                                      if (
-                                        req?.infoEmpleadoAkilesDto
-                                          ?.descrip_Departamento ===
-                                        employeeLoggedDeparment
-                                      ) {
-                                        setFormValues(req);*/
-                                      navigate("/newRequisition", {
-                                        state: {
-                                          request: request,
-                                          requisition: req,
-                                          hasPrevRequisition: request
-                                            ?.requisitions[idx + 1]
-                                            ? true
-                                            : false,
-                                          prevRequisition:
-                                            request.requisitions.length > 1
-                                              ? request.requisitions[idx + 1]
-                                              : null,
-                                          action: "update",
-                                        },
-                                      });
-                                    }}
+                                    key={req.id}
+                                    className="flex-shrink-0 min-w-[24rem] relative flex flex-col items-center z-10 cursor-pointer"
                                   >
-                                    <div className="flex">
-                                      <p
-                                        className={`text-black font-bold py-1 px-2 rounded-full text-xs ${
-                                          req.state === "Completado"
-                                            ? "bg-green-400"
-                                            : "bg-gray-400"
+                                    {/* Punto y fecha */}
+                                    <div className="flex flex-col items-center mb-4 relative">
+                                      <p className="text-sm text-gray-500 mb-1">
+                                        {new Date(
+                                          req.createdDate
+                                        ).toLocaleString()}
+                                      </p>
+                                      <div
+                                        className={`h-4 w-4 rounded-full border-2 border-white shadow-md z-10 ${
+                                          idx === 0
+                                            ? "bg-black"
+                                            : "bg-slate-500"
                                         }`}
-                                      >
-                                        {req.state === "En Proceso"
-                                          ? "Incompleto"
-                                          : req.state}
+                                      ></div>
+                                      {idx === 0 && (
+                                        <div className="w-0.5 h-6 bg-black absolute top-full"></div>
+                                      )}
+                                    </div>
+
+                                    {/* Card principal */}
+                                    <div
+                                      className={`bg-white border rounded-lg ${
+                                        idx === 0 ? "shadow-md" : ""
+                                      } p-6 w-full hover:shadow-lg transition-shadow`}
+                                      onClick={() => {
+                                        navigate("/newRequisition", {
+                                          state: {
+                                            request: request,
+                                            requisition: req,
+                                            hasPrevRequisition: request
+                                              ?.requisitions[idx + 1]
+                                              ? true
+                                              : false,
+                                            prevRequisition:
+                                              request.requisitions.length > 1
+                                                ? request.requisitions[idx + 1]
+                                                : null,
+                                            action: "update",
+                                          },
+                                        });
+                                      }}
+                                    >
+                                      <div className="flex justify-between items-center mb-2">
+                                        <p
+                                          className={`text-black font-bold py-1 px-2 rounded-full text-xs ${
+                                            req.state === "Completado"
+                                              ? "bg-green-400"
+                                              : "bg-gray-400"
+                                          }`}
+                                        >
+                                          {req.state === "En Proceso"
+                                            ? "Incompleto"
+                                            : req.state}
+                                        </p>
+
+                                        {/* Botón Ver Detalles */}
+                                        <button
+                                          onClick={(e) => {
+                                            e.stopPropagation();
+                                            setSelectedRequisition(req);
+                                            setIsModalOpen(true);
+                                          }}
+                                          className="text-sm bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded-md transition-all shadow-sm"
+                                        >
+                                          Ver Detalles
+                                        </button>
+                                      </div>
+
+                                      <h3 className="font-semibold text-xl mb-1">
+                                        Requisición {req.id}
+                                      </h3>
+                                      <p className="text-gray-600 text-sm ">
+                                        {req.requestType
+                                          ? req.requestType.name
+                                          : "Por definir"}
+                                      </p>
+
+                                      {req?.externalEmployee ? (
+                                        <p className="text-gray-600 text-sm ">
+                                          {req?.externalEmployee?.fullname &&
+                                            req.state === "Completado" &&
+                                            `Empleado: ${req?.externalEmployee?.fullname}`}
+                                        </p>
+                                      ) : (
+                                        <p className="text-gray-600 text-sm ">
+                                          {req?.infoEmpleadoAkilesDto?.nombre &&
+                                            req.state === "Completado" &&
+                                            `Empleado: ${req?.infoEmpleadoAkilesDto?.nombre}`}
+                                        </p>
+                                      )}
+
+                                      <p className="text-gray-600 text-sm ">
+                                        {req?.infoEmpleadoAkilesDto &&
+                                          `Departamento: ${req?.infoEmpleadoAkilesDto?.descrip_Departamento}`}
+                                      </p>
+                                      <p className="text-gray-600 mb-4">
+                                        {req.details}
                                       </p>
                                     </div>
-                                    <h3 className="font-semibold text-xl mb-1">
-                                      Requisición {req.id}
-                                    </h3>
-                                    <p className="text-gray-600 text-sm ">
-                                      {req.requestType
-                                        ? `${req.requestType.name}  `
-                                        : "Por definir"}
-                                    </p>
-                                    {req?.externalEmployee ? (
-                                      <p className="text-gray-600 text-sm ">
-                                        {req?.externalEmployee?.fullname &&
-                                          req.state === "Completado" &&
-                                          `Empleado: ${req?.externalEmployee?.fullname}`}
-                                      </p>
-                                    ) : (
-                                      <p className="text-gray-600 text-sm ">
-                                        {req?.infoEmpleadoAkilesDto?.nombre &&
-                                          req.state === "Completado" &&
-                                          `Empleado: ${req?.infoEmpleadoAkilesDto?.nombre}`}
-                                      </p>
-                                    )}
-                                    <p className="text-gray-600 text-sm ">
-                                      {req?.infoEmpleadoAkilesDto &&
-                                        `Departamento:
-                                      ${req?.infoEmpleadoAkilesDto?.descrip_Departamento}`}
-                                    </p>{" "}
-                                    <p className="text-gray-600 mb-4">
-                                      {req.details}
-                                    </p>
                                   </div>
-                                </div>
-                              ))}
+                                ))}
                             </div>
                           </div>
                         </div>
@@ -496,17 +639,15 @@ function Requisitions() {
             )}
           </div>
 
-          {/* Componente de paginación */}
-          {requestIsSuccess && requestData && totalPages > 1 && (
-            <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
-              onPageChange={handlePageChange}
-              pageSize={pageSize}
-              onPageSizeChange={handlePageSizeChange}
-            />
-          )}
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={handlePageChange}
+            pageSize={pageSize}
+            onPageSizeChange={handlePageSizeChange}
+          />
         </div>
+        {/* Paginación y resumen */}
       </div>
     </Layout>
   );

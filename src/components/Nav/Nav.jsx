@@ -17,19 +17,9 @@ import {
   Wallet, // Para Finance
   FileText, // Para Payroll
   UserCheck, // Para HR
-  Briefcase, // Para MD
-  MonitorSmartphone, // Para IT
   Home, // Para el ítem "Inicio"
-  UserCog, // Para el ítem "Administrador" (SuperAdmin)
-  LogOut, // Para Cerrar Sesión
-  Moon, // Para Modo Oscuro
-  Languages, // Para Idioma
   ChevronRight, // Para Expandir/Contraer menú
-  User, // Para Perfil de Usuario
-  BarChart2, // Para Analista de Datos
-  Coins,
   UserPlus,
-  Landmark,
 } from "lucide-react";
 
 import NavItem from "./NavItem"; // Ajusta la ruta según donde lo guardes
@@ -93,7 +83,6 @@ function NewNav() {
       translationKey: "supervisor",
       pathSegment: "supervisor",
     },
-
     finance: {
       icon: Wallet,
       translationKey: "finance",
@@ -104,19 +93,7 @@ function NewNav() {
       translationKey: "payroll",
       pathSegment: "payroll",
     },
-    activos: {
-      icon: Landmark,
-      translationKey: "activos",
-      pathSegment: "activos",
-    },
     hr: { icon: UserCheck, translationKey: "hr", pathSegment: "hr" }, // Clave 'hr'
-    md: { icon: Briefcase, translationKey: "md", pathSegment: "md" },
-    it: { icon: MonitorSmartphone, translationKey: "it", pathSegment: "it" },
-    asolion: {
-      icon: Coins,
-      translationKey: "asolion",
-      pathSegment: "asolion",
-    },
     superadmin: {
       icon: Settings,
       translationKey: "SuperAdmin",
@@ -325,21 +302,11 @@ function NewNav() {
             {/* === INICIO: Renderizado dinámico de TODOS los NavItems === */}
             {roles &&
               roles.map((roleNameFromRolesArray) => {
-                // Asegúrate de que los roles en localStorage estén en mayúsculas iniciales
-                // como "Supervisor", "Payroll", "Finance", etc.
-                // Y que las claves en roleNavConfig estén en minúsculas.
                 const lowercaseRoleName = roleNameFromRolesArray.toLowerCase();
                 const config = roleNavConfig[lowercaseRoleName];
-
-                // Depuración:
-                // console.log(`Procesando rol: ${roleNameFromRolesArray}`);
-                // console.log(`Rol en minúsculas para lookup: ${lowercaseRoleName}`);
-                // console.log(`Configuración encontrada para ${lowercaseRoleName}:`, config);
-
                 if (config) {
                   const navigateToPath = `/${config.pathSegment}`;
                   let notificationProps = {};
-
                   // Lógica específica para notificaciones (ej. para el rol 'Payroll')
                   if (
                     lowercaseRoleName === "payroll" &&
@@ -347,7 +314,6 @@ function NewNav() {
                   ) {
                     notificationProps.hasNotification = hasNewPayrollRequests;
                   }
-
                   return (
                     <NavItem
                       key={roleNameFromRolesArray} // La clave debe ser única
@@ -363,27 +329,9 @@ function NewNav() {
                 // console.warn(`No se encontró configuración para el rol: ${roleNameFromRolesArray}. No se renderizará NavItem.`);
                 return null;
               })}
-            {/* === FIN: Renderizado dinámico === */}
-
-            {/* === ELIMINAR ESTOS NAVITEMS MANUALES Y REDUNDANTES === */}
-            {/* <NavItem icon={faHome} text={t("home")} navigateTo="/home" /> */}
-            {/* <NavItem icon={faUsers} text={t("supervisor")} navigateTo="/supervisor" /> */}
-            {/* {roles?.find((role) => role === "Payroll") && ( ... )} */}
-            {/* {roles?.find((role) => role === "Finance") && ( ... )} */}
           </ul>
           <div className="mt-auto">
-            <ul className="space-y-1">
-              {/* === ESTE TAMBIÉN SE PUEDE INTEGRAR EN EL MAPEO DINÁMICO === */}
-              {/* {roles?.find((role) => role === "SuperAdmin") && (
-                <NavItem
-                  icon={faUserGear}
-                  text={t("administrator")}
-                  navigateTo="/configurationDashboard"
-                />
-              )} */}
-
-              {/* Otros NavItems fijos si los hay */}
-            </ul>
+            <ul className="space-y-1"></ul>
           </div>
         </div>
       </header>

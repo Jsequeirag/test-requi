@@ -27,7 +27,6 @@ import {
   ClipboardList,
   XCircle,
 } from "lucide-react";
-
 import {
   Entrada,
   MovimientoLateral,
@@ -46,7 +45,11 @@ import { useApiSend } from "../../api/config/customHooks";
 import { toast } from "react-toastify";
 import { getEmployeesbyBoss } from "../../api/urls/Employee.js";
 import { useApiGet } from "../../api/config/customHooks.js";
+import { RequestType } from "../../contants/requestType.js";
+import { RequisitionType } from "../../contants/requisitionType.js";
+import websiteConfigStore from "../../../stores/WebsiteConfig";
 function NewRequisition() {
+  const language = websiteConfigStore((s) => s.language);
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -193,11 +196,15 @@ function NewRequisition() {
   };
 
   const createNewRequest = async () => {
-    if (formValues?.requestTypeId === 2 || formValues?.requestTypeId === 5) {
+    if (
+      formValues?.requestTypeId === RequestType.Entrada ||
+      formValues?.requestTypeId === RequestType.CierreDePlaza
+    ) {
       return onSubmitEntradaRequest();
     }
-    //si es SALIDA se crea directamente o abre el modal si el empleado tiene gente a cargo
-    if (formValues?.requestTypeId === 1) {
+
+    // si es SALIDA se crea directamente o abre el modal si el empleado tiene gente a cargo
+    if (formValues?.requestTypeId === RequestType.Salida) {
       if (employeesData.length > 0) {
         return dispatcher({ type: "SET_OPEN_MODAL" });
       }
@@ -209,21 +216,24 @@ function NewRequisition() {
   };
 
   const updateRequest = async () => {
-    if (formValues?.requestTypeId === 2 || formValues?.requestTypeId === 5) {
+    if (
+      formValues?.requestTypeId === RequestType.Entrada ||
+      formValues?.requestTypeId === RequestType.CierreDePlaza
+    ) {
       return onSubmitEntradaRequest();
     }
-    //si tiene gente a cargo abre el modal
+
+    // si tiene gente a cargo abre el modal
     if (employeesData.length > 0) {
       return dispatcher({ type: "SET_OPEN_MODAL" });
     } else {
-      //si no crea a solicitud
+      // si no crea la solicitud
       await updateRequisition({
         ...formValues,
         userId: userLogged,
       });
     }
   };
-
   const onSubmit = (e) => {
     e.preventDefault();
 
@@ -285,7 +295,10 @@ function NewRequisition() {
             className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group"
           >
             <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-0.5 transition-transform" />
-            <TextButton text={"Atrás"} className="p-0 text-lg font-medium" />
+            <TextButton
+              text={language === "es" ? "Atrás" : "Back"}
+              className="p-0 text-lg font-medium"
+            />
           </a>
           <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">
             Formulario de Requisición{JSON.stringify(formValues)}
@@ -302,22 +315,27 @@ function NewRequisition() {
                 <div className="p-2 rounded-full bg-blue-100 mr-3 text-blue-600 dark:bg-blue-900 dark:text-blue-400 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
                   <Layers className="w-6 h-6" />
                 </div>
-                Tipo de solicitud
+                {language === "es" ? "Tipo de solicitud" : "Request type"}
               </h2>
               {/*debe de esta en actualizar  */}
               <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
                 {(location.state?.action === "update" &&
                   location.state?.hasPrevRequisition &&
-                  location.state?.prevRequisition?.requestTypeId === 1) ||
-                location.state?.prevRequisition?.requestTypeId === 3 ||
-                location.state?.prevRequisition?.requestTypeId === 4 ? (
+                  location.state?.prevRequisition?.requestTypeId ===
+                    RequestType.Salida) ||
+                location.state?.prevRequisition?.requestTypeId ===
+                  RequestType.Promocion ||
+                location.state?.prevRequisition?.requestTypeId ===
+                  RequestType.MovimientoLateral ? (
                   <>
                     <div>
                       <label
                         htmlFor="requiresReplacement"
                         className="block text-gray-800 dark:text-gray-200 text-lg font-semibold mb-2"
                       >
-                        Requiere reemplazo
+                        {language === "es"
+                          ? "Requiere reemplazo"
+                          : "Requires Replacement"}
                         <span className="text-red-500 font-bold dark:text-red-400">
                           *
                         </span>
@@ -338,24 +356,31 @@ function NewRequisition() {
                         }
                       >
                         <option selected disabled value=""></option>
-                        <option value="true">Sí</option>
-                        <option value="false">No</option>
+                        <option value="true">
+                          {" "}
+                          {language === "es" ? "Sí" : "Yes"}
+                        </option>
+                        <option value="false">
+                          {" "}
+                          {language === "es" ? "No" : "No"}
+                        </option>
                       </select>
                     </div>
                     <div>
                       <label
-                        className="block text-gray-800 dark:text-gray-200 text-lg font-semibold mb-2"
+                        className="block text-gray-800 dark:text-gray-200  font-semibold mb-2"
                         htmlFor="requestTypeId"
                       >
-                        Acción
+                        {language === "es" ? "Acción" : "Action Information"}
                         <span className="text-red-500 font-bold dark:text-red-400">
                           *
                         </span>
                       </label>
                       <AsyncSelect
-                        url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestType/false/${location.state.prevRequisition.requestTypeId}/${formValues.requiresReplacement}`}
+                        url={`https://localhost:7040/getRequestType/false/${location.state.prevRequisition.requestTypeId}/${formValues.requiresReplacement}`}
                         name={"requestTypeId"}
                         value={formValues?.requestTypeId || ""}
+                        customNameParam={language === "es" ? "name" : "nameEn"}
                         disabled={formValues?.requiresReplacement?.length === 0}
                         // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
                         // de que sus estilos internos también soporten el dark mode
@@ -366,10 +391,10 @@ function NewRequisition() {
                 ) : (
                   <div>
                     <label
-                      className="block text-gray-800 dark:text-gray-200 text-lg font-semibold mb-2"
+                      className="block text-gray-800 dark:text-gray-200  font-semibold mb-2"
                       htmlFor="requestTypeId"
                     >
-                      Acción
+                      {language === "es" ? "Acción" : "Action Information"}
                       <span className="text-red-500 font-bold dark:text-red-400">
                         *
                       </span>
@@ -377,8 +402,9 @@ function NewRequisition() {
                     {/*Cuando se esta creando solo carga entra y salida */}
                     {location.state?.action === "create" && (
                       <AsyncSelect
-                        url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestType/true/0/false`}
+                        url={`https://localhost:7040/getRequestType/true/0/false`}
                         name={"requestTypeId"}
+                        customNameParam={language === "es" ? "name" : "nameEn"}
                         value={formValues?.requestTypeId || ""}
                       />
                     )}
@@ -386,9 +412,9 @@ function NewRequisition() {
                     {location.state?.action === "update" && (
                       <>
                         {location.state?.prevRequisition?.requestTypeId ===
-                        2 ? (
+                        RequestType.Entrada ? (
                           <AsyncSelect
-                            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestTypeForPrevNewJoiner/${location.state.prevRequisition.requisitionTypeId}/${location.state.prevRequisition.recruitmentType}`}
+                            url={`https://localhost:7040/getRequestTypeForPrevNewJoiner/${location.state.prevRequisition.requisitionTypeId}/${location.state.prevRequisition.recruitmentType}`}
                             name={"requestTypeId"}
                             value={formValues?.requestTypeId || ""}
                             // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
@@ -397,7 +423,7 @@ function NewRequisition() {
                           />
                         ) : (
                           <AsyncSelect
-                            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestType/false/0/false`}
+                            url={`https://localhost:7040/getRequestType/false/0/false`}
                             name={"requestTypeId"}
                             value={formValues?.requestTypeId || ""}
                             // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
@@ -410,16 +436,18 @@ function NewRequisition() {
 
                     {!formValues?.requestTypeId && (
                       <p className="mt-1 text-sm text-red-600 dark:text-red-500 flex items-center">
-                        <Info className="w-4 h-4 mr-1" /> Este campo es
-                        requerido.
+                        <Info className="w-4 h-4 mr-1" />
+                        {language === "es"
+                          ? "Este campo es requerido"
+                          : "This field is required"}
                       </p>
                     )}
                   </div>
                 )}
               </div>
-              {/*Si la accion es promocion o movimiento lateral*/}
-              {(formValues.requestTypeId === 3 ||
-                formValues.requestTypeId === 4) && (
+              {/* Si la acción es promoción o movimiento lateral */}
+              {(formValues.requestTypeId === RequestType.Promocion ||
+                formValues.requestTypeId === RequestType.MovimientoLateral) && (
                 <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-2">
                   {/* Campo 1: Motivo */}
                   <div>
@@ -427,13 +455,18 @@ function NewRequisition() {
                       className="block text-gray-700  text-lg font-semibold mb-2 dark:text-gray-300"
                       htmlFor="motivo" // ID corregido y único
                     >
-                      Proceso de contratación
+                      {language === "es"
+                        ? "Proceso de contratación"
+                        : "Recruitment Process"}
                       <span className="text-red-500">*</span>{" "}
                       {/* Asterisco de requerido */}
                     </label>
                     <AsyncSelect
-                      url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=${
-                        formValues.requestTypeId === 4 ? 8 : 7
+                      url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=${
+                        formValues.requestTypeId ===
+                        RequestType.MovimientoLateral
+                          ? 8
+                          : 7
                       }`}
                       name={"recruitmentProccess"}
                       id={"recruitmentProccess"} // Añadido ID
@@ -444,15 +477,16 @@ function NewRequisition() {
                   </div>
                 </div>
               )}{" "}
-              {formValues.requestTypeId === 2 && (
+              {formValues.requestTypeId === RequestType.Entrada && (
                 <>
                   <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-2">
                     <div>
                       <label
-                        className="block text-gray-700   text-lg font-semibold mb-2 dark:text-gray-300"
+                        className="block text-gray-700 text-lg font-semibold mb-2 dark:text-gray-300"
                         htmlFor="motivo" // ID único y corregido
                       >
-                        Motivo
+                        {" "}
+                        {language === "es" ? "Motivo" : "Reason"}
                         <span className="text-red-500">*</span>{" "}
                         {/* Asterisco de requerido */}
                       </label>
@@ -460,8 +494,8 @@ function NewRequisition() {
                         url={`${
                           location.state?.action === "update" &&
                           location.state.hasPrevRequisition
-                            ? `https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/true`
-                            : `https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`
+                            ? `https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/true`
+                            : `https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`
                         }`}
                         name={"requisitionTypeId"}
                         id={"requisitionTypeId"}
@@ -475,18 +509,21 @@ function NewRequisition() {
                         required={true} // Marcado como requerido
                       />
                     </div>
+
                     {location.state?.action === "update" && (
                       <div>
                         <label
                           className="block text-gray-700 text-lg font-semibold mb-2 dark:text-gray-300"
                           htmlFor="RecruitmentProcess" // ID corregido y único
                         >
-                          Proceso de contratación
+                          {language === "es"
+                            ? "Proceso de contratación"
+                            : "Recruitment Process"}
                           <span className="text-red-500">*</span>{" "}
                           {/* Asterisco de requerido */}
                         </label>
                         <AsyncSelect
-                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
+                          url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
                           name={"requisitionSubtypeId"}
                           id={"requisitionSubtypeId"} // Añadido ID
                           value={
@@ -500,22 +537,26 @@ function NewRequisition() {
                         />
                       </div>
                     )}
+
                     {location.state?.action === "create" && (
                       <div>
                         <label
                           className="block text-gray-700 text-lg font-semibold mb-2 dark:text-gray-300"
                           htmlFor="RecruitmentProcess" // ID corregido y único
                         >
-                          Proceso de contratación
+                          {language === "es"
+                            ? "Proceso de contratación"
+                            : "Recruitment Process"}
                           <span className="text-red-500">*</span>{" "}
                           {/* Asterisco de requerido */}
                         </label>
                         <AsyncSelect
-                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
+                          url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
                           id={"requisitionSubtypeId"} // Añadido ID
                           name={"requisitionSubtypeId"}
                           value={
-                            formValues?.requisitionTypeId === 12
+                            formValues?.requisitionTypeId ===
+                            RequisitionType.Temporal
                               ? 53
                               : formValues?.requisitionSubtypeId || ""
                           }
@@ -537,27 +578,41 @@ function NewRequisition() {
                     <div className="p-2 rounded-full bg-green-100 mr-3 text-green-600 dark:bg-green-900 dark:text-green-400 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-6">
                       <User className="w-6 h-6" />
                     </div>
-                    Información del Empleado
+
+                    {language === "es"
+                      ? "Información del Empleado"
+                      : "Employee Information"}
                   </h2>
                   <EmployeeInfo />
                 </div>
               )}
 
             {/* Sección: Información de Acción (condicional) - Colores ajustados para Dark Mode */}
+
             {formValues?.requestTypeId && (
               <div className="group mb-8 p-6 bg-purple-50/50 rounded-xl border border-purple-100 shadow-sm dark:bg-purple-950/50 dark:border-purple-800">
                 <h2 className="text-2xl font-bold text-purple-800 dark:text-purple-200 mb-4 flex items-center">
                   <div className="p-2 rounded-full bg-purple-100 mr-3 text-purple-600 dark:bg-purple-900 dark:text-purple-400 transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6">
                     {getRequestTypeIcon(formValues.requestTypeId)}
                   </div>
-                  Información de Acción
+                  {language === "es"
+                    ? "Información del Empleado"
+                    : "Employee Information"}
                 </h2>
+
                 {/* Renderizado de formularios específicos de acción */}
-                {formValues?.requestTypeId === 1 && <Salida />}
-                {formValues?.requestTypeId === 2 && <Entrada />}
-                {formValues?.requestTypeId === 3 && <Promocion />}
-                {formValues?.requestTypeId === 4 && <MovimientoLateral />}
-                {formValues?.requestTypeId === 5 && <CierrePlaza />}
+                {formValues?.requestTypeId === RequestType.Salida && <Salida />}
+                {formValues?.requestTypeId === RequestType.Entrada && (
+                  <Entrada />
+                )}
+                {formValues?.requestTypeId === RequestType.Promocion && (
+                  <Promocion />
+                )}
+                {formValues?.requestTypeId ===
+                  RequestType.MovimientoLateral && <MovimientoLateral />}
+                {formValues?.requestTypeId === RequestType.CierreDePlaza && (
+                  <CierrePlaza />
+                )}
               </div>
             )}
 
@@ -565,8 +620,8 @@ function NewRequisition() {
             <div
               className={`w-full flex justify-end items-center border-t border-gray-200 pt-6 mt-8 dark:border-gray-700`}
             >
-              {/*Si es entrada y no esta completada  */}
-              {formValues?.requestTypeId === 2 &&
+              {/* Si es entrada y no está completada */}
+              {formValues?.requestTypeId === RequestType.Entrada &&
                 formValues?.state !== "Completado" && (
                   <button
                     type="button"
@@ -574,17 +629,16 @@ function NewRequisition() {
                       onSubmitDraftRequest();
                     }}
                     className={`bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl
-              transition-all duration-300 shadow-md hover:shadow-lg
-              flex items-center justify-center space-x-2
-              focus:outline-none focus:ring-4 focus:ring-blue-300/50
-              dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-600/50
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600 mr-2`}
+        transition-all duration-300 shadow-md hover:shadow-lg
+        flex items-center justify-center space-x-2
+        focus:outline-none focus:ring-4 focus:ring-blue-300/50
+        dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-600/50
+        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600 mr-2`}
                     disabled={isPendingDraftRequest}
                   >
                     {!isPendingDraftRequest && (
                       <CheckCircle className="w-5 h-5 mr-2" />
                     )}
-
                     <span>
                       {isPendingDraftRequest
                         ? "Guardando"
@@ -592,17 +646,18 @@ function NewRequisition() {
                     </span>
                   </button>
                 )}
-              {formValues?.requestTypeId === 5 ||
-              formValues?.requestTypeId === 2 ? (
+
+              {formValues?.requestTypeId === RequestType.CierreDePlaza ||
+              formValues?.requestTypeId === RequestType.Entrada ? (
                 <>
                   <button
                     type="submit"
                     className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl
-              transition-all duration-300 shadow-md hover:shadow-lg
-              flex items-center justify-center space-x-2
-              focus:outline-none focus:ring-4 focus:ring-blue-300/50
-              dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
+        transition-all duration-300 shadow-md hover:shadow-lg
+        flex items-center justify-center space-x-2
+        focus:outline-none focus:ring-4 focus:ring-blue-300/50
+        dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
+        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
                   >
                     <CheckCircle className="w-5 h-5 mr-2" />
                     <span>
@@ -612,10 +667,10 @@ function NewRequisition() {
                     </span>
                   </button>
                 </>
-              ) : //*Si es promoción o movimiento sin completar  */}
-              (formValues.requestTypeId === 3 &&
+              ) : //* Si es promoción o movimiento sin completar  */
+              (formValues.requestTypeId === RequestType.Promocion &&
                   formValues?.state !== "Completado") ||
-                (formValues.requestTypeId === 4 &&
+                (formValues.requestTypeId === RequestType.MovimientoLateral &&
                   formValues?.state !== "Completado") ? (
                 <>
                   <button
@@ -624,34 +679,34 @@ function NewRequisition() {
                       onSubmitDraftRequest();
                     }}
                     className={`bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl
-              transition-all duration-300 shadow-md hover:shadow-lg
-              flex items-center justify-center space-x-2
-              focus:outline-none focus:ring-4 focus:ring-blue-300/50
-              dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-600/50
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600 mr-2`}
+        transition-all duration-300 shadow-md hover:shadow-lg
+        flex items-center justify-center space-x-2
+        focus:outline-none focus:ring-4 focus:ring-blue-300/50
+        dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-600/50
+        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600 mr-2`}
                     disabled={isPendingDraftRequest}
                   >
                     {!isPendingDraftRequest && (
                       <CheckCircle className="w-5 h-5 mr-2" />
                     )}
-
                     <span>
                       {isPendingDraftRequest
                         ? "Guardando"
                         : "Guardar temporalmente"}
                     </span>
                   </button>
+
                   <button
                     type="submit"
                     className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl
-              transition-all duration-300 shadow-md hover:shadow-lg
-              flex items-center justify-center space-x-2
-              focus:outline-none focus:ring-4 focus:ring-blue-300/50
-              dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
+        transition-all duration-300 shadow-md hover:shadow-lg
+        flex items-center justify-center space-x-2
+        focus:outline-none focus:ring-4 focus:ring-blue-300/50
+        dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
+        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
                   >
                     <CheckCircle className="w-5 h-5 mr-2" />
-                    <span>Completar</span>
+                    <span> {language === "es" ? "Completar" : "Complete"}</span>
                   </button>
                 </>
               ) : (
@@ -659,11 +714,11 @@ function NewRequisition() {
                   disabled={!isFetchedEmployeesByBoss}
                   type="submit"
                   className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl
-              transition-all duration-300 shadow-md hover:shadow-lg
-              flex items-center justify-center space-x-2
-              focus:outline-none focus:ring-4 focus:ring-blue-300/50
-              dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
-              disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
+      transition-all duration-300 shadow-md hover:shadow-lg
+      flex items-center justify-center space-x-2
+      focus:outline-none focus:ring-4 focus:ring-blue-300/50
+      dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
+      disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
                 >
                   <CheckCircle className="w-5 h-5 mr-2" />
                   <span>

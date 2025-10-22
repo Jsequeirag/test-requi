@@ -8,10 +8,7 @@ import {
   getLocalStorageItem,
   removeLocalStorageItem,
 } from "../../utils/localstore";
-
-// --- Iconos SVG personalizados y animados ---
-// (Estos íconos son los mismos que en los componentes de Login/RecoverPassword
-// para mantener la consistencia visual y animaciones)
+import websiteConfigStore from "../../../stores/WebsiteConfig";
 
 const SunIcon = ({ className }) => (
   <motion.svg
@@ -268,6 +265,8 @@ const MoonIcon = ({ className }) => (
 
 export default function Topnav() {
   const navigate = useNavigate();
+  const storeLanguage = websiteConfigStore((s) => s.language);
+  const toggleLanguage = websiteConfigStore((s) => s.toggleLanguage);
   const translations = {
     es: {
       dashboard: "Dashboard",
@@ -333,12 +332,12 @@ export default function Topnav() {
   const t = (key) => translations[language][key] || key;
 
   // Function to toggle language
-  const toggleLanguage = () => {
-    const newLang = language === "es" ? "en" : "es";
-    setLanguage(newLang);
-    saveLocalStorage("requi-language", newLang);
-  };
-
+  <button
+    onClick={toggleLanguage}
+    className="px-4 py-2 rounded-md border border-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 transition"
+  >
+    {storeLanguage === "es" ? "Cambiar a Inglés" : "Switch to Spanish"}
+  </button>;
   // Function to apply/remove dark mode class on HTML element
   const toggleDarkModeClass = (isDarkModeActive) => {
     const html = document.documentElement;
@@ -451,14 +450,14 @@ export default function Topnav() {
           <button
             onClick={toggleLanguage}
             className="relative flex items-center justify-center p-2 rounded-lg
-                       text-gray-700 dark:text-gray-300
-                       hover:bg-gray-200 dark:hover:bg-gray-700
-                       focus:outline-none focus:ring-2 focus:ring-[#bdab78]
-                       transition-colors duration-200 group h-10 w-16"
+                 text-gray-700 dark:text-gray-300
+                 hover:bg-gray-200 dark:hover:bg-gray-700
+                 focus:outline-none focus:ring-2 focus:ring-[#bdab78]
+                 transition-colors duration-200 group h-10 w-16"
             aria-label={t("language")}
           >
             <ReactCountryFlag
-              countryCode={language === "es" ? "CR" : "US"}
+              countryCode={storeLanguage === "es" ? "CR" : "US"}
               svg
               style={{
                 width: "1.5em",
@@ -466,11 +465,13 @@ export default function Topnav() {
                 borderRadius: "2px",
                 boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
               }}
-              title={language === "es" ? "Costa Rica" : "United States"}
+              title={storeLanguage === "es" ? "Costa Rica" : "United States"}
             />
+
             <span className="ml-2 font-semibold text-sm">
-              {language.toUpperCase()}
+              {storeLanguage.toUpperCase()}
             </span>
+
             <div className={tooltipClasses}>{t("language")}</div>
           </button>
 
