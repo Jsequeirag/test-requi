@@ -5,7 +5,7 @@ import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js"; // Se mantiene por si formValues.requestTypeId se setea externamente y se usa aquí
 import AsyncSelectFreeText from "../../../components/AsyncComponents/AsyncSelectFreeText.jsx";
 import Tooltip from "../../../components/Tooltip";
-export default function CierrePlaza() {
+export default function InfoCierrePlaza() {
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
   const setFormValues = formStore((state) => state.setFormValues);

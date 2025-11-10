@@ -1,14 +1,14 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
-  faChevronUp,
-  faChevronDown,
   faCheck,
   faXmark,
+  faChevronRight,
 } from "@fortawesome/free-solid-svg-icons";
-import AsyncModal from "../../../components/AsyncComponents/AsyncModal"; // Asegúrate de que esta ruta sea correcta
+import AsyncModal from "../../../components/AsyncComponents/AsyncModal";
 import { updateStateRequestRoleFlow } from "../../../api/urls/RequestRoleFlow";
 import { useNavigate } from "react-router-dom";
+import { Role } from "../../../contansts/roles";
 export default function PayrollRequestItem({ request, expandedRequest }) {
   const today = new Date().toLocaleDateString();
   const [modalState, setModalState] = useState(false);
@@ -16,49 +16,62 @@ export default function PayrollRequestItem({ request, expandedRequest }) {
   const [requestState, setRequestState] = useState("");
   const [requisitionId, setRequisitionId] = useState("");
   const [workflowId, setWorkflowId] = useState("");
+  const [comment, setComment] = useState("");
   const navigate = useNavigate();
-  const showDetails = (requisition) => {
-    console.log(requisition);
-  };
+  const fullName = JSON.parse(
+    localStorage.getItem("requitool-employeeInfo")
+  ).name;
 
-  const handleApprove = () => {
-    // Aquí iría la lógica para aprobar la solicitud
-    setModalState(true);
-  };
+  // 🧠 Cargar comentario inicial solo una vez que llega la solicitud
+  useEffect(() => {
+    if (
+      request?.workflowComment !== undefined &&
+      request?.workflowComment !== null
+    ) {
+      setComment(request.workflowComment);
+    } else {
+      setComment("");
+    }
+  }, [request]);
 
-  const handleReject = () => {
-    // Aquí iría la lógica para rechazar la solicitud
-    setModalState(true);
-  };
+  const handleApprove = () => setModalState(true);
+  const handleReject = () => setModalState(true);
 
   return (
-    // Contenedor principal con sombra y bordes redondeados como una "tarjeta" de iOS/macOS
-    <div className="  rounded-xl shadow-lg hover:shadow-xl transition-shadow duration-300 m-4 overflow-hidden border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <div className="rounded-xl shadow-md hover:shadow-lg transition-all duration-300 m-4 overflow-hidden border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
       <AsyncModal
         setOpenModal={setModalState}
         message={modalMessage}
         openModal={modalState}
         request={() =>
-          updateStateRequestRoleFlow(workflowId, requisitionId, requestState)
+          updateStateRequestRoleFlow(
+            workflowId,
+            requisitionId,
+            requestState,
+            comment,
+            fullName,
+            Role.Finanzas
+          )
+            .then(() => {
+              // 🟢 Recargar la página si la solicitud se actualiza correctamente
+              navigate(0);
+            })
+            .catch((err) => {
+              console.error("Error al actualizar estado:", err);
+            })
         }
         data={request}
       />
 
-      {/* Cabecera de la tarjeta con efecto "difuminado" y bordes redondeados solo arriba */}
-      <div className="flex items-center bg-white/30 dark:bg-gray-900/40  backdrop-blur-md px-6 py-4 rounded-t-xl border-b border-gray-200 justify-between gap-4 flex-wrap  dark:border-gray-600">
-        <p className="text-gray-800 font-bold text-xl dark:text-gray-100">
-          {/* Título principal más grande y en negrita */}
-          Requisición:
-          <span className="font-normal text-lg">
-            {request?.id || "PRUEBA-001"}
-          </span>
-          {/* ID ligeramente más pequeño y normal */}
+      {/* Header */}
+      <div className="flex flex-wrap items-center justify-between bg-white/40 dark:bg-gray-900/40 backdrop-blur-md px-6 py-4 rounded-t-xl border-b border-gray-200 dark:border-gray-700 gap-3">
+        <p className="text-gray-800 font-bold text-lg dark:text-gray-100">
+          Requisición:{" "}
+          <span className="font-normal">{request?.id || "PRUEBA-001"}</span>
         </p>
 
-        {/* Etiqueta de estado con colores sutiles y forma de pastilla */}
         <span
-          className={`px-3 py-1 rounded-full text-sm font-semibold ${
-            /* font-semibold para un poco más de énfasis */
+          className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
             request?.requestRoleFlowState?.toLowerCase() === "pendiente"
               ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300"
               : request?.state === "aprobado"
@@ -69,152 +82,133 @@ export default function PayrollRequestItem({ request, expandedRequest }) {
           {request?.requestRoleFlowState}
         </span>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {/* Color ligeramente más oscuro para etiquetas */}
+        <p className="text-xs text-gray-600 dark:text-gray-400">
           <span className="font-semibold">Fecha Creación:</span>{" "}
-          {/* Negrita para la etiqueta */}
-          <span className="font-medium">
-            {request?.createdDate
-              ? new Date(request?.createdDate).toLocaleString()
-              : new Date().toLocaleString()}
-          </span>
+          {request?.createdDate
+            ? new Date(request?.createdDate).toLocaleString()
+            : new Date().toLocaleString()}
         </p>
 
-        <p className="text-sm text-gray-600 dark:text-gray-400">
-          {/* Color ligeramente más oscuro para etiquetas */}
+        <p className="text-xs text-gray-600 dark:text-gray-400">
           <span className="font-semibold">Creador:</span>{" "}
-          {/* Negrita para la etiqueta */}
-          <span className="font-medium">
-            {request?.user?.name || "Usuario Prueba"}
-          </span>
+          {request?.user?.name || "Usuario Prueba"}
         </p>
+      </div>
 
-        {/* Contenedor de botones con espaciado consistente */}
-        <div className="flex space-x-3 mt-2 sm:mt-0 ">
-          {/* Botones de acción con estilo iOS/macOS */}
+      {/* Cuerpo compacto */}
+      <div className="flex sm:flex-row items-center justify-between gap-2 px-6 py-3 bg-white dark:bg-gray-800">
+        {/* Comentario editable */}
+        <textarea
+          value={comment}
+          onChange={(e) => setComment(e.target.value)}
+          placeholder="Comentario..."
+          rows={1}
+          className="flex-1 text-xs p-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-green-500 focus:outline-none resize-none min-h-[30px]"
+        />
+
+        {/* Botones compactos */}
+        <div className="flex-1 gap-2 w-full sm:w-auto justify-end flex-row flex space-x-2">
           {request?.state !== "aprobado" ? (
             <>
-              {/* Botón Aprobar */}
+              {/* Aprobar */}
               <button
                 disabled={request.requestRoleFlowState === "Completado"}
                 onClick={() => {
-                  setRequisitionId(request.id),
-                    setRequestState(1),
-                    setWorkflowId(request.workflowId),
-                    setModalMessage(`Desea aprobar la Solicitud ${request.id}`),
-                    handleApprove();
+                  setRequisitionId(request.id);
+                  setRequestState(1);
+                  setWorkflowId(request.workflowId);
+                  setModalMessage(`Desea aprobar la Solicitud ${request.id}`);
+                  handleApprove();
                 }}
-                className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium"
+                className="flex items-center justify-center bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition-all focus:ring-1 focus:ring-green-400 active:scale-95"
               >
-                <FontAwesomeIcon icon={faCheck} className="mr-2 text-base" />
-                <span>Aprobar</span>
+                <FontAwesomeIcon icon={faCheck} className="mr-1 text-sm" />
+                Aprobar
               </button>
-              {/* Botón Rechazar */}
+
+              {/* Rechazar */}
               <button
                 disabled={request.requestRoleFlowState === "Completado"}
                 onClick={() => {
-                  setRequisitionId(request.id),
-                    setRequestState(2),
-                    setWorkflowId(request.workflowId),
-                    setModalMessage(
-                      `Desea rechazar la Solicitud ${request.id}`
-                    ),
-                    handleReject();
+                  setRequisitionId(request.id);
+                  setRequestState(2);
+                  setWorkflowId(request.workflowId);
+                  setModalMessage(`Desea rechazar la Solicitud ${request.id}`);
+                  handleReject();
                 }}
-                className="flex items-center bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium"
+                className="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition-all focus:ring-1 focus:ring-red-400 active:scale-95"
               >
-                <FontAwesomeIcon icon={faXmark} className="mr-2 text-base" />
-                <span>Rechazar</span>
+                <FontAwesomeIcon icon={faXmark} className="mr-1 text-sm" />
+                Rechazar
+              </button>
+
+              {/* Detalles */}
+              <button
+                onClick={() => {
+                  navigate("/infoNewRequisition", {
+                    state: {
+                      requisition: request,
+                      hasPrevRequisition: null,
+                      prevRequisition: null,
+                      action: "update",
+                    },
+                  });
+                }}
+                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 text-xs font-medium transition-all border border-gray-200 dark:border-gray-600"
+              >
+                {expandedRequest === request?.id ? "Ocultar" : "Detalles"}
+                <FontAwesomeIcon
+                  icon={faChevronRight}
+                  className="ml-1 text-[10px]"
+                />
               </button>
             </>
           ) : (
-            // Si el estado es "aprobado", puedes mostrar un botón deshabilitado o solo el botón de detalles
-            <button
-              className="flex items-center bg-gray-300 text-gray-600 px-4 py-2 rounded-lg cursor-not-allowed text-sm font-medium"
-              onClick={() => {
-                setModalMessage(
-                  "Desea rechazar la Solicitud # por requestType"
-                ),
-                  setWorkflowId(request.workFlowId),
-                  handleReject();
-              }}
-            >
-              <FontAwesomeIcon icon={faCheck} className="mr-2 text-base" />
-              <span>Aprobado</span>
+            <button className="flex items-center justify-center bg-gray-300 text-gray-600 text-xs px-3 py-1.5 rounded-md cursor-not-allowed">
+              <FontAwesomeIcon icon={faCheck} className="mr-1 text-sm" />
+              Aprobado
             </button>
           )}
-
-          {/* Botón de expandir/colapsar con icono integrado */}
-          <button
-            onClick={() => {
-              navigate("/newRequisition", {
-                state: {
-                  request: request,
-                  requisition: request,
-                  hasPrevRequisition: null,
-                  prevRequisition: null,
-                  action: "update",
-                },
-              });
-            }}
-            className="flex items-center bg-gray-200 text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-300 focus:outline-none focus:ring-2 focus:ring-gray-300 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium dark:bg-gray-600 dark:text-gray-200 dark:hover:bg-gray-500  border border-gray-300"
-          >
-            <span>
-              {expandedRequest === request?.id ? "Ocultar" : "Detalles"}
-            </span>
-            <FontAwesomeIcon
-              icon={
-                expandedRequest === request?.id ? faChevronUp : faChevronDown
-              }
-              className="ml-2 text-xs" // Tamaño del icono más pequeño
-            />
-          </button>
         </div>
       </div>
 
-      {/* Sección de detalles expandida con un fondo suave y animación */}
+      {/* Sección expandida */}
       {expandedRequest === request?.id && (
-        <div
-          className="bg-white/30 dark:bg-gray-900/40   px-6 py-4 bg-gray-50 border-t border-gray-100 text-gray-700 animate-slide-down
-                     dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300" // Clases de modo oscuro
-        >
-          <h4 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
-            {/* Título de sección más grande y bold */}
+        <div className="bg-gray-50 dark:bg-gray-900 px-6 py-3 border-t border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm">
+          <h4 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">
             Detalles de la Solicitud
           </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-3 gap-x-4 text-base">
-            {/* Espaciado mejorado */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4">
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Tipo de Acción:
-              </strong>
+              </strong>{" "}
               Cambio de supervisor
             </p>
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Fecha:
-              </strong>
+              </strong>{" "}
               {today}
             </p>
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Supervisor Anterior:
-              </strong>
+              </strong>{" "}
               Juan Pérez
             </p>
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Nuevo Supervisor:
-              </strong>
+              </strong>{" "}
               María Gómez
             </p>
             <p>
               <strong className="text-gray-700 dark:text-gray-400">
                 Motivo:
-              </strong>
+              </strong>{" "}
               Reorganización del equipo
             </p>
-            {/* Puedes añadir más datos de prueba aquí */}
           </div>
         </div>
       )}

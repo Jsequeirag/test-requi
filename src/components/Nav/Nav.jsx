@@ -73,24 +73,25 @@ function NewNav() {
   // === roleNavConfig con claves en minúsculas y componentes Lucid ===
   const roleNavConfig = {
     home: { icon: Home, translationKey: "home", pathSegment: "home" }, // Añadido para el inicio
-    recruitment: {
+    reclutamiento: {
       icon: UserPlus,
-      translationKey: "recruitment",
+      translationKey: "Recruitment",
       pathSegment: "recruitment",
     },
+
     supervisor: {
       icon: Users,
-      translationKey: "supervisor",
+      translationKey: "Supervisor",
       pathSegment: "supervisor",
     },
-    finance: {
+    finanzas: {
       icon: Wallet,
-      translationKey: "finance",
+      translationKey: "Finanzas",
       pathSegment: "finance",
     },
     payroll: {
       icon: FileText,
-      translationKey: "payroll",
+      translationKey: "Payroll",
       pathSegment: "payroll",
     },
     hr: { icon: UserCheck, translationKey: "hr", pathSegment: "hr" }, // Clave 'hr'
@@ -98,6 +99,31 @@ function NewNav() {
       icon: Settings,
       translationKey: "SuperAdmin",
       pathSegment: "configurationDashboard",
+    },
+    activos: {
+      icon: Home,
+      translationKey: "Activos",
+      pathSegment: "assetsDashboard",
+    },
+    humancapital: {
+      icon: UserCheck,
+      translationKey: "Human Capital",
+      pathSegment: "humanCapitalDashboard",
+    },
+    mdm: {
+      icon: Settings,
+      translationKey: "MD",
+      pathSegment: "masterData",
+    },
+    it: {
+      icon: Settings,
+      translationKey: "IT",
+      pathSegment: "itDashboard",
+    },
+    asolion: {
+      icon: Settings,
+      translationKey: "Asolion",
+      pathSegment: "asolionDashboard",
     },
   };
 

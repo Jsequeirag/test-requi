@@ -9,8 +9,24 @@ export const setStateRequestRoleFlow = (roleId) =>
     url: `/setStateRequestRoleFlow/${roleId}`,
     method: "post",
   });
-export const updateStateRequestRoleFlow = (workflowId, requisitionId, state) =>
+
+export const updateStateRequestRoleFlow = (
+  workflowId,
+  requisitionId,
+  state,
+  comment = "",
+  fullname,
+  RoleName
+) =>
   request({
-    url: `/updateStateRequestRoleFlow/${workflowId}/${requisitionId}/${state}`,
+    url: `/updateStateRequestRoleFlow`,
     method: "post",
+    data: {
+      id: workflowId,
+      requisitionId: requisitionId,
+      state: state,
+      comment: comment,
+      fullname: fullname,
+      RoleName: RoleName,
+    },
   });

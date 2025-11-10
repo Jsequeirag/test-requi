@@ -4,3 +4,8 @@ export const GetRequisitionTypeByRequestTypeId = (requestTypeId) =>
     url: `/getRequisitionTypeByRequestTypeId/${requestTypeId}`,
     method: "GET",
   });
+export const GetRequisitionById = (requisitionId) =>
+  request({
+    url: `/getRequisitionById?requisitionId=${requisitionId}`,
+    method: "GET",
+  });

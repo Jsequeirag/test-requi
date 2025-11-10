@@ -9,6 +9,7 @@ import Register from "../pages/Auth/Register";
 import ValidateCode from "../pages/Auth/ValidateCode";
 import UpdatePassword from "../pages/Auth/UpdatePassword";
 import NewRequisition from "../pages/NewRequisition/NewRequisition";
+import InfoNewRequisition from "../pages/InfoRequisition/InfoNewRequisition.jsx";
 import Requisitions from "../pages/Requisitions/Requisitions";
 import ConfigurationDashboard from "../pages/ConfigurationDashboard/ConfigurationDashboard";
 
@@ -137,7 +138,7 @@ export default [
     title: "mdRequests",
   },
   {
-    path: "/hr",
+    path: "/humanCapitalDashboard",
     element: <RRHHDashboard />,
     title: "hr",
   },
@@ -199,7 +200,16 @@ export default [
     element: <PayrollRequest />,
     title: "payrollRequests",
   },
-
+  {
+    path: "/payrollRequests",
+    element: <PayrollRequest />,
+    title: "payrollRequests",
+  },
+  {
+    path: "/infoNewRequisition",
+    element: <InfoNewRequisition />,
+    title: "infoNewRequisition",
+  },
   {
     path: "*",
     element: <Navigate to="/login" replace />,

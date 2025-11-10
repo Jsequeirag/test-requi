@@ -3,7 +3,7 @@ import Layout from "../../../components/Layout/Layout.jsx"; // Ensure this path 
 import { removeLocalStorageItem } from "../../../utils/localstore.js"; // Ensure this path is correct
 import formStore from "../../../../stores/FormStore.js"; // Ensure this path is correct
 import MenuCard from "../../../components/MenuCard/MenuCard.jsx";
-export default function FinanceDasahboard() {
+export default function FinanceDashboard() {
   const setForm = formStore((state) => state.setForm);
 
   useEffect(() => {

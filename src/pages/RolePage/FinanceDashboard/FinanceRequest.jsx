@@ -4,18 +4,8 @@ import RequestItem from "./FinanceRequestItem"; // Asegúrate de que la ruta sea
 import TextButton from "../../../components/Button/TextButton";
 import Layout from "../../../components/Layout/Layout";
 import { useNavigate } from "react-router-dom";
-import {
-  ChevronLeft,
-  Info,
-  Layers,
-  User,
-  FileText,
-  CheckCircle,
-  Briefcase,
-  ClipboardList,
-  XCircle,
-} from "lucide-react";
-const FinanceRequest = () => {
+import { ChevronLeft } from "lucide-react";
+export default function FinanceRequest() {
   const navigate = new useNavigate();
   const [childRequestsData, setChildRequestsData] = useState([]);
   const [selectedParentId, setSelectedParentId] = useState(null);
@@ -52,33 +42,31 @@ const FinanceRequest = () => {
     }
   };
 
-  const handleExpandChild = (childId) => {
-    setExpandedChildId(childId === expandedChildId ? null : childId);
-  };
-
   return (
     <Layout>
-      <div className="flex h-screen">
+      <div className="flex h-full">
         <Sidebar
           onParentSelect={handleParentSelect}
           setChildRequestsData={setChildRequestsData}
         />
-        <main className="flex-1 p-6 overflow-y-auto   ">
+        <main
+          className="flex-1 p-6 flex flex-col"
+          style={{ height: "calc(100vh - 64px)" }}
+        >
           <div className="flex items-center border-b p-4 mx-2">
             <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-0.5 transition-transform" />
             <TextButton
               onClick={() => {
-                navigate("/finance");
+                navigate("/payroll");
               }}
-              text={"Atras"}
+              text={"Atrás"}
             />
             <h1 className="px-9 text-3xl p-4">
-              {" "}
               Lista de Requisiciones - Finanzas
             </h1>
           </div>
           {selectedParentId ? (
-            <div className="space-y-4">
+            <div className="flex-1 overflow-y-auto space-y-4 mt-4">
               {/* Espaciado entre items */}
               {getChildRequests(selectedParentId).map((child, index) => (
                 <div
@@ -86,19 +74,18 @@ const FinanceRequest = () => {
                   className={`transition-all duration-300 transform ease-out
                                 ${
                                   showChildRequests
-                                    ? "opacity-100 translate-y-0" // Aparece desde arriba
+                                    ? "opacity-100 translate-y-0"
                                     : "opacity-0 -translate-y-4"
                                 }`}
                   style={{
                     transitionDelay: showChildRequests
                       ? `${index * 75}ms`
                       : "0ms",
-                  }} // Retraso en cascada
+                  }}
                 >
                   <RequestItem
                     request={child}
                     expandedRequest={expandedChildId}
-                    handleExpand={handleExpandChild}
                   />
                 </div>
               ))}
@@ -109,7 +96,7 @@ const FinanceRequest = () => {
               )}
             </div>
           ) : (
-            <div className="flex items-center justify-center h-full text-center">
+            <div className="flex items-center justify-center flex-1 text-center">
               <p className="text-xl text-gray-500 dark:text-gray-400">
                 Selecciona una solicitud de la barra lateral para ver sus
                 detalles.
@@ -120,6 +107,4 @@ const FinanceRequest = () => {
       </div>
     </Layout>
   );
-};
-
-export default FinanceRequest;
+}

@@ -10,7 +10,7 @@ import { useApiGet } from "../../../api/config/customHooks";
 import { useLocation } from "react-router-dom";
 import { RequisitionType } from "../../../contants/requisitionType.js";
 
-export default function Entrada() {
+export default function InfoEntrada() {
   const location = useLocation();
   const employeeSelected = formStore((state) => state.employeeSelected);
   const setEmployeeSelected = formStore((state) => state.setEmployeeSelected);

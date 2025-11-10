@@ -26,7 +26,7 @@ export default function RRHHDashboard() {
         {/* Adjust min-h if your Layout has a fixed header/footer */}
         {/* Page Title - Large and bold, similar to macOS app titles */}
         <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-10 tracking-tight">
-          Panel de RH
+          Panel de Human Capital
         </h1>
         <div className="flex flex-wrap justify-center gap-8">
           {options.map((option, index) => (

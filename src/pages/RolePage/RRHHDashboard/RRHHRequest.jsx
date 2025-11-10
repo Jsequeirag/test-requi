@@ -61,7 +61,9 @@ export default function PayrollRequest() {
               }}
               text={"Atrás"}
             />
-            <h1 className="px-9 text-3xl p-4">Lista de Requisiciones - HR</h1>
+            <h1 className="px-9 text-3xl p-4">
+              Lista de Requisiciones - Human Capital
+            </h1>
           </div>
           {selectedParentId ? (
             <div className="flex-1 overflow-y-auto space-y-4 mt-4">

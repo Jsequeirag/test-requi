@@ -3,11 +3,11 @@ import FileUploadWithPreview from "../../../components/FileUploadWithPreview/Fil
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
-import Tooltip from "../../../components/Tooltip";
+import Tooltip from "../../../components/Tooltip.jsx";
 import { RequisitionType } from "../../../contants/requisitionType.js";
 import { RequestType } from "../../../contants/requestType.js";
 import websiteConfigStore from "../../../../stores/WebsiteConfig.js";
-export default function Salida() {
+export default function InfoSalida() {
   const language = websiteConfigStore((s) => s.language);
   //GLOBAL
   const formValues = formStore((state) => state.formValues);

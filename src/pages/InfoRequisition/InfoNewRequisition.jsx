@@ -1,21 +1,19 @@
 import { useEffect, useReducer, useState } from "react";
-import Layout from "../../components/Layout/Layout";
+import Layout from "../../components/Layout/Layout.jsx";
 import { useLocation } from "react-router-dom";
-import TextButton from "../../components/Button/TextButton";
-import { initialState, reducer } from "./Reducer";
+import TextButton from "../../components/Button/TextButton.jsx";
+import { initialState, reducer } from "./Reducer.jsx";
 import {
   createRequests,
   updateRequests,
   draftRequest,
-} from "../../api/urls/Request";
+} from "../../api/urls/Request.js";
+import { GetRequisitionById } from "../../api/urls/Requisition.js";
 import AsyncSelect from "../../components/AsyncComponents/AsyncSelect.jsx";
 import formStore from "../../../stores/FormStore.js";
-import LoadingModal from "../../components/LoadingModal/LoadingModal";
+import LoadingModal from "../../components/LoadingModal/LoadingModal.jsx";
 import { useNavigate } from "react-router-dom";
-import {
-  getLocalStorageItem,
-  getLocalStorageKeyValue,
-} from "../../utils/localstore";
+import { getLocalStorageKeyValue } from "../../utils/localstore.js";
 import {
   ChevronLeft,
   Info,
@@ -28,12 +26,12 @@ import {
   XCircle,
 } from "lucide-react";
 import {
-  Entrada,
-  MovimientoLateral,
-  Promocion,
-  Salida,
-  CierrePlaza,
-} from "./RequisitionForm/RequisitionForm.jsx";
+  InfoEntrada,
+  InfoMovimientoLateral,
+  InfoPromocion,
+  InfoSalida,
+  InfoCierrePlaza,
+} from "./RequisitionForm/InfoRequisitionForm.jsx";
 import {
   RDetailMovimientoLateral,
   RDetailPromocion,
@@ -41,23 +39,20 @@ import {
 } from "./RequisitionDetail/RequisitionDetail.jsx";
 import EmployeeInfo from "./EmployeeInfo/EmployeeInfo.jsx";
 import ModalRequisitionDetails from "../../components/ModalRequisitionDetails/ModalRequisitionDetails.jsx";
-import { useApiSend } from "../../api/config/customHooks";
+import { useApiSend } from "../../api/config/customHooks.js";
 import { toast } from "react-toastify";
 import { getEmployeesbyBoss } from "../../api/urls/Employee.js";
 import { useApiGet } from "../../api/config/customHooks.js";
 import { RequestType } from "../../contants/requestType.js";
 import { RequisitionType } from "../../contants/requisitionType.js";
-import websiteConfigStore from "../../../stores/WebsiteConfig";
-function NewRequisition() {
+import websiteConfigStore from "../../../stores/WebsiteConfig.js";
+function InfoNewRequisition() {
   const language = websiteConfigStore((s) => s.language);
   const navigate = useNavigate();
   const location = useLocation();
-
   const formValues = formStore((state) => state.formValues);
   const setFormValues = formStore((state) => state.setFormValues);
-
   const [state, dispatcher] = useReducer(reducer, initialState);
-
   const userLogged = getLocalStorageKeyValue("requitool-employeeInfo", "id");
 
   //draft
@@ -116,7 +111,18 @@ function NewRequisition() {
         },
       }
     );
-
+  const { data: requisitionData, isFetched: isFetchedRequisition } = useApiGet(
+    ["requisitionById", location.state.requisition.id],
+    () => GetRequisitionById(location.state.requisition.id),
+    {
+      enabled: !!location.state.requisition.id,
+      refetchOnWindowFocus: false,
+      refetchOnReconnect: false,
+      onError: (e) => {
+        console.error("❌ Error fetching requisition by ID:", e);
+      },
+    }
+  );
   const {
     mutateAsync: updateRequisition,
     isPending: isPendingUpdateRequisition,
@@ -127,7 +133,7 @@ function NewRequisition() {
         className: "bg-green-600 text-white",
         progressClassName: "bg-white",
       });
-      navigate("/requisitions", {
+      navigate("/payrollRequests", {
         replace: true,
         state: { refresh: Date.now() },
       }); // <--- CAMBIO AQUÍ
@@ -142,19 +148,11 @@ function NewRequisition() {
   );
 
   useEffect(() => {
-    if (location.state?.action === "update") {
-      const requisition = location.state.requisition;
-      if (requisition) {
-        setFormValues(requisition);
-      } else {
-        const localData = getLocalStorageItem("requitool-requisition");
-        if (localData) {
-          setFormValues(JSON.parse(localData));
-        }
-      }
+    if (isFetchedRequisition && requisitionData) {
+      setFormValues(requisitionData);
+      console.log("✅ Requisition loaded:", requisitionData);
     }
-    console.log(location.state);
-  }, [location.state, setFormValues]);
+  }, [isFetchedRequisition, requisitionData?.requisitions, setFormValues]);
 
   const onSubmitDraftRequest = async () => {
     await draftRequisition({
@@ -287,11 +285,7 @@ function NewRequisition() {
         {/* Cabecera de la página */}
         <div className="flex items-center justify-between mb-6">
           <a
-            href={
-              location.state?.action === "create"
-                ? "supervisor"
-                : "requisitions"
-            }
+            href={"payrollRequests"}
             className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group"
           >
             <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-0.5 transition-transform" />
@@ -601,17 +595,19 @@ function NewRequisition() {
                 </h2>
 
                 {/* Renderizado de formularios específicos de acción */}
-                {formValues?.requestTypeId === RequestType.Salida && <Salida />}
+                {formValues?.requestTypeId === RequestType.Salida && (
+                  <InfoSalida />
+                )}
                 {formValues?.requestTypeId === RequestType.Entrada && (
-                  <Entrada />
+                  <InfoEntrada />
                 )}
                 {formValues?.requestTypeId === RequestType.Promocion && (
-                  <Promocion />
+                  <InfoPromocion />
                 )}
                 {formValues?.requestTypeId ===
-                  RequestType.MovimientoLateral && <MovimientoLateral />}
+                  RequestType.MovimientoLateral && <InfoMovimientoLateral />}
                 {formValues?.requestTypeId === RequestType.CierreDePlaza && (
-                  <CierrePlaza />
+                  <InfoCierrePlaza />
                 )}
               </div>
             )}
@@ -736,4 +732,4 @@ function NewRequisition() {
   );
 }
 
-export default NewRequisition;
+export default InfoNewRequisition;
