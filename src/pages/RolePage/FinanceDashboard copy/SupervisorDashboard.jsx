@@ -1,46 +1,32 @@
-import { React, useEffect } from "react";
+import { useEffect, useState } from "react";
 import Layout from "../../../components/Layout/Layout.jsx"; // Ensure this path is correct
-import { useNavigate } from "react-router-dom";
 import { removeLocalStorageItem } from "../../../utils/localstore.js"; // Ensure this path is correct
 import formStore from "../../../../stores/FormStore.js"; // Ensure this path is correct
 import MenuCard from "../../../components/MenuCard/MenuCard.jsx";
-import { List, FileText } from "lucide-react";
-import { icon } from "@fortawesome/fontawesome-svg-core";
-export default function Supervisor() {
+export default function SupervisorDashboard() {
   const setForm = formStore((state) => state.setForm);
+
   useEffect(() => {
     removeLocalStorageItem("requitool-requisition");
     setForm({});
+    // Here you could add logic to fetch the actual number of requests
   }, []);
   const options = [
     {
-      title: "Crear Requisición",
-      description: "Podras gestionar la creacion de Requisiciones",
-      path: "/newRequisition",
-      icon: <FileText className="w-8 h-8  text-blue-600  dark:text-blue-400" />,
-      bgColor: "bg-blue-100 dark:bg-blue-900",
-    },
-    {
-      title: "Ver Requisiciones",
-      description: "Podras ver el listado de requisiciones",
-      path: "/requisitions",
-      icon: (
-        <List className="w-8 h-8  mr-3 text-green-600  dark:text-green-400" />
-      ),
-      bgColor: "bg-green-100 dark:bg-green-900",
-    },
-    {
       title: "Solicitudes",
       description: "Aquí podras ver información de las solicitudes",
-      path: "/supervisorRequest",
+      path: "/financeRequests",
       requestCount: 4,
     },
   ];
   return (
     <Layout>
-      <div className="flex flex-col items-center justify-center p-8 min-h-[calc(100vh-64px)]">
+      {/* Main content area with padding and centering */}
+      <div className=" flex flex-col items-center justify-center p-8 min-h-[calc(100vh-64px)]">
+        {/* Adjust min-h if your Layout has a fixed header/footer */}
+        {/* Page Title - Large and bold, similar to macOS app titles */}
         <h1 className="text-4xl font-bold text-gray-900 dark:text-gray-100 mb-10 tracking-tight">
-          Dashboard
+          Panel de Finanzas
         </h1>
         <div className="flex flex-wrap justify-center gap-8">
           {options.map((option, index) => (
@@ -50,8 +36,6 @@ export default function Supervisor() {
               description={option.description}
               path={option.path}
               requestCount={option.requestCount}
-              icon={option.icon}
-              bgColor={option.bgColor}
             />
           ))}
         </div>

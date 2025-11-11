@@ -39,7 +39,7 @@ import RecluitmentRequest from "../pages/RolePage/Recluitment/RecluitmentRequest
 
 import ActivosDashboard from "../pages/RolePage/Activos/ActivosDashboard";
 import ActivosRequest from "../pages/RolePage/Activos/ActivosRequest";
-
+import SupervisorRequest from "../pages/RolePage/Supervisor/SupervisorRequest.jsx";
 import Home from "../pages/Home/Home";
 export default [
   {
@@ -164,6 +164,11 @@ export default [
     title: "asolion",
   },
   {
+    path: "/supervisorFlow",
+    element: <AsolionDashboard />,
+    title: "supervisorFlow",
+  },
+  {
     path: "/asolionRequests",
     element: <AsolionRequest />,
     title: "asolionRequests",
@@ -201,9 +206,9 @@ export default [
     title: "payrollRequests",
   },
   {
-    path: "/payrollRequests",
-    element: <PayrollRequest />,
-    title: "payrollRequests",
+    path: "/supervisorRequest",
+    element: <SupervisorRequest />,
+    title: "supervisorRequest",
   },
   {
     path: "/infoNewRequisition",

@@ -9,7 +9,7 @@ import AsyncModal from "../../../components/AsyncComponents/AsyncModal";
 import { updateStateRequestRoleFlow } from "../../../api/urls/RequestRoleFlow";
 import { useNavigate } from "react-router-dom";
 import { Role } from "../../../contansts/roles";
-export default function FinanceRequestItem({ request, expandedRequest }) {
+export default function SupervisorRequestItem({ request, expandedRequest }) {
   const today = new Date().toLocaleDateString();
   const [modalState, setModalState] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
