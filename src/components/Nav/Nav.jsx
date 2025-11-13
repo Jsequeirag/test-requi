@@ -110,21 +110,6 @@ function NewNav() {
       translationKey: "Human Capital",
       pathSegment: "humanCapitalDashboard",
     },
-    mdm: {
-      icon: Settings,
-      translationKey: "MD",
-      pathSegment: "masterData",
-    },
-    it: {
-      icon: Settings,
-      translationKey: "IT",
-      pathSegment: "itDashboard",
-    },
-    asolion: {
-      icon: Settings,
-      translationKey: "Asolion",
-      pathSegment: "asolionDashboard",
-    },
   };
 
   const themeColors = WebsiteConfig((state) => state.themeColors);
