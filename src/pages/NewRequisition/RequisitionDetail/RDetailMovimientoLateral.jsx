@@ -142,7 +142,7 @@ export default function RDetailMovimientoLateral() {
             Nuevo encargado
           </label>
           <AsyncSelect
-            url={`https://localhost:7040/getEmployees`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getEmployees`}
             name={"newDominoEffectManager"}
             disabled={
               formValues.changeManager === false ||
@@ -212,7 +212,7 @@ export default function RDetailMovimientoLateral() {
             {
               <>
                 <AsyncSelect
-                  url={`https://localhost:7040/getEmployeesBySupervisorRole`}
+                  url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getEmployeesBySupervisorRole`}
                   name={"asignEmployees"}
                   customNameParam={"nombre"}
                   disabled={!employeesData?.length > 0}

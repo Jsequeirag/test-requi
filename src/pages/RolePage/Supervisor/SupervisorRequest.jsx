@@ -62,7 +62,7 @@ export default function SupervisorRequest() {
               text={"Atrás"}
             />
             <h1 className="px-9 text-3xl p-4">
-              Lista de Requisiciones - Finanzas
+              Lista de Requisiciones - Supervisor
             </h1>
           </div>
           {selectedParentId ? (

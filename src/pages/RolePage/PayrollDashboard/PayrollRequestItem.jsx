@@ -9,8 +9,12 @@ import AsyncModal from "../../../components/AsyncComponents/AsyncModal";
 import { updateStateRequestRoleFlow } from "../../../api/urls/RequestRoleFlow";
 import { useNavigate } from "react-router-dom";
 import { Role } from "../../../contansts/roles";
+import {
+  RequestRoleFlow,
+  getRequestRoleFlowName,
+} from "../../../contansts/RequestRoleFlowState";
+import { RequisitionState } from "../../../contansts/RequisitionState";
 export default function PayrollRequestItem({ request, expandedRequest }) {
-  const today = new Date().toLocaleDateString();
   const [modalState, setModalState] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [requestState, setRequestState] = useState("");
@@ -22,23 +26,47 @@ export default function PayrollRequestItem({ request, expandedRequest }) {
     localStorage.getItem("requitool-employeeInfo")
   ).name;
 
-  // 🧠 Cargar comentario inicial solo una vez que llega la solicitud
+  const isDisabled =
+    request.workflowState === RequestRoleFlow.COMPLETED ||
+    !request.workflowEnabled;
+
   useEffect(() => {
-    if (
-      request?.workflowComment !== undefined &&
-      request?.workflowComment !== null
-    ) {
-      setComment(request.workflowComment);
-    } else {
-      setComment("");
-    }
+    setComment(request?.workflowComment ?? "");
   }, [request]);
 
-  const handleApprove = () => setModalState(true);
-  const handleReject = () => setModalState(true);
+  const handleApprove = () => {
+    if (isDisabled) return;
+    setRequisitionId(request.id);
+    setRequestState(1);
+    setWorkflowId(request.workflowId);
+    setModalMessage(`¿Desea aprobar la Solicitud ${request.id}?`);
+    setModalState(true);
+  };
+
+  const handleReject = () => {
+    if (isDisabled) return;
+    setRequisitionId(request.id);
+    setRequestState(2);
+    setWorkflowId(request.workflowId);
+    setModalMessage(`¿Desea rechazar la Solicitud ${request.id}?`);
+    setModalState(true);
+  };
+
+  const handleDetails = () => {
+    if (isDisabled) return;
+    navigate("/infoNewRequisition", {
+      state: { requisition: request, action: "update" },
+    });
+  };
 
   return (
-    <div className="rounded-xl shadow-md hover:shadow-lg transition-all duration-300 m-4 overflow-hidden border border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+    <div
+      className={`
+        rounded-2xl bg-white shadow-sm border border-gray-100 
+        overflow-hidden transition-all duration-300 m-3
+        ${isDisabled ? "opacity-50 pointer-events-none" : "hover:shadow-md"}
+      `}
+    >
       <AsyncModal
         setOpenModal={setModalState}
         message={modalMessage}
@@ -50,164 +78,176 @@ export default function PayrollRequestItem({ request, expandedRequest }) {
             requestState,
             comment,
             fullName,
-            Role.Finanzas
+            Role.Payroll
           )
             .then(() => {
-              // 🟢 Recargar la página si la solicitud se actualiza correctamente
-              navigate(0);
+              navigate(0); // Recarga tras aprobar/rechazar
             })
-            .catch((err) => {
-              console.error("Error al actualizar estado:", err);
-            })
+            .catch((err) => console.error("Error al actualizar estado:", err))
         }
         data={request}
       />
 
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between bg-white/40 dark:bg-gray-900/40 backdrop-blur-md px-6 py-4 rounded-t-xl border-b border-gray-200 dark:border-gray-700 gap-3">
-        <p className="text-gray-800 font-bold text-lg dark:text-gray-100">
-          Requisición:{" "}
-          <span className="font-normal">{request?.id || "PRUEBA-001"}</span>
-        </p>
+      {/* HEADER - Igual a la captura */}
+      <div className="px-6 py-4 flex flex-wrap items-center justify-between gap-3 overflow-hidden relative">
+        {/* Fondo animado con onda arcoíris */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div
+            className="h-full w-[300%] animate-rainbow-wave"
+            style={{
+              background: `linear-gradient(90deg,
+          #fee2e2 0%,
+          #fef3c7 10%,
+          #ecfccb 20%,
+          #dbeafe 30%,
+          #e0e7ff 40%,
+          #dbeafe 50%,
+          #ecfccb 60%,
+          #fef3c7 70%,
+          #fee2e2 80%,
+          #fee2e2 100%
+        )`,
+              backgroundSize: "300% 100%",
+              opacity: 0.25,
+            }}
+          />
+        </div>
 
-        <span
-          className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-            request?.requestRoleFlowState?.toLowerCase() === "pendiente"
-              ? "bg-yellow-100 text-yellow-800 dark:bg-yellow-800/20 dark:text-yellow-300"
-              : request?.state === "aprobado"
-              ? "bg-green-100 text-green-800 dark:bg-green-800/20 dark:text-green-300"
-              : "bg-blue-100 text-blue-800 dark:bg-blue-800/20 dark:text-blue-300"
-          }`}
-        >
-          {request?.requestRoleFlowState}
-        </span>
+        {/* Contenido encima */}
+        <div className="relative z-10 flex items-center gap-2">
+          <div className="w-8 h-8 bg-gray-200 border-2 border-dashed rounded-lg"></div>
+          <p className="text-gray-800 font-semibold text-lg">
+            Requisición:{" "}
+            <span className="font-normal">{request?.id || "449"}</span>
+          </p>
+        </div>
 
-        <p className="text-xs text-gray-600 dark:text-gray-400">
-          <span className="font-semibold">Fecha Creación:</span>{" "}
-          {request?.createdDate
-            ? new Date(request?.createdDate).toLocaleString()
-            : new Date().toLocaleString()}
-        </p>
-
-        <p className="text-xs text-gray-600 dark:text-gray-400">
-          <span className="font-semibold">Creador:</span>{" "}
-          {request?.user?.name || "Usuario Prueba"}
-        </p>
+        <div className="relative z-10 flex items-center gap-4 text-sm text-gray-600">
+          <span className="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+            {getRequestRoleFlowName(request.workflowState)}
+          </span>
+          <span>
+            Fecha Creación:{" "}
+            {request?.createdDate
+              ? new Date(request.createdDate)
+                  .toLocaleString("es-CR", {
+                    day: "2-digit",
+                    month: "2-digit",
+                    year: "numeric",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })
+                  .replace(",", "")
+              : "12/11/2025, 03:05"}
+          </span>
+          <span>Creador: {request?.user?.name || "Usuario Prueba"}</span>
+        </div>
       </div>
 
-      {/* Cuerpo compacto */}
-      <div className="flex sm:flex-row items-center justify-between gap-2 px-6 py-3 bg-white dark:bg-gray-800">
-        {/* Comentario editable */}
+      {/* CUERPO - Comentario SIEMPRE visible + botones */}
+      <div className="px-6 py-3 bg-white flex flex-col sm:flex-row gap-3">
+        {/* Comentario (siempre visible) */}
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
+          disabled={isDisabled}
           placeholder="Comentario..."
           rows={1}
-          className="flex-1 text-xs p-2 rounded-md border border-gray-300 dark:border-gray-600 dark:bg-gray-800 dark:text-gray-200 focus:ring-1 focus:ring-green-500 focus:outline-none resize-none min-h-[30px]"
+          className={`
+            flex-1 min-w-0 p-2 text-sm border rounded-lg resize-none focus:ring-2 focus:ring-indigo-500 focus:outline-none
+            ${
+              isDisabled
+                ? "bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200"
+                : "bg-white border-gray-300"
+            }
+          `}
         />
 
-        {/* Botones compactos */}
-        <div className="flex-1 gap-2 w-full sm:w-auto justify-end flex-row flex space-x-2">
-          {request?.state !== "aprobado" ? (
+        {/* Botones */}
+        <div className="flex gap-2 justify-end">
+          {request?.state === RequisitionState.COMPLETED ? (
             <>
-              {/* Aprobar */}
               <button
-                disabled={request.requestRoleFlowState === "Completado"}
-                onClick={() => {
-                  setRequisitionId(request.id);
-                  setRequestState(1);
-                  setWorkflowId(request.workflowId);
-                  setModalMessage(`Desea aprobar la Solicitud ${request.id}`);
-                  handleApprove();
-                }}
-                className="flex items-center justify-center bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition-all focus:ring-1 focus:ring-green-400 active:scale-95"
+                onClick={handleApprove}
+                className={`
+                  flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
+                  transition-all active:scale-95
+                  ${
+                    isDisabled
+                      ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                      : "bg-white text-green-600 border-green-300 hover:bg-green-50 hover:border-green-400"
+                  }
+                `}
               >
-                <FontAwesomeIcon icon={faCheck} className="mr-1 text-sm" />
+                <FontAwesomeIcon icon={faCheck} />
                 Aprobar
               </button>
 
-              {/* Rechazar */}
               <button
-                disabled={request.requestRoleFlowState === "Completado"}
-                onClick={() => {
-                  setRequisitionId(request.id);
-                  setRequestState(2);
-                  setWorkflowId(request.workflowId);
-                  setModalMessage(`Desea rechazar la Solicitud ${request.id}`);
-                  handleReject();
-                }}
-                className="flex items-center justify-center bg-red-500 hover:bg-red-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition-all focus:ring-1 focus:ring-red-400 active:scale-95"
+                onClick={handleReject}
+                className={`
+                  flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
+                  transition-all active:scale-95
+                  ${
+                    isDisabled
+                      ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                      : "bg-white text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
+                  }
+                `}
               >
-                <FontAwesomeIcon icon={faXmark} className="mr-1 text-sm" />
+                <FontAwesomeIcon icon={faXmark} />
                 Rechazar
               </button>
 
-              {/* Detalles */}
               <button
-                onClick={() => {
-                  navigate("/infoNewRequisition", {
-                    state: {
-                      requisition: request,
-                      hasPrevRequisition: null,
-                      prevRequisition: null,
-                      action: "update",
-                    },
-                  });
-                }}
-                className="flex items-center bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 px-3 py-1.5 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 text-xs font-medium transition-all border border-gray-200 dark:border-gray-600"
+                onClick={handleDetails}
+                className={`
+                  flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
+                  transition-all active:scale-95
+                  ${
+                    isDisabled
+                      ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
+                  }
+                `}
               >
-                {expandedRequest === request?.id ? "Ocultar" : "Detalles"}
+                Detalles
                 <FontAwesomeIcon
                   icon={faChevronRight}
-                  className="ml-1 text-[10px]"
+                  className="text-xs ml-1"
                 />
               </button>
             </>
           ) : (
-            <button className="flex items-center justify-center bg-gray-300 text-gray-600 text-xs px-3 py-1.5 rounded-md cursor-not-allowed">
-              <FontAwesomeIcon icon={faCheck} className="mr-1 text-sm" />
+            <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed">
+              <FontAwesomeIcon icon={faCheck} />
               Aprobado
             </button>
           )}
         </div>
       </div>
 
-      {/* Sección expandida */}
+      {/* SECCIÓN EXPANDIDA (solo detalles adicionales) */}
       {expandedRequest === request?.id && (
-        <div className="bg-gray-50 dark:bg-gray-900 px-6 py-3 border-t border-gray-100 dark:border-gray-700 text-gray-700 dark:text-gray-300 text-sm">
-          <h4 className="text-base font-semibold mb-2 text-gray-900 dark:text-gray-100">
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
+          <h4 className="font-semibold text-gray-800 mb-3">
             Detalles de la Solicitud
           </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-y-2 gap-x-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
             <p>
-              <strong className="text-gray-700 dark:text-gray-400">
-                Tipo de Acción:
-              </strong>{" "}
-              Cambio de supervisor
+              <strong>Tipo de Acción:</strong> Cambio de supervisor
             </p>
             <p>
-              <strong className="text-gray-700 dark:text-gray-400">
-                Fecha:
-              </strong>{" "}
-              {today}
+              <strong>Fecha:</strong> {new Date().toLocaleDateString()}
             </p>
             <p>
-              <strong className="text-gray-700 dark:text-gray-400">
-                Supervisor Anterior:
-              </strong>{" "}
-              Juan Pérez
+              <strong>Supervisor Anterior:</strong> Juan Pérez
             </p>
             <p>
-              <strong className="text-gray-700 dark:text-gray-400">
-                Nuevo Supervisor:
-              </strong>{" "}
-              María Gómez
+              <strong>Nuevo Supervisor:</strong> María Gómez
             </p>
             <p>
-              <strong className="text-gray-700 dark:text-gray-400">
-                Motivo:
-              </strong>{" "}
-              Reorganización del equipo
+              <strong>Motivo:</strong> Reorganización del equipo
             </p>
           </div>
         </div>
