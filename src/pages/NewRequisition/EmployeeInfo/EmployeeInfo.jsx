@@ -230,7 +230,7 @@ export default function EmployeeInfo() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="departamento"
           >
-            {language === "es" ? "Departamento" : "Area Name"}
+            {language === "es" ? "Nombre del Área" : "Area Name"}
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base

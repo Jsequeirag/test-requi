@@ -39,7 +39,7 @@ export default function FinanceRequestItem({ request, expandedRequest }) {
     setRequisitionId(request.id);
     setRequestState(1);
     setWorkflowId(request.workflowId);
-    setModalMessage(`¿Desea aprobar la Solicitud ${request.id}?`);
+    setModalMessage(`¿Desea aprobar la Requisición ${request.id}?`);
     setModalState(true);
   };
   const handleReject = () => {
@@ -47,7 +47,7 @@ export default function FinanceRequestItem({ request, expandedRequest }) {
     setRequisitionId(request.id);
     setRequestState(2);
     setWorkflowId(request.workflowId);
-    setModalMessage(`¿Desea rechazar la Solicitud ${request.id}?`);
+    setModalMessage(`¿Desea rechazar la Requisición ${request.id}?`);
     setModalState(true);
   };
 

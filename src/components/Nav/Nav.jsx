@@ -31,7 +31,7 @@ const translations = {
     supervisor: "Supervisor",
     payroll: "Payroll",
     finance: "Finanzas",
-    activos: "Activos",
+
     superAdmin: "Administrador",
     recruitment: "Reclutamiento", // Clave ajustada para coincidir con roleNavConfig
     logout: "Cerrar Sesión",
@@ -51,7 +51,6 @@ const translations = {
     home: "Home",
     supervisor: "Supervisor",
     recluitment: "Recruitment",
-    activo: "Actives",
     payroll: "Payroll",
     finance: "Finance",
     superAdmin: "Administrator", // Clave ajustada
@@ -100,11 +99,7 @@ function NewNav() {
       translationKey: "SuperAdmin",
       pathSegment: "configurationDashboard",
     },
-    activos: {
-      icon: Home,
-      translationKey: "Activos",
-      pathSegment: "assetsDashboard",
-    },
+
     humancapital: {
       icon: UserCheck,
       translationKey: "Human Capital",
@@ -310,6 +305,15 @@ function NewNav() {
         {/* Menú de Navegación Principal */}
         <div className="flex-grow mb-4">
           <ul className="space-y-1">
+            {" "}
+            <NavItem
+              key={"home"} // La clave debe ser única
+              icon={Home} // Pasa el componente Lucid icon
+              text={"Inicio"}
+              navigateTo={"home"}
+              hiddenMenu={hiddenMenu} // Pasa hiddenMenu a NavItem
+              theme={theme} // Pasa theme a NavItem
+            />
             {/* === INICIO: Renderizado dinámico de TODOS los NavItems === */}
             {roles &&
               roles.map((roleNameFromRolesArray) => {

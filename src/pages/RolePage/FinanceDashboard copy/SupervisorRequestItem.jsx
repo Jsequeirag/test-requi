@@ -117,7 +117,7 @@ export default function SupervisorRequestItem({ request, expandedRequest }) {
                   setRequisitionId(request.id);
                   setRequestState(1);
                   setWorkflowId(request.workflowId);
-                  setModalMessage(`Desea aprobar la Solicitud ${request.id}`);
+                  setModalMessage(`Desea aprobar la Requisición ${request.id}`);
                   handleApprove();
                 }}
                 className="flex items-center justify-center bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-md font-semibold transition-all focus:ring-1 focus:ring-green-400 active:scale-95"

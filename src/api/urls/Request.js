@@ -43,3 +43,5 @@ export const draftRequest = (data) =>
 
 export const updateRequests = (data) =>
   request({ url: "/updateRequest", method: "POST", data });
+export const updateRequisitionDetail = (data) =>
+  request({ url: "/updateRequisitionDetail", method: "POST", data });

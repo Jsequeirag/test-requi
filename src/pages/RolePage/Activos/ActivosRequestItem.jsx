@@ -94,7 +94,7 @@ export default function ActivosRequestItem({
               {/* Botón Aprobar */}
               <button
                 onClick={() => {
-                  setModalMessage(`Desea aprobar la Solicitud ${request.id}`),
+                  setModalMessage(`Desea aprobar la Requisición ${request.id}`),
                     handleApprove();
                 }}
                 className="flex items-center bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-400 focus:ring-opacity-75 active:scale-95 transition-all duration-200 text-sm font-medium"

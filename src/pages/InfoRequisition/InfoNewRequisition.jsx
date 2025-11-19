@@ -5,7 +5,7 @@ import TextButton from "../../components/Button/TextButton.jsx";
 import { initialState, reducer } from "./Reducer.jsx";
 import {
   createRequests,
-  updateRequests,
+  updateRequisitionDetail,
   draftRequest,
 } from "../../api/urls/Request.js";
 import { GetRequisitionById } from "../../api/urls/Requisition.js";
@@ -127,16 +127,13 @@ function InfoNewRequisition() {
     mutateAsync: updateRequisition,
     isPending: isPendingUpdateRequisition,
   } = useApiSend(
-    updateRequests,
+    updateRequisitionDetail,
     () => {
       toast.success("Solicitud actualizada exitosamente!", {
         className: "bg-green-600 text-white",
         progressClassName: "bg-white",
       });
-      navigate("/payrollRequests", {
-        replace: true,
-        state: { refresh: Date.now() },
-      }); // <--- CAMBIO AQUÍ
+      navigate(-1); // <--- CAMBIO AQUÍ
     },
     (e) => {
       console.error("Error al actualizar la solicitud:", e);
@@ -284,16 +281,17 @@ function InfoNewRequisition() {
       <div className="w-full  mx-auto p-4 sm:p-6 lg:p-8   text-gray-900 dark:text-gray-100 ">
         {/* Cabecera de la página */}
         <div className="flex items-center justify-between mb-6">
-          <a
-            href={"payrollRequests"}
-            className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group"
+          <div
+            onClick={() => navigate(-1)}
+            className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group cursor-pointer"
           >
             <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-0.5 transition-transform" />
+
             <TextButton
               text={language === "es" ? "Atrás" : "Back"}
               className="p-0 text-lg font-medium"
             />
-          </a>
+          </div>
           <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">
             Formulario de Requisición{JSON.stringify(formValues)}
           </h1>

@@ -52,26 +52,12 @@ export default function Promocion() {
       <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
         {/* Campo 1: Motivo */}
 
-        <div>
-          <FileUploadWithPreview
-            name="attachmentBase64"
-            onFileChange={(data) => {
-              setFormValues({
-                attachmentBase64: data,
-              });
-            }}
-            accept=".pdf, image/*"
-            id="attachmentBase64"
-            value={formValues?.attachmentBase64 || ""}
-          />
-        </div>
-
         {/* Campo 4: Fecha Oficial del Movimiento (Fecha efectiva) */}
         <div>
           <div className="flex">
             <label
               className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
-              htmlFor="promotionDate"
+              htmlFor="movementDate"
             >
               {language === "es" ? "Fecha del Movimiento" : "Movement Date"}
             </label>

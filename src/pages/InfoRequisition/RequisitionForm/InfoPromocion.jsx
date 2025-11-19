@@ -52,20 +52,6 @@ export default function InfoPromocion() {
       <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6">
         {/* Campo 1: Motivo */}
 
-        <div>
-          <FileUploadWithPreview
-            name="attachmentBase64"
-            onFileChange={(data) => {
-              setFormValues({
-                attachmentBase64: data,
-              });
-            }}
-            accept=".pdf, image/*"
-            id="attachmentBase64"
-            value={formValues?.attachmentBase64 || ""}
-          />
-        </div>
-
         {/* Campo 4: Fecha Oficial del Movimiento (Fecha efectiva) */}
         <div>
           <div className="flex">

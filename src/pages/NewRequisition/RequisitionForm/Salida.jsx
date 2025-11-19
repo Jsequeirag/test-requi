@@ -268,7 +268,7 @@ export default function Salida() {
               htmlFor="employeeDepartureDate" // ID único
             >
               {language === "es"
-                ? "Fecha Oficial de Salida"
+                ? "Fecha Real de Salida"
                 : "Real Departure Date"}
               <span className="text-red-500">*</span>{" "}
               {/* Asterisco de requerido */}

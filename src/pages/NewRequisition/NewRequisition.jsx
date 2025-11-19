@@ -551,7 +551,7 @@ function NewRequisition() {
                           {/* Asterisco de requerido */}
                         </label>
                         <AsyncSelect
-                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
+                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
                           id={"requisitionSubtypeId"} // Añadido ID
                           name={"requisitionSubtypeId"}
                           value={
