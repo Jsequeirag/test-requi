@@ -1,8 +1,8 @@
 export const RequisitionType = Object.freeze({
   Renuncia: 1,
   Despido: 2,
-  "Nueva Posición": 3,
-  "Concurso interno": 4,
+  NuevaPosicion: 3,
+  ConcursoInterno: 4,
   "Disminución del Alcance": 5,
   "Concurso interno (ML)": 6,
   Reemplazo: 7,

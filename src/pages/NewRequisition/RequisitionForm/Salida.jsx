@@ -36,7 +36,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
             name={"requisitionTypeId"}
             customNameParam={language === "es" ? "name" : "nameEn"}
             id={"requisitionMotivo"} // Añadido ID
@@ -55,7 +55,7 @@ export default function Salida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getRequisitionSubtypeByRequisitionTypeId/${
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtypeId || ""}

@@ -63,7 +63,7 @@ export default function EmployeeInfo() {
             </span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getEmployeesByDepartmentAndBoss/${employeeId}`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesByDepartmentAndBoss/${employeeId}`}
             name={"employeeId"}
             customNameParam="nombre"
             //para promocion no debe ser obligatorio
@@ -74,14 +74,15 @@ export default function EmployeeInfo() {
             className="w-full text-base"
           />
           {/*si es promocion no activarlo*/}
-          {!formValues?.employeeId && (
-            <p className="mt-1 text-xs text-red-600 flex items-center dark:text-red-500">
-              <Info className="w-3 h-3 mr-1" />
-              {language === "es"
-                ? "Este campo es requerido"
-                : "This field is required"}
-            </p>
-          )}
+          {!formValues?.employeeId &&
+            !formValues?.requestTypeId === RequestType.Promocion && (
+              <p className="mt-1 text-xs text-red-600 flex items-center dark:text-red-500">
+                <Info className="w-3 h-3 mr-1" />
+                {language === "es"
+                  ? "Este campo es requerido"
+                  : "This field is required"}
+              </p>
+            )}
         </div>
 
         {/* Campo 2: Exactus ID */}

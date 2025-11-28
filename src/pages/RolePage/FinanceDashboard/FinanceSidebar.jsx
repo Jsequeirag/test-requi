@@ -328,7 +328,9 @@ export default function FinanceSidebar({
                 >
                   <div className="flex flex-col flex-grow truncate">
                     <div className="flex justify-between">
-                      <span className="font-semibold">{parent.displayId}</span>
+                      <span className="font-semibold">
+                        {parent.displayId || parent.id}
+                      </span>
                       <span>{parent.state}</span>
                     </div>
                     <span className="text-xs">

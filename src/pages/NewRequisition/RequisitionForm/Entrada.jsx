@@ -9,7 +9,7 @@ import { getEmployeeById } from "../../../api/urls/Employee";
 import { useApiGet } from "../../../api/config/customHooks";
 import { useLocation } from "react-router-dom";
 import { RequisitionType } from "../../../contants/requisitionType.js";
-
+import { RequisitionSubtype } from "../../../contants/requisitionSubtypeType.js";
 export default function Entrada() {
   const location = useLocation();
   const employeeSelected = formStore((state) => state.employeeSelected);
@@ -109,7 +109,7 @@ export default function Entrada() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getRequisitionFeature?requisitionFeatureId=9`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=9`}
             name={"process"}
             id={"process"} // Añadido ID
             value={formValues?.process || ""} // Usamos 'value' y un fallback a ""
@@ -159,7 +159,7 @@ export default function Entrada() {
                 });
             }}
             autoComplete="off"
-            value={formValues.tForm || ""}
+            value={formValues.tForm}
             required={
               formValues.requisitionTypeId === RequisitionType.NuevaPosicion
             }
@@ -179,7 +179,7 @@ export default function Entrada() {
           </label>
 
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getRequisitionFeature?requisitionFeatureId=10`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=10`}
             id={"typeTemporality"}
             name="typeTemporality"
             value={formValues?.typeTemporality || ""}
@@ -273,7 +273,7 @@ export default function Entrada() {
                     className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                     htmlFor="positionCode"
                   >
-                    Código de Posición{" "}
+                    Código de Posición
                     {(formValues?.requisitionTypeId ===
                       RequisitionType.NuevaPosicion ||
                       formValues?.requisitionTypeId ===
@@ -324,7 +324,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getEmployeesBySupervisorRole`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesBySupervisorRole`}
                     name={"supervisor"}
                     id={"supervisor"}
                     value={formValues?.supervisor || ""}
@@ -353,7 +353,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//GetGrades`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetGrades`}
                     name={"grade"}
                     id={"grade"}
                     value={formValues?.grade || ""}
@@ -381,7 +381,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelectFreeText
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//GetProjectsByExactus`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
                     name={"project"}
                     id={"project"}
                     value={formValues?.project || ""}
@@ -409,7 +409,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getDepartments`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getDepartments`}
                     name={"department"}
                     id={"department"}
                     customNameParam={"descriptionDepartamento"}
@@ -435,7 +435,7 @@ export default function Entrada() {
                     Nombre
                   </label>
                   <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net//getEmployees`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
                     name={"employeeId"}
                     customNameParam="nombre"
                     //para promocion no debe ser obligatorio
@@ -630,7 +630,6 @@ export default function Entrada() {
                 }
               />
             </div>
-
             {/* Campo 2: Exactus ID */}
             <div>
               <label
@@ -671,7 +670,6 @@ export default function Entrada() {
                 }
               />
             </div>
-
             {/* Campo 3: Career Settings ID */}
             <div>
               <label
@@ -708,7 +706,6 @@ export default function Entrada() {
                 }
               />
             </div>
-
             {/* Campo 4: Lion Login */}
             <div>
               <label
@@ -747,7 +744,6 @@ export default function Entrada() {
                 }
               />
             </div>
-
             {/* Campo 5: Company Email */}
             <div>
               <label
@@ -786,7 +782,6 @@ export default function Entrada() {
                 }
               />
             </div>
-
             {/* Campo 6: Start Date */}
             <div>
               <label
@@ -824,6 +819,43 @@ export default function Entrada() {
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
                   formValues.recruitmentProccess === 14
+                }
+              />
+            </div>{" "}
+            <div>
+              <label
+                className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+                htmlFor="endDate"
+              >
+                Fecha de Finalización
+              </label>
+              <input
+                className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
+                  formValues.requisitionSubtypeId ===
+                  RequisitionSubtype.ConcursoExterno3
+                    ? "bg-white"
+                    : "bg-gray-100 cursor-not-allowed"
+                } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+                id="endDate"
+                name="endDate"
+                placeholder="Fecha"
+                onChange={(e) => {
+                  setFormValues({
+                    ...formValues,
+                    [e.target.name]: e.target.value,
+                  });
+                }}
+                autoComplete="off"
+                value={
+                  formValues.endDate
+                    ? formValues.endDate.split("T")[0]
+                    : new Date().toISOString().split("T")[0]
+                }
+                type="date"
+                disabled={
+                  !formValues.requisitionSubtypeId ===
+                  RequisitionSubtype.ConcursoExterno3
                 }
               />
             </div>

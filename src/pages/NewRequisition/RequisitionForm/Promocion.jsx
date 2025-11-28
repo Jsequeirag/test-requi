@@ -75,7 +75,7 @@ export default function Promocion() {
                        dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400"
             id="promotionDate"
             type="date"
-            name={language === "es" ? "Fecha de Promoción" : "Promotion Date"}
+            name={"promotionDate"}
             value={
               formValues.promotionDate
                 ? formValues.promotionDate.split("T")[0]

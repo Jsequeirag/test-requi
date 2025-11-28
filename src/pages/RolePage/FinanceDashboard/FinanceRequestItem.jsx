@@ -4,6 +4,7 @@ import {
   faCheck,
   faXmark,
   faChevronRight,
+  faPause, // ← Icono para “En Espera”
 } from "@fortawesome/free-solid-svg-icons";
 import AsyncModal from "../../../components/AsyncComponents/AsyncModal";
 import { updateStateRequestRoleFlow } from "../../../api/urls/RequestRoleFlow";
@@ -14,6 +15,7 @@ import {
   getRequestRoleFlowName,
 } from "../../../contansts/RequestRoleFlowState";
 import { RequisitionState } from "../../../contansts/RequisitionState";
+
 export default function FinanceRequestItem({ request, expandedRequest }) {
   const [modalState, setModalState] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -22,34 +24,44 @@ export default function FinanceRequestItem({ request, expandedRequest }) {
   const [workflowId, setWorkflowId] = useState("");
   const [comment, setComment] = useState("");
   const navigate = useNavigate();
+
   const fullName = JSON.parse(
     localStorage.getItem("requitool-employeeInfo")
   ).name;
 
   const isDisabled =
     request.workflowState === RequestRoleFlow.COMPLETED ||
+    request.workflowState === RequestRoleFlow.DENIED ||
     !request.workflowEnabled;
+
+  const canHold =
+    request.workflowEnabled &&
+    request.workflowState !== RequestRoleFlow.ONHOLD &&
+    request.workflowState !== RequestRoleFlow.COMPLETED &&
+    request.workflowState !== RequestRoleFlow.DENIED;
 
   useEffect(() => {
     setComment(request?.workflowComment ?? "");
   }, [request]);
 
-  const handleApprove = () => {
+  const openModal = (stateValue, msg) => {
     if (isDisabled) return;
+
     setRequisitionId(request.id);
-    setRequestState(1);
     setWorkflowId(request.workflowId);
-    setModalMessage(`¿Desea aprobar la Requisición ${request.id}?`);
+    setRequestState(stateValue);
+    setModalMessage(msg);
     setModalState(true);
   };
-  const handleReject = () => {
-    if (isDisabled) return;
-    setRequisitionId(request.id);
-    setRequestState(2);
-    setWorkflowId(request.workflowId);
-    setModalMessage(`¿Desea rechazar la Requisición ${request.id}?`);
-    setModalState(true);
-  };
+
+  const handleApprove = () =>
+    openModal(1, `¿Desea aprobar la Requisición ${request.id}?`);
+
+  const handleReject = () =>
+    openModal(2, `¿Desea rechazar la Requisición ${request.id}?`);
+
+  const handleHold = () =>
+    openModal(4, `¿Desea poner en espera la Requisición ${request.id}?`);
 
   const handleDetails = () => {
     if (isDisabled) return;
@@ -79,43 +91,37 @@ export default function FinanceRequestItem({ request, expandedRequest }) {
             fullName,
             Role.Finanzas
           )
-            .then(() => {
-              // 🟢 Recargar la página si la solicitud se actualiza correctamente
-              navigate(0);
-            })
-            .catch((err) => {
-              console.error("Error al actualizar estado:", err);
-            })
+            .then(() => navigate(0))
+            .catch((err) => console.error("Error al actualizar estado:", err))
         }
         data={request}
       />
 
-      {/* HEADER - Igual a la captura */}
+      {/* HEADER */}
       <div className="px-6 py-4 flex flex-wrap items-center justify-between gap-3 overflow-hidden relative">
-        {/* Fondo animado con onda arcoíris */}
+        {/* Dejo igual tu arcoiris */}
         <div className="absolute inset-0 pointer-events-none">
           <div
             className="h-full w-[300%] animate-rainbow-wave"
             style={{
               background: `linear-gradient(90deg,
-          #fee2e2 0%,
-          #fef3c7 10%,
-          #ecfccb 20%,
-          #dbeafe 30%,
-          #e0e7ff 40%,
-          #dbeafe 50%,
-          #ecfccb 60%,
-          #fef3c7 70%,
-          #fee2e2 80%,
-          #fee2e2 100%
-        )`,
+                #fee2e2 0%,
+                #fef3c7 10%,
+                #ecfccb 20%,
+                #dbeafe 30%,
+                #e0e7ff 40%,
+                #dbeafe 50%,
+                #ecfccb 60%,
+                #fef3c7 70%,
+                #fee2e2 80%,
+                #fee2e2 100%
+              )`,
               backgroundSize: "300% 100%",
               opacity: 0.25,
             }}
           />
         </div>
 
-        {/* Contenido encima */}
         <div className="relative z-10 flex items-center gap-2">
           <div className="w-8 h-8 bg-gray-200 border-2 border-dashed rounded-lg"></div>
           <p className="text-gray-800 font-semibold text-lg">
@@ -145,9 +151,9 @@ export default function FinanceRequestItem({ request, expandedRequest }) {
           <span>Creador: {request?.user?.name || "Usuario Prueba"}</span>
         </div>
       </div>
-      {/* CUERPO - Comentario SIEMPRE visible + botones */}
+
+      {/* BODY */}
       <div className="px-6 py-3 bg-white flex flex-col sm:flex-row gap-3">
-        {/* Comentario (siempre visible) */}
         <textarea
           value={comment}
           onChange={(e) => setComment(e.target.value)}
@@ -155,7 +161,8 @@ export default function FinanceRequestItem({ request, expandedRequest }) {
           placeholder="Comentario..."
           rows={1}
           className={`
-            flex-1 min-w-0 p-2 text-sm border rounded-lg resize-none focus:ring-2 focus:ring-indigo-500 focus:outline-none
+            flex-1 min-w-0 p-2 text-sm border rounded-lg resize-none 
+            focus:ring-2 focus:ring-indigo-500 focus:outline-none
             ${
               isDisabled
                 ? "bg-gray-50 text-gray-400 cursor-not-allowed border-gray-200"
@@ -164,95 +171,73 @@ export default function FinanceRequestItem({ request, expandedRequest }) {
           `}
         />
 
-        {/* Botones */}
         <div className="flex gap-2 justify-end">
-          {request?.state === RequisitionState.COMPLETED ? (
-            <>
-              <button
-                onClick={handleApprove}
-                className={`
-                  flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
-                  transition-all active:scale-95
-                  ${
-                    isDisabled
-                      ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
-                      : "bg-white text-green-600 border-green-300 hover:bg-green-50 hover:border-green-400"
-                  }
-                `}
-              >
-                <FontAwesomeIcon icon={faCheck} />
-                Aprobar
-              </button>
-
-              <button
-                onClick={handleReject}
-                className={`
-                  flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
-                  transition-all active:scale-95
-                  ${
-                    isDisabled
-                      ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
-                      : "bg-white text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
-                  }
-                `}
-              >
-                <FontAwesomeIcon icon={faXmark} />
-                Rechazar
-              </button>
-
-              <button
-                onClick={handleDetails}
-                className={`
-                  flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
-                  transition-all active:scale-95
-                  ${
-                    isDisabled
-                      ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
-                  }
-                `}
-              >
-                Detalles
-                <FontAwesomeIcon
-                  icon={faChevronRight}
-                  className="text-xs ml-1"
-                />
-              </button>
-            </>
-          ) : (
-            <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed">
-              <FontAwesomeIcon icon={faCheck} />
-              Aprobado
+          {/* BOTÓN EN ESPERA */}
+          {canHold && (
+            <button
+              onClick={handleHold}
+              className={`
+                flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
+                transition-all active:scale-95
+                bg-yellow-50 text-yellow-700 border-yellow-300 
+                hover:bg-yellow-100 hover:border-yellow-400
+              `}
+            >
+              <FontAwesomeIcon icon={faPause} />
+              En Espera
             </button>
           )}
+
+          {/* APROBAR */}
+          <button
+            disabled={isDisabled}
+            onClick={handleApprove}
+            className={`
+              flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
+              transition-all active:scale-95
+              ${
+                isDisabled
+                  ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                  : "bg-white text-green-600 border-green-300 hover:bg-green-50"
+              }
+            `}
+          >
+            <FontAwesomeIcon icon={faCheck} />
+            Aprobar
+          </button>
+
+          {/* RECHAZAR */}
+          <button
+            disabled={isDisabled}
+            onClick={handleReject}
+            className={`
+              flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
+              transition-all active:scale-95
+              ${
+                isDisabled
+                  ? "bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed"
+                  : "bg-white text-red-600 border-red-300 hover:bg-red-50"
+              }
+            `}
+          >
+            <FontAwesomeIcon icon={faXmark} />
+            Rechazar
+          </button>
+
+          {/* DETALLES */}
+          <button
+            onClick={handleDetails}
+            className={`
+              flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
+              transition-all active:scale-95
+              bg-white text-gray-700 border-gray-300 hover:bg-gray-100
+            `}
+          >
+            Detalles
+            <FontAwesomeIcon icon={faChevronRight} className="text-xs ml-1" />
+          </button>
         </div>
       </div>
-
-      {/* SECCIÓN EXPANDIDA (solo detalles adicionales) */}
-      {expandedRequest === request?.id && (
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100">
-          <h4 className="font-semibold text-gray-800 mb-3">
-            Detalles de la Solicitud
-          </h4>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-sm text-gray-600">
-            <p>
-              <strong>Tipo de Acción:</strong> Cambio de supervisor
-            </p>
-            <p>
-              <strong>Fecha:</strong> {new Date().toLocaleDateString()}
-            </p>
-            <p>
-              <strong>Supervisor Anterior:</strong> Juan Pérez
-            </p>
-            <p>
-              <strong>Nuevo Supervisor:</strong> María Gómez
-            </p>
-            <p>
-              <strong>Motivo:</strong> Reorganización del equipo
-            </p>
-          </div>
-        </div>
-      )}
     </div>
   );
 }
