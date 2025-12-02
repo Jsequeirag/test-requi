@@ -63,7 +63,7 @@ export default function EmployeeInfo() {
             </span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesByDepartmentAndBoss/${employeeId}`}
+            url={`https://localhost:7040/getEmployeesByDepartmentAndBoss/${employeeId}`}
             name={"employeeId"}
             customNameParam="nombre"
             //para promocion no debe ser obligatorio

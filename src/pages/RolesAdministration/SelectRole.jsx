@@ -175,7 +175,7 @@ export default function SelectRole({ action, setModalOpen }) {
             Departamento
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getDepartments`}
+            url={`https://localhost:7040/getDepartments`}
             name={"departmentId"} // Matches formData key
             value={formData.departmentId}
             onChange={handleSelectChange} // Custom handler for AsyncSelect
