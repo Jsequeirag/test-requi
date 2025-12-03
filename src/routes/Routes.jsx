@@ -25,9 +25,6 @@ import FinanceRequest from "../pages/RolePage/FinanceDashboard/FinanceRequest";
 import RRHHDashboard from "../pages/RolePage/RRHHDashboard/RRHHDashboard";
 import RRHHRequest from "../pages/RolePage/RRHHDashboard/RRHHRequest";
 
-import MDDashboard from "../pages/RolePage/MDDashboard/MDDashboard";
-import MDRequest from "../pages/RolePage/MDDashboard/MDRequest";
-
 import TIDashboard from "../pages/RolePage/TIDashboard/TIDashboard";
 import TIRequest from "../pages/RolePage/TIDashboard/TIRequest";
 
@@ -127,16 +124,7 @@ export default [
     element: <ActivosRequest />,
     title: "activosRequests",
   },
-  {
-    path: "/md",
-    element: <MDDashboard />,
-    title: "md",
-  },
-  {
-    path: "/mdRequests",
-    element: <MDRequest />,
-    title: "mdRequests",
-  },
+
   {
     path: "/humanCapitalDashboard",
     element: <RRHHDashboard />,
