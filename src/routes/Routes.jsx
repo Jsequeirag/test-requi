@@ -25,17 +25,9 @@ import FinanceRequest from "../pages/RolePage/FinanceDashboard/FinanceRequest";
 import RRHHDashboard from "../pages/RolePage/RRHHDashboard/RRHHDashboard";
 import RRHHRequest from "../pages/RolePage/RRHHDashboard/RRHHRequest";
 
-import TIDashboard from "../pages/RolePage/TIDashboard/TIDashboard";
-import TIRequest from "../pages/RolePage/TIDashboard/TIRequest";
-
-import AsolionDashboard from "../pages/RolePage/AsolionDashboard/AsolionDashboard";
-import AsolionRequest from "../pages/RolePage/AsolionDashboard/AsolionRequest";
-
 import RecluitmentDashboard from "../pages/RolePage/Recluitment/RecluitmentDashboard";
 import RecluitmentRequest from "../pages/RolePage/Recluitment/RecluitmentRequest";
 
-import ActivosDashboard from "../pages/RolePage/Activos/ActivosDashboard";
-import ActivosRequest from "../pages/RolePage/Activos/ActivosRequest";
 import SupervisorRequest from "../pages/RolePage/Supervisor/SupervisorRequest.jsx";
 import Home from "../pages/Home/Home";
 export default [
@@ -114,16 +106,6 @@ export default [
     element: <FinanceRequest />,
     title: "financeRequests",
   },
-  {
-    path: "/activos",
-    element: <ActivosDashboard />,
-    title: "activos",
-  },
-  {
-    path: "/activosRequests",
-    element: <ActivosRequest />,
-    title: "activosRequests",
-  },
 
   {
     path: "/humanCapitalDashboard",
@@ -134,32 +116,6 @@ export default [
     path: "/rrhhRequests",
     element: <RRHHRequest />,
     title: "rrhhRequests",
-  },
-  {
-    path: "/it",
-    element: <TIDashboard />,
-    title: "it",
-  },
-  {
-    path: "/itRequests",
-    element: <TIRequest />,
-    title: "itRequests",
-  },
-
-  {
-    path: "/asolion",
-    element: <AsolionDashboard />,
-    title: "asolion",
-  },
-  {
-    path: "/supervisorFlow",
-    element: <AsolionDashboard />,
-    title: "supervisorFlow",
-  },
-  {
-    path: "/asolionRequests",
-    element: <AsolionRequest />,
-    title: "asolionRequests",
   },
 
   {
