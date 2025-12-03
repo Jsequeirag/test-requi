@@ -177,27 +177,53 @@ export default function RecluitmentSidebar({
   // -------------------------------
   const filteredRequests =
     requestData?.data?.filter((parent) => {
-      const reqIdMatch = filters.requestId
-        ? parent.displayId?.toString().includes(filters.requestId)
+      // ---------------------------------------
+      // FILTRO 1: ID de solicitud (displayId o id)
+      // ---------------------------------------
+      const requestIdMatch = filters.requestId
+        ? parent.displayId?.toString() === filters.requestId ||
+          parent.id?.toString() === filters.requestId
         : true;
 
+      // ---------------------------------------
+      // FILTRO 2: ID de requisición interna
+      // ---------------------------------------
+      const requisitionIdMatch = filters.requestId
+        ? parent.requisitions?.some(
+            (req) => req.id?.toString() === filters.requestId
+          )
+        : true;
+
+      // Solicitud coincide si coincide por solicitud o por requisición
+      const requestOrRequisitionMatch = requestIdMatch || requisitionIdMatch;
+
+      // ---------------------------------------
+      // FILTRO 3: Líder (por nombre o por ID)
+      // ---------------------------------------
       const leaderMatch = filters.leader
-        ? parent.leaderName
+        ? parent.user?.id?.toString() === filters.leader ||
+          parent.user?.name
             ?.toLowerCase()
             .includes(filters.leader.toLowerCase())
         : true;
 
-      const created = new Date(parent.createdDate);
+      // ---------------------------------------
+      // FILTRO 4: Rango de fechas
+      // ---------------------------------------
+      const createdDate = new Date(parent.createdDate);
 
       const startMatch = filters.startDate
-        ? created >= new Date(filters.startDate)
+        ? createdDate >= new Date(filters.startDate)
         : true;
 
       const endMatch = filters.endDate
-        ? created <= new Date(filters.endDate)
+        ? createdDate <= new Date(filters.endDate)
         : true;
 
-      return reqIdMatch && leaderMatch && startMatch && endMatch;
+      // ---------------------------------------
+      // Resultado final
+      // ---------------------------------------
+      return requestOrRequisitionMatch && leaderMatch && startMatch && endMatch;
     }) || [];
 
   // -------------------------------
@@ -242,7 +268,7 @@ export default function RecluitmentSidebar({
             {/* ID */}
             <input
               type="text"
-              placeholder="ID de solicitud"
+              placeholder="ID de Solicitud/Requisición"
               value={filters.requestId}
               onChange={(e) =>
                 setFilters((f) => ({ ...f, requestId: e.target.value }))

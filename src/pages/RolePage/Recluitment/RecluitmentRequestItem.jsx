@@ -69,7 +69,7 @@ export default function RecluitmentRequestItem({ request, expandedRequest }) {
     openModal(2, `¿Desea rechazar la Requisición ${request.id}?`);
 
   const handleHold = () =>
-    openModal(4, `¿Desea poner en espera la Requisición ${request.id}?`);
+    openModal(5, `¿Desea poner en espera la Requisición ${request.id}?`);
 
   const handleDetails = () => {
     if (isDisabled) return;

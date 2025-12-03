@@ -177,26 +177,54 @@ export default function FinanceSidebar({
   // FILTRO REAL SOBRE LOS DATOS DEL BACKEND
   // -------------------------------------------------------------------------
   const filteredRequests =
-    requestData?.data?.filter((item) => {
-      const reqIdMatch = filters.requestId
-        ? item.displayId?.toString().includes(filters.requestId)
+    requestData?.data?.filter((parent) => {
+      // ---------------------------------------
+      // FILTRO 1: ID de solicitud (displayId o id)
+      // ---------------------------------------
+      const requestIdMatch = filters.requestId
+        ? parent.displayId?.toString() === filters.requestId ||
+          parent.id?.toString() === filters.requestId
         : true;
 
+      // ---------------------------------------
+      // FILTRO 2: ID de requisición interna
+      // ---------------------------------------
+      const requisitionIdMatch = filters.requestId
+        ? parent.requisitions?.some(
+            (req) => req.id?.toString() === filters.requestId
+          )
+        : true;
+
+      // Solicitud coincide si coincide por solicitud o por requisición
+      const requestOrRequisitionMatch = requestIdMatch || requisitionIdMatch;
+
+      // ---------------------------------------
+      // FILTRO 3: Líder (por nombre o por ID)
+      // ---------------------------------------
       const leaderMatch = filters.leader
-        ? item.user?.name?.toLowerCase().includes(filters.leader.toLowerCase())
+        ? parent.user?.id?.toString() === filters.leader ||
+          parent.user?.name
+            ?.toLowerCase()
+            .includes(filters.leader.toLowerCase())
         : true;
 
-      const created = new Date(item.createdDate);
+      // ---------------------------------------
+      // FILTRO 4: Rango de fechas
+      // ---------------------------------------
+      const createdDate = new Date(parent.createdDate);
 
       const startMatch = filters.startDate
-        ? created >= new Date(filters.startDate)
+        ? createdDate >= new Date(filters.startDate)
         : true;
 
       const endMatch = filters.endDate
-        ? created <= new Date(filters.endDate)
+        ? createdDate <= new Date(filters.endDate)
         : true;
 
-      return reqIdMatch && leaderMatch && startMatch && endMatch;
+      // ---------------------------------------
+      // Resultado final
+      // ---------------------------------------
+      return requestOrRequisitionMatch && leaderMatch && startMatch && endMatch;
     }) || [];
 
   // -------------------------------------------------------------------------
@@ -246,7 +274,7 @@ export default function FinanceSidebar({
           <div className="p-4 space-y-3">
             <input
               type="text"
-              placeholder="ID de solicitud"
+              placeholder="ID de Solicitud/Requisición"
               value={filters.requestId}
               onChange={(e) =>
                 setFilters((f) => ({ ...f, requestId: e.target.value }))
