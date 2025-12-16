@@ -78,6 +78,14 @@ export default function RecluitmentRequestItem({ request, expandedRequest }) {
         requisition: request,
         action: "update",
         role: Role.Reclutamiento,
+        workFlow: {
+          Id: request.workflowId,
+          RequisitionId: request.id,
+          State: 1,
+          FullName: fullName,
+          RoleId: Role.Supervisor,
+          NotifyAsolion: isAsolion,
+        },
       },
     });
   };
