@@ -24,7 +24,7 @@ const SidebarPagination = ({
   if (totalPages <= 1) return null;
 
   return (
-    <div className="flex items-center justify-between px-2 py-3 border-t border-gray-200 dark:border-gray-700 mt-4 ">
+    <div className="flex items-center justify-between px-2 py-3 border-t border-gray-200 dark:border-gray-700 mt-4">
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1 || isLoading}
@@ -71,8 +71,8 @@ const PaginationSettings = ({
       </button>
 
       <div
-        className={`overflow-hidden transition-all duration-300 ${
-          isExpanded ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
+        className={`transition-all duration-300 overflow-hidden ${
+          isExpanded ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <div className="px-3 pb-3">
@@ -96,15 +96,19 @@ const PaginationSettings = ({
 };
 
 // -----------------------------------------------------------------------------
-// SIDEBAR PRINCIPAL RRHH
+// RRHHSidebar PRINCIPAL
 // -----------------------------------------------------------------------------
 export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
-  // PAGINACIÓN
-  const [currentPage, setCurrentPage] = useState(1);
+  // =============================
+  // 1️⃣  PAGINACIÓN INICIAL DESDE LOCALSTORAGE
+  // =============================
+  const savedPage = Number(localStorage.getItem("humancapital_selected_page"));
+  const [currentPage, setCurrentPage] = useState(savedPage || 1);
   const [pageSize, setPageSize] = useState(5);
+
   const [settingsExpanded, setSettingsExpanded] = useState(false);
 
-  // === FILTROS ===
+  // ======== FILTROS ========
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [filters, setFilters] = useState({
     requestId: "",
@@ -113,16 +117,16 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
     endDate: "",
   });
 
-  const activeFilterCount = Object.values(filters).filter((x) => x).length;
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
-  // API
+  // API call
   const {
     data: requestData,
     isFetching,
     refetch,
     isSuccess,
   } = useApiGet(
-    ["GetRequestsFromRequestRoleFlowRRHH", currentPage, pageSize],
+    ["RRHHSidebarData", currentPage, pageSize],
     () => getRequestsFromRequestRoleFlow(8, currentPage, pageSize),
     {
       refetchOnWindowFocus: false,
@@ -133,70 +137,88 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
   const [selectedParentId, setSelectedParentId] = useState(null);
   const [showRequests, setShowRequests] = useState(false);
 
+  // =============================
+  // 2️⃣  CARGAR ID SELECCIONADO DESDE LOCALSTORAGE
+  // =============================
+  useEffect(() => {
+    const savedId = localStorage.getItem("humancapital_selected_parent");
+    if (savedId) {
+      setSelectedParentId(Number(savedId));
+    }
+  }, []);
+
   // Animación
   useEffect(() => {
     if (isSuccess && !isFetching && requestData) {
       const t = setTimeout(() => setShowRequests(true), 50);
       return () => clearTimeout(t);
-    }
-    setShowRequests(false);
+    } else setShowRequests(false);
   }, [isSuccess, isFetching, requestData]);
 
-  // Refresh
+  // =============================
+  // 3️⃣  AUTO-SELECCIÓN CUANDO LA DATA LLEGUE
+  // =============================
+  useEffect(() => {
+    if (!requestData?.data) return;
+
+    const savedId = Number(
+      localStorage.getItem("humancapital_selected_parent")
+    );
+    if (!savedId) return;
+
+    const found = requestData.data.find((p) => p.id === savedId);
+    if (!found) return;
+
+    setSelectedParentId(savedId);
+    setChildRequestsData(found.requisitions);
+    onParentSelect(savedId);
+  }, [requestData]);
+
   const handleRefresh = async () => {
     await refetch();
-    setSelectedParentId(null);
-    setChildRequestsData([]);
+    clearSelection();
   };
 
-  // Cambio de pagina
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+  // =============================
+  // 🔥 Fun auxiliar para limpiar selección
+  // =============================
+  const clearSelection = () => {
     setSelectedParentId(null);
     setChildRequestsData([]);
+    onParentSelect(null);
+    localStorage.removeItem("humancapital_selected_parent");
+    localStorage.removeItem("humancapital_selected_page");
   };
 
-  // Page size
-  const handlePageSizeChange = (size) => {
-    setPageSize(size);
+  const handlePageChange = (n) => {
+    setCurrentPage(n);
+    clearSelection();
+  };
+
+  const handlePageSizeChange = (n) => {
+    setPageSize(n);
     setCurrentPage(1);
-    setSelectedParentId(null);
-    setChildRequestsData([]);
+    clearSelection();
   };
 
-  // Total pages
   const totalPages = requestData
     ? Math.ceil(requestData.totalRecords / requestData.pageSize)
     : 0;
 
-  // -------------------------------------------------------------------------
-  // FILTRADO REAL
-  // -------------------------------------------------------------------------
+  // FILTROS
   const filteredRequests =
     requestData?.data?.filter((parent) => {
-      // ---------------------------------------
-      // FILTRO 1: ID de solicitud (displayId o id)
-      // ---------------------------------------
       const requestIdMatch = filters.requestId
         ? parent.displayId?.toString() === filters.requestId ||
           parent.id?.toString() === filters.requestId
         : true;
 
-      // ---------------------------------------
-      // FILTRO 2: ID de requisición interna
-      // ---------------------------------------
       const requisitionIdMatch = filters.requestId
         ? parent.requisitions?.some(
             (req) => req.id?.toString() === filters.requestId
           )
         : true;
 
-      // Solicitud coincide si coincide por solicitud o por requisición
-      const requestOrRequisitionMatch = requestIdMatch || requisitionIdMatch;
-
-      // ---------------------------------------
-      // FILTRO 3: Líder (por nombre o por ID)
-      // ---------------------------------------
       const leaderMatch = filters.leader
         ? parent.user?.id?.toString() === filters.leader ||
           parent.user?.name
@@ -204,9 +226,6 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
             .includes(filters.leader.toLowerCase())
         : true;
 
-      // ---------------------------------------
-      // FILTRO 4: Rango de fechas
-      // ---------------------------------------
       const createdDate = new Date(parent.createdDate);
 
       const startMatch = filters.startDate
@@ -217,23 +236,24 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
         ? createdDate <= new Date(filters.endDate)
         : true;
 
-      // ---------------------------------------
-      // Resultado final
-      // ---------------------------------------
-      return requestOrRequisitionMatch && leaderMatch && startMatch && endMatch;
+      return (
+        (requestIdMatch || requisitionIdMatch) &&
+        leaderMatch &&
+        startMatch &&
+        endMatch
+      );
     }) || [];
 
   // -------------------------------------------------------------------------
   // RENDER
   // -------------------------------------------------------------------------
   return (
-    <div className="bg-white/30 dark:bg-gray-900/40 backdrop-blur-md shadow-lg p-5 w-72 border-r border-gray-200 dark:border-gray-800 overflow-y-auto flex flex-col">
-      {/* HEADER */}
+    <div className="bg-white/30 dark:bg-gray-900/40 backdrop-blur-md shadow-lg p-5 w-72 border-r border-gray-200 dark:border-gray-800 flex flex-col">
+      {/* Header */}
       <div className="flex justify-between items-center pb-4 border-b border-gray-200 dark:border-gray-700 mb-4">
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           Solicitudes
         </h2>
-
         <button
           onClick={handleRefresh}
           className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -242,23 +262,22 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
         </button>
       </div>
 
-      {/* ----------------- FILTROS DESPLEGABLE ----------------- */}
+      {/* FILTROS */}
       <div className="mb-4 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-white/40 dark:bg-gray-800/40">
         <button
           onClick={() => setFiltersExpanded(!filtersExpanded)}
-          className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="flex justify-between items-center w-full px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <span>Filtros</span>
 
           {activeFilterCount > 0 && (
-            <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">
               {activeFilterCount}
             </span>
           )}
 
           <FontAwesomeIcon
             icon={filtersExpanded ? faChevronUp : faChevronDown}
-            size="sm"
           />
         </button>
 
@@ -267,7 +286,7 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
             filtersExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="p-4 space-y-3">
+          <div className="p-4 flex flex-col gap-3">
             <input
               type="text"
               placeholder="ID de Solicitud/Requisición"
@@ -275,40 +294,40 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
               onChange={(e) =>
                 setFilters((f) => ({ ...f, requestId: e.target.value }))
               }
-              className="w-full p-2 rounded-md text-sm border bg-white dark:bg-gray-900"
+              className="p-2 text-sm border rounded-md bg-white dark:bg-gray-900"
             />
 
             <input
               type="text"
-              placeholder="Líder de equipo"
+              placeholder="Líder"
               value={filters.leader}
               onChange={(e) =>
                 setFilters((f) => ({ ...f, leader: e.target.value }))
               }
-              className="w-full p-2 rounded-md text-sm border bg-white dark:bg-gray-900"
+              className="p-2 text-sm border rounded-md bg-white dark:bg-gray-900"
             />
 
-            <div className="flex flex-col">
-              <label className="text-xs mb-1">Fecha inicio</label>
+            <div>
+              <label className="text-xs text-gray-500">Fecha inicio</label>
               <input
                 type="date"
                 value={filters.startDate}
                 onChange={(e) =>
                   setFilters((f) => ({ ...f, startDate: e.target.value }))
                 }
-                className="p-2 rounded-md text-sm border bg-white dark:bg-gray-900"
+                className="w-full p-2 text-sm border rounded-md bg-white dark:bg-gray-900"
               />
             </div>
 
-            <div className="flex flex-col">
-              <label className="text-xs mb-1">Fecha fin</label>
+            <div>
+              <label className="text-xs text-gray-500">Fecha fin</label>
               <input
                 type="date"
                 value={filters.endDate}
                 onChange={(e) =>
                   setFilters((f) => ({ ...f, endDate: e.target.value }))
                 }
-                className="p-2 rounded-md text-sm border bg-white dark:bg-gray-900"
+                className="w-full p-2 text-sm border rounded-md bg-white dark:bg-gray-900"
               />
             </div>
 
@@ -321,7 +340,7 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
                   endDate: "",
                 })
               }
-              className="w-full py-2 text-sm bg-gray-400 hover:bg-gray-500 text-white rounded-md"
+              className="py-2 text-sm bg-gray-400 text-white rounded-md hover:bg-gray-500"
             >
               Limpiar filtros
             </button>
@@ -329,8 +348,8 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
         </div>
       </div>
 
-      {/* ----------------------- LISTA ----------------------- */}
-      <nav className="flex-grow">
+      {/* LISTA */}
+      <nav className="flex-1 overflow-y-auto">
         <ul>
           {isFetching ? (
             <RequestRoleSkn />
@@ -346,16 +365,33 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
                 style={{ transitionDelay: `${index * 50}ms` }}
               >
                 <div
+                  onClick={() => {
+                    // Deselección
+                    if (selectedParentId === parent.id) {
+                      clearSelection();
+                      return;
+                    }
+
+                    // Selección normal
+                    setSelectedParentId(parent.id);
+                    setChildRequestsData(parent.requisitions);
+                    onParentSelect(parent.id);
+
+                    // Guardar en localStorage
+                    localStorage.setItem(
+                      "humancapital_selected_parent",
+                      parent.id
+                    );
+                    localStorage.setItem(
+                      "humancapital_selected_page",
+                      currentPage
+                    );
+                  }}
                   className={`relative flex items-center justify-between py-3 px-4 rounded-lg cursor-pointer ${
                     selectedParentId === parent.id
-                      ? "bg-blue-500 text-white"
+                      ? "bg-blue-600 text-white"
                       : "hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
-                  onClick={() => {
-                    setSelectedParentId(parent.id);
-                    onParentSelect(parent.id);
-                    setChildRequestsData(parent.requisitions);
-                  }}
                 >
                   <div className="flex flex-col flex-grow truncate">
                     <div className="flex justify-between">
@@ -364,11 +400,9 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
                       </span>
                       <span>{parent.state}</span>
                     </div>
-
                     <span className="text-xs">
                       {formatIsoDateToYYYYMMDD(parent.createdDate)}
                     </span>
-
                     <span className="font-bold text-xs">
                       {parent.user?.name}
                     </span>
@@ -380,7 +414,7 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
                         ? faChevronRight
                         : faChevronDown
                     }
-                    className="ml-3"
+                    className="ml-3 text-sm"
                   />
                 </div>
               </li>
@@ -393,8 +427,8 @@ export default function RRHHSidebar({ onParentSelect, setChildRequestsData }) {
         </ul>
       </nav>
 
-      {/* ------------------- PAGINACIÓN ------------------- */}
-      <div className="mt-auto">
+      {/* Paginación */}
+      <div className="mt-4">
         <SidebarPagination
           currentPage={currentPage}
           totalPages={totalPages}

@@ -1,79 +1,92 @@
-// NavItem.js (Este archivo debería estar separado, por ejemplo, en src/components/NavItem.js)
 import React from "react";
-import { useNavigate } from "react-router-dom"; // Importa useNavigate para la navegación
+import { useNavigate } from "react-router-dom";
 
-// Este componente NavItem es responsable de renderizar cada elemento individual del menú de navegación.
-// Recibe el componente de icono de Lucid React a través de la prop 'icon'.
 const NavItem = ({
   icon: IconComponent,
   text,
   navigateTo,
   hasNotification = false,
+  count = 0,
   hiddenMenu,
   theme,
 }) => {
-  const navigate = useNavigate(); // Hook para la navegación programática
+  const navigate = useNavigate();
+
+  const showDot = hasNotification && count === 1;
+  const showBadge = hasNotification && count > 1;
 
   return (
     <li
-      // Clases Tailwind CSS para el estilo del elemento de lista
-      className={`nav-link relative h-12 flex items-center ${theme.hoverColor} rounded-lg
-                  transition-all duration-200 cursor-pointer group`}
+      className={`nav-link relative h-12 flex items-center ${theme?.hoverColor}
+      rounded-lg transition-all duration-200 cursor-pointer group`}
     >
-      <a
-        // Clases Tailwind CSS para el estilo del enlace
+      <button
+        type="button"
         className={`no-underline h-full w-full flex items-center
-                    text-gray-700 dark:text-gray-300
-                    hover:text-gr-700 dark:hover:text-white
-                    focus:outline-none focus:ring-2 focus:ring-blue-300/50
-                    active:scale-[0.98]
-                    ${hiddenMenu ? "justify-center" : "justify-start"}`}
-        onClick={() => navigate(navigateTo)} // Maneja la navegación al hacer clic
-        role="menuitem" // Semántica para accesibilidad
-        tabIndex="0" // Permite enfocar con el teclado
+          text-gray-700 dark:text-gray-300
+          hover:text-black dark:hover:text-white
+          focus:outline-none focus:ring-2 focus:ring-blue-300/50
+          active:scale-[0.98]
+          ${hiddenMenu ? "justify-center" : "justify-start"}`}
+        onClick={() => navigate(navigateTo)}
       >
-        {/* === PARTE CRÍTICA: RENDERIZADO DEL ICONO DE LUCID REACT === */}
-        {/* Se verifica si IconComponent existe antes de renderizarlo */}
+        {/* ICON */}
         {IconComponent && (
           <IconComponent
-            size={24} // Tamaño del icono (puedes ajustar esto)
-            // Clases Tailwind CSS para el estilo del icono
-            className="min-w-[60px] flex items-center justify-center text-2xl
-                       group-hover:text-black dark:group-hover:text-white"
-            // Puedes pasar props adicionales de Lucid como 'color' o 'strokeWidth' aquí
-            // Por ejemplo: color="currentColor" para que el icono herede el color del texto
+            size={24}
+            className="min-w-[60px] text-2xl group-hover:text-black dark:group-hover:text-white"
           />
         )}
 
-        {/* Texto del elemento de navegación */}
+        {/* TEXT */}
         <span
           className={`text nav-text font-semibold whitespace-nowrap overflow-hidden
-                      ${hiddenMenu ? "w-0 opacity-0" : "w-auto opacity-100"}
-                      transition-all duration-200 delay-100`}
+            ${hiddenMenu ? "w-0 opacity-0" : "w-auto opacity-100"}
+            transition-all duration-200 delay-100`}
         >
           {text}
         </span>
 
-        {/* Indicador de notificación (si hasNotification es true) */}
-        {hasNotification && (
-          <span
-            className={`absolute top-2 right-2.5 w-2.5 h-2.5 bg-red-500 rounded-full
-                        ${hiddenMenu ? "left-[calc(50%+10px)]" : ""}
-                        transition-all duration-200`}
-          ></span>
+        {/* --- 🔴 SINGLE-DOT NOTIFICATION --- */}
+        {showDot && (
+          <div
+            className={`absolute top-2 right-2.5
+              w-2.5 h-2.5 bg-red-500 rounded-full 
+              ${hiddenMenu ? "left-[calc(50%+12px)] right-auto" : ""}
+              `}
+          ></div>
         )}
-      </a>
 
-      {/* Tooltip visible cuando el menú está colapsado y se hace hover */}
+        {/* --- 🔴 BADGE WITH ANIMATION (MenuCard STYLE) --- */}
+        {showBadge && (
+          <div
+            className={`absolute top-1.5 right-2 z-20
+            ${hiddenMenu ? "left-[calc(50%+8px)] right-auto" : ""}`}
+          >
+            {/* Badge principal */}
+            <div className="relative">
+              <div
+                className="bg-red-500 text-white rounded-full
+                min-w-[20px] h-[20px] px-1.5 flex items-center justify-center
+                text-xs font-bold shadow-md animate-pulse"
+              >
+                {count > 99 ? "99+" : count}
+              </div>
+
+              {/* Anillo expansivo (igual a MenuCard) */}
+              <div className="absolute inset-0 bg-red-400 rounded-full animate-ping opacity-75"></div>
+            </div>
+          </div>
+        )}
+      </button>
+
+      {/* TOOLTIP (solo si está colapsado) */}
       {hiddenMenu && (
         <div
           className="absolute left-full ml-2 top-1/2 -translate-y-1/2 z-[100]
-                      px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-lg
-                      opacity-0 invisible group-hover:opacity-100 group-hover:visible
-                      transition-all duration-300 delay-500 whitespace-nowrap pointer-events-none
-                      before:content-[''] before:absolute before:top-1/2 before:-left-1
-                      before:-translate-y-1/2 before:border-4 before:border-transparent
-                      before:border-r-gray-900 dark:bg-gray-700 dark:before:border-r-gray-700"
+        px-3 py-2 text-sm font-medium text-white bg-gray-900 rounded-lg shadow-lg
+        opacity-0 invisible group-hover:opacity-100 group-hover:visible
+        transition-all duration-300 delay-500 whitespace-nowrap pointer-events-none"
         >
           {text}
         </div>
@@ -82,4 +95,4 @@ const NavItem = ({
   );
 };
 
-export default NavItem; // Exporta el componente para poder usarlo en otros archivos
+export default NavItem;

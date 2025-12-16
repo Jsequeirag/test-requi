@@ -14,8 +14,9 @@ import {
   RequestRoleFlow,
   getRequestRoleFlowName,
 } from "../../../contansts/RequestRoleFlowState";
-import { RequisitionState } from "../../../contansts/RequisitionState";
 
+import { RequestType } from "../../../contants/requestType.js";
+import { RequisitionSubtype } from "../../../contants/requisitionSubtypeType.js";
 export default function FinanceRequestItem({ request, expandedRequest }) {
   const [modalState, setModalState] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -66,7 +67,7 @@ export default function FinanceRequestItem({ request, expandedRequest }) {
   const handleDetails = () => {
     if (isDisabled) return;
     navigate("/infoNewRequisition", {
-      state: { requisition: request, action: "update" },
+      state: { requisition: request, action: "update", role: Role.Finanzas },
     });
   };
 
@@ -173,19 +174,28 @@ export default function FinanceRequestItem({ request, expandedRequest }) {
 
         <div className="flex gap-2 justify-end">
           {/* BOTÓN EN ESPERA */}
-          {canHold && (
-            <button
-              onClick={handleHold}
-              className={`
-                flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
-                transition-all active:scale-95
-                bg-yellow-50 text-yellow-700 border-yellow-300 
-                hover:bg-yellow-100 hover:border-yellow-400
-              `}
-            >
-              <FontAwesomeIcon icon={faPause} />
-              En Espera
-            </button>
+          {(request.RequestTypeId === RequestType.Promocion ||
+            request.requisitionSubtypeId ===
+              RequisitionSubtype.ConcursoExterno3 ||
+            request.requisitionSubtypeId ===
+              RequisitionSubtype.ConcursoExterno8 ||
+            request.RequestTypeId === RequestType.MovimientoLateral) && (
+            <>
+              {canHold && (
+                <button
+                  onClick={handleHold}
+                  className="
+          flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
+          transition-all active:scale-95
+          bg-yellow-50 text-yellow-700 border-yellow-300 
+          hover:bg-yellow-100 hover:border-yellow-400
+        "
+                >
+                  <FontAwesomeIcon icon={faPause} />
+                  En Espera
+                </button>
+              )}
+            </>
           )}
 
           {/* APROBAR */}

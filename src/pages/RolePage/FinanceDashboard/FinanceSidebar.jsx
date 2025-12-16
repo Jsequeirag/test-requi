@@ -96,15 +96,19 @@ const PaginationSettings = ({
 };
 
 // -----------------------------------------------------------------------------
-// FINANCESIDEBAR PRINCIPAL
+// payrollSIDEBAR PRINCIPAL
 // -----------------------------------------------------------------------------
-export default function FinanceSidebar({
+export default function payrollSidebar({
   onParentSelect,
   setChildRequestsData,
 }) {
-  // Paginación
-  const [currentPage, setCurrentPage] = useState(1);
+  // =============================
+  // 1️⃣  PAGINACIÓN INICIAL DESDE LOCALSTORAGE
+  // =============================
+  const savedPage = Number(localStorage.getItem("payroll_selected_page"));
+  const [currentPage, setCurrentPage] = useState(savedPage || 1);
   const [pageSize, setPageSize] = useState(5);
+
   const [settingsExpanded, setSettingsExpanded] = useState(false);
 
   // ======== FILTROS ========
@@ -118,14 +122,14 @@ export default function FinanceSidebar({
 
   const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
-  // API call (ROLE: FINANCE = 5)
+  // API call
   const {
     data: requestData,
     isFetching,
     refetch,
     isSuccess,
   } = useApiGet(
-    ["FinanceSidebarData", currentPage, pageSize],
+    ["payrollSidebarData", currentPage, pageSize],
     () => getRequestsFromRequestRoleFlow(5, currentPage, pageSize),
     {
       refetchOnWindowFocus: false,
@@ -136,7 +140,17 @@ export default function FinanceSidebar({
   const [selectedParentId, setSelectedParentId] = useState(null);
   const [showRequests, setShowRequests] = useState(false);
 
-  // Animación en la entrada de elementos
+  // =============================
+  // 2️⃣  CARGAR ID SELECCIONADO DESDE LOCALSTORAGE
+  // =============================
+  useEffect(() => {
+    const savedId = localStorage.getItem("payroll_selected_parent");
+    if (savedId) {
+      setSelectedParentId(Number(savedId));
+    }
+  }, []);
+
+  // Animación
   useEffect(() => {
     if (isSuccess && !isFetching && requestData) {
       const t = setTimeout(() => setShowRequests(true), 50);
@@ -144,57 +158,68 @@ export default function FinanceSidebar({
     } else setShowRequests(false);
   }, [isSuccess, isFetching, requestData]);
 
+  // =============================
+  // 3️⃣  AUTO-SELECCIÓN CUANDO LA DATA LLEGUE
+  // =============================
+  useEffect(() => {
+    if (!requestData?.data) return;
+
+    const savedId = Number(localStorage.getItem("payroll_selected_parent"));
+    if (!savedId) return;
+
+    const found = requestData.data.find((p) => p.id === savedId);
+    if (!found) return;
+
+    setSelectedParentId(savedId);
+    setChildRequestsData(found.requisitions);
+    onParentSelect(savedId);
+  }, [requestData]);
+
   const handleRefresh = async () => {
     await refetch();
+    clearSelection();
+  };
+
+  // =============================
+  // 🔥 Fun auxiliar para limpiar selección
+  // =============================
+  const clearSelection = () => {
     setSelectedParentId(null);
     setChildRequestsData([]);
+    onParentSelect(null);
+    localStorage.removeItem("payroll_selected_parent");
+    localStorage.removeItem("payroll_selected_page");
   };
 
   const handlePageChange = (n) => {
     setCurrentPage(n);
-    setSelectedParentId(null);
-    setChildRequestsData([]);
+    clearSelection();
   };
 
   const handlePageSizeChange = (n) => {
     setPageSize(n);
     setCurrentPage(1);
-    setSelectedParentId(null);
-    setChildRequestsData([]);
+    clearSelection();
   };
 
   const totalPages = requestData
     ? Math.ceil(requestData.totalRecords / requestData.pageSize)
     : 0;
 
-  // -------------------------------------------------------------------------
-  // FILTRADO REAL DE LA DATA
-  // -------------------------------------------------------------------------
+  // FILTROS
   const filteredRequests =
     requestData?.data?.filter((parent) => {
-      // ---------------------------------------
-      // FILTRO 1: ID de solicitud (displayId o id)
-      // ---------------------------------------
       const requestIdMatch = filters.requestId
         ? parent.displayId?.toString() === filters.requestId ||
           parent.id?.toString() === filters.requestId
         : true;
 
-      // ---------------------------------------
-      // FILTRO 2: ID de requisición interna
-      // ---------------------------------------
       const requisitionIdMatch = filters.requestId
         ? parent.requisitions?.some(
             (req) => req.id?.toString() === filters.requestId
           )
         : true;
 
-      // Solicitud coincide si coincide por solicitud o por requisición
-      const requestOrRequisitionMatch = requestIdMatch || requisitionIdMatch;
-
-      // ---------------------------------------
-      // FILTRO 3: Líder (por nombre o por ID)
-      // ---------------------------------------
       const leaderMatch = filters.leader
         ? parent.user?.id?.toString() === filters.leader ||
           parent.user?.name
@@ -202,9 +227,6 @@ export default function FinanceSidebar({
             .includes(filters.leader.toLowerCase())
         : true;
 
-      // ---------------------------------------
-      // FILTRO 4: Rango de fechas
-      // ---------------------------------------
       const createdDate = new Date(parent.createdDate);
 
       const startMatch = filters.startDate
@@ -215,11 +237,14 @@ export default function FinanceSidebar({
         ? createdDate <= new Date(filters.endDate)
         : true;
 
-      // ---------------------------------------
-      // Resultado final
-      // ---------------------------------------
-      return requestOrRequisitionMatch && leaderMatch && startMatch && endMatch;
+      return (
+        (requestIdMatch || requisitionIdMatch) &&
+        leaderMatch &&
+        startMatch &&
+        endMatch
+      );
     }) || [];
+
   // -------------------------------------------------------------------------
   // RENDER
   // -------------------------------------------------------------------------
@@ -238,7 +263,7 @@ export default function FinanceSidebar({
         </button>
       </div>
 
-      {/* ---------------- FILTROS DESPLEGABLE ---------------- */}
+      {/* FILTROS */}
       <div className="mb-4 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-white/40 dark:bg-gray-800/40">
         <button
           onClick={() => setFiltersExpanded(!filtersExpanded)}
@@ -257,7 +282,6 @@ export default function FinanceSidebar({
           />
         </button>
 
-        {/* Contenido del Filtro */}
         <div
           className={`transition-all duration-300 overflow-hidden ${
             filtersExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
@@ -325,7 +349,7 @@ export default function FinanceSidebar({
         </div>
       </div>
 
-      {/* ---------------- LISTA ---------------- */}
+      {/* LISTA */}
       <nav className="flex-1 overflow-y-auto">
         <ul>
           {isFetching ? (
@@ -343,9 +367,20 @@ export default function FinanceSidebar({
               >
                 <div
                   onClick={() => {
+                    // Deselección
+                    if (selectedParentId === parent.id) {
+                      clearSelection();
+                      return;
+                    }
+
+                    // Selección normal
                     setSelectedParentId(parent.id);
-                    onParentSelect(parent.id);
                     setChildRequestsData(parent.requisitions);
+                    onParentSelect(parent.id);
+
+                    // Guardar en localStorage
+                    localStorage.setItem("payroll_selected_parent", parent.id);
+                    localStorage.setItem("payroll_selected_page", currentPage);
                   }}
                   className={`relative flex items-center justify-between py-3 px-4 rounded-lg cursor-pointer ${
                     selectedParentId === parent.id
@@ -387,7 +422,7 @@ export default function FinanceSidebar({
         </ul>
       </nav>
 
-      {/* ---------------- PAGINACIÓN ---------------- */}
+      {/* Paginación */}
       <div className="mt-4">
         <SidebarPagination
           currentPage={currentPage}

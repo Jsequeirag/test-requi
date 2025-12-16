@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react"; // `React` y `useReducer` no son necesarios si no se usan directamente
 import formStore from "../../../../stores/FormStore";
+import { useLocation } from "react-router-dom";
 import { useApiGet } from "../../../api/config/customHooks";
 import { getEmployeeById } from "../../../api/urls/Employee";
 import { formatIsoDateToYYYYMMDD } from "../../../utils/dateFormat.js";
@@ -8,17 +9,18 @@ import { Info } from "lucide-react"; // Importa el icono Info
 import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx"; // Asegúrate de que el nombre sea correcto
 import { RequestType } from "../../../contants/requestType.js";
 import websiteConfigStore from "../../../../stores/WebsiteConfig";
+
 export default function EmployeeInfo() {
   const language = websiteConfigStore((s) => s.language);
   const formValues = formStore((state) => state.formValues);
   const employeeSelected = formStore((state) => state.employeeSelected);
   const setEmployeeSelected = formStore((state) => state.setEmployeeSelected);
-
+  const location = useLocation();
   const employeeId = getLocalStorageKeyValue(
     "requitool-employeeInfo",
     "employeeId"
   );
-
+  //  alert(location.state.role);
   const { data: employeeData, isLoading } = useApiGet(
     ["employeeById", formValues?.employeeId],
     () => getEmployeeById(formValues?.employeeId),
@@ -57,20 +59,15 @@ export default function EmployeeInfo() {
             htmlFor="employeeId"
           >
             {language === "es" ? "Nombre" : "Full Name"}
-            <span className="text-red-500 font-bold">
-              {/*Si es promocion no se debe mostrar el */}
-              {formValues?.requestTypeId === RequestType.Promocion ? "" : "*"}
-            </span>
+            <span className="text-red-500 font-bold">*</span>
           </label>
           <AsyncSelect
             url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesByDepartmentAndBoss/${employeeId}`}
             name={"employeeId"}
             customNameParam="nombre"
             //para promocion no debe ser obligatorio
-            required={
-              formValues?.requestTypeId === RequestType.Promocion ? false : true
-            }
-            value={formValues?.employeeId || ""}
+            required
+            value={formValues?.employeeId || null}
             className="w-full text-base"
           />
           {/*si es promocion no activarlo*/}

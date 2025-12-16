@@ -7,6 +7,7 @@ import { getLocalStorageKeyValue } from "../../../utils/localstore";
 import { Info } from "lucide-react"; // Importa el icono Info
 import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx"; // Asegúrate de que el nombre sea correcto
 import { RequestType } from "../../../contants/requestType.js";
+import { FeatureType } from "../../../contants/featureType.js";
 import websiteConfigStore from "../../../../stores/WebsiteConfig";
 export default function EmployeeInfo() {
   const language = websiteConfigStore((s) => s.language);
@@ -59,7 +60,11 @@ export default function EmployeeInfo() {
             {language === "es" ? "Nombre" : "Full Name"}
             <span className="text-red-500 font-bold">
               {/*Si es promocion no se debe mostrar el */}
-              {formValues?.requestTypeId === RequestType.Promocion ? "" : "*"}
+              {formValues?.recruitmentProccess !==
+                FeatureType.ConcursoInterno2 &&
+              formValues?.recruitmentProccess !== FeatureType.ConcursoInterno3
+                ? "*"
+                : ""}
             </span>
           </label>
           <AsyncSelect
@@ -68,7 +73,14 @@ export default function EmployeeInfo() {
             customNameParam="nombre"
             //para promocion no debe ser obligatorio
             required={
-              formValues?.requestTypeId === RequestType.Promocion ? false : true
+              formValues?.recruitmentProccess !==
+                FeatureType.ConcursoInterno2 &&
+              formValues?.recruitmentProccess !== FeatureType.ConcursoInterno3
+            }
+            disabled={
+              formValues?.recruitmentProccess ===
+                FeatureType.ConcursoInterno2 ||
+              formValues?.recruitmentProccess === FeatureType.ConcursoInterno3
             }
             value={formValues?.employeeId || ""}
             className="w-full text-base"

@@ -3,17 +3,14 @@ import Layout from "../../components/Layout/Layout.jsx";
 import { useLocation } from "react-router-dom";
 import TextButton from "../../components/Button/TextButton.jsx";
 import { initialState, reducer } from "./Reducer.jsx";
-import {
-  createRequests,
-  updateRequisitionDetail,
-  draftRequest,
-} from "../../api/urls/Request.js";
+import { updateRequisitionDetail } from "../../api/urls/Request.js";
 import { GetRequisitionById } from "../../api/urls/Requisition.js";
 import AsyncSelect from "../../components/AsyncComponents/AsyncSelect.jsx";
 import formStore from "../../../stores/FormStore.js";
 import LoadingModal from "../../components/LoadingModal/LoadingModal.jsx";
 import { useNavigate } from "react-router-dom";
 import { getLocalStorageKeyValue } from "../../utils/localstore.js";
+import LoadingStore from "../../../stores/loadingStore.js";
 import {
   ChevronLeft,
   Info,
@@ -40,13 +37,14 @@ import {
 import EmployeeInfo from "./EmployeeInfo/EmployeeInfo.jsx";
 import ModalRequisitionDetails from "../../components/ModalRequisitionDetails/ModalRequisitionDetails.jsx";
 import { useApiSend } from "../../api/config/customHooks.js";
-import { toast } from "react-toastify";
 import { getEmployeesbyBoss } from "../../api/urls/Employee.js";
 import { useApiGet } from "../../api/config/customHooks.js";
 import { RequestType } from "../../contants/requestType.js";
 import { RequisitionType } from "../../contants/requisitionType.js";
 import websiteConfigStore from "../../../stores/WebsiteConfig.js";
+import { RequisitionSubtype } from "../../contants/requisitionSubtypeType.js";
 function InfoNewRequisition() {
+  const loadingStore = LoadingStore();
   const language = websiteConfigStore((s) => s.language);
   const navigate = useNavigate();
   const location = useLocation();
@@ -55,49 +53,6 @@ function InfoNewRequisition() {
   const [state, dispatcher] = useReducer(reducer, initialState);
   const userLogged = getLocalStorageKeyValue("requitool-employeeInfo", "id");
 
-  //draft
-  const { mutateAsync: draftRequisition, isPending: isPendingDraftRequest } =
-    useApiSend(
-      draftRequest,
-      () => {
-        toast.success("Solicitud guardada exitosamente!", {
-          className: "bg-green-600 text-white",
-          progressClassName: "bg-white",
-        });
-        navigate("/requisitions");
-      },
-      (e) => {
-        console.error("Error al crear la solicitud:", e);
-        toast.error("Error al crear la solicitud", {
-          className: "bg-red-600 text-white",
-          progressClassName: "bg-white",
-        });
-      }
-    );
-  //crear
-  const {
-    mutateAsync: createRequisition,
-    isPending: isPendingCreateRequisition,
-  } = useApiSend(
-    createRequests,
-    () => {
-      toast.success("Solicitud creada exitosamente!", {
-        className: "bg-green-600 text-white",
-        progressClassName: "bg-white",
-      });
-      navigate("/requisitions", {
-        replace: true,
-        state: { refresh: Date.now() },
-      }); // <--- CAMBIO AQUÍ
-    },
-    (e) => {
-      console.error("Error al crear la solicitud:", e);
-      toast.error("Error al crear la solicitud", {
-        className: "bg-red-600 text-white",
-        progressClassName: "bg-white",
-      });
-    }
-  );
   const { data: employeesData, isFetched: isFetchedEmployeesByBoss } =
     useApiGet(
       ["employeesByBoss", formValues?.employeeId],
@@ -111,7 +66,14 @@ function InfoNewRequisition() {
         },
       }
     );
-  const { data: requisitionData, isFetched: isFetchedRequisition } = useApiGet(
+
+  const {
+    data: requisitionData,
+    isFetched: isFetchedRequisition,
+    isSuccess: isSuccessRequisition,
+    error: isErrorRequisition,
+    isPending: isPendingRequisition,
+  } = useApiGet(
     ["requisitionById", location.state.requisition.id],
     () => GetRequisitionById(location.state.requisition.id),
     {
@@ -123,55 +85,19 @@ function InfoNewRequisition() {
       },
     }
   );
+
   const {
     mutateAsync: updateRequisition,
     isPending: isPendingUpdateRequisition,
-  } = useApiSend(
-    updateRequisitionDetail,
-    () => {
-      toast.success("Solicitud actualizada exitosamente!", {
-        className: "bg-green-600 text-white",
-        progressClassName: "bg-white",
-      });
-      navigate(-1); // <--- CAMBIO AQUÍ
-    },
-    (e) => {
-      console.error("Error al actualizar la solicitud:", e);
-      toast.error("Error al actualizar la solicitud", {
-        className: "bg-red-600 text-white",
-        progressClassName: "bg-white",
-      });
-    }
-  );
+  } = useApiSend(updateRequisitionDetail);
 
   useEffect(() => {
     if (isFetchedRequisition && requisitionData) {
       setFormValues(requisitionData);
       console.log("✅ Requisition loaded:", requisitionData);
+      console.log("✅ Workflow loaded:", location.state.workFlow);
     }
   }, [isFetchedRequisition, requisitionData?.requisitions, setFormValues]);
-
-  const onSubmitDraftRequest = async () => {
-    await draftRequisition({
-      ...formValues,
-      userId: userLogged,
-    });
-  };
-
-  const onSubmitEntradaRequest = async () => {
-    if (location.state?.action === "create") {
-      await createRequisition({
-        ...formValues,
-        userId: userLogged,
-      });
-    }
-    if (location.state?.action === "update") {
-      await updateRequisition({
-        ...formValues,
-        userId: userLogged,
-      });
-    }
-  };
 
   const switchRDetail = (requestTypeId) => {
     switch (requestTypeId) {
@@ -190,52 +116,33 @@ function InfoNewRequisition() {
     }
   };
 
-  const createNewRequest = async () => {
-    if (
-      formValues?.requestTypeId === RequestType.Entrada ||
-      formValues?.requestTypeId === RequestType.CierreDePlaza
-    ) {
-      return onSubmitEntradaRequest();
-    }
-
-    // si es SALIDA se crea directamente o abre el modal si el empleado tiene gente a cargo
-    if (formValues?.requestTypeId === RequestType.Salida) {
-      if (employeesData.length > 0) {
-        return dispatcher({ type: "SET_OPEN_MODAL" });
-      }
-      return await createRequisition({
-        ...formValues,
-        userId: userLogged,
-      });
-    }
-  };
-
-  const updateRequest = async () => {
-    if (
-      formValues?.requestTypeId === RequestType.Entrada ||
-      formValues?.requestTypeId === RequestType.CierreDePlaza
-    ) {
-      return onSubmitEntradaRequest();
-    }
-
+  const onSubmit = async (e) => {
+    e.preventDefault();
     // si tiene gente a cargo abre el modal
+
+    if (formValues?.requestTypeId === RequestType.Entrada) {
+      await updateRequisition({
+        data: {
+          ...formValues,
+          userId: userLogged,
+        },
+        requestRoleFlowDTO: location.state.workFlow,
+      });
+      navigate(-1);
+    }
+
     if (employeesData.length > 0) {
       return dispatcher({ type: "SET_OPEN_MODAL" });
     } else {
       // si no crea la solicitud
       await updateRequisition({
-        ...formValues,
-        userId: userLogged,
+        data: {
+          ...formValues,
+          userId: userLogged,
+        },
+        requestRoleFlowDTO: location.state.workFlow,
       });
-    }
-  };
-  const onSubmit = (e) => {
-    e.preventDefault();
-
-    if (location.state?.action === "update") {
-      updateRequest();
-    } else if (location.state?.action === "create") {
-      createNewRequest();
+      navigate(-1);
     }
   };
 
@@ -256,6 +163,27 @@ function InfoNewRequisition() {
     }
   };
 
+  useEffect(() => {
+    // Loading state
+    loadingStore.setLoading(isPendingRequisition);
+    loadingStore.setMessage("Cargando requisición...");
+
+    if (requisitionData) {
+      loadingStore.setLoading(false);
+    }
+
+    if (isErrorRequisition) {
+      loadingStore.setMessage("Error cargando requisiciones");
+      loadingStore.setLoading(false);
+    }
+  }, [
+    location.pathname,
+    requisitionData,
+    isSuccessRequisition,
+    isPendingRequisition,
+    isErrorRequisition,
+  ]);
+
   return (
     <Layout>
       <ModalRequisitionDetails
@@ -265,11 +193,7 @@ function InfoNewRequisition() {
       />
 
       <LoadingModal
-        openModal={
-          isPendingCreateRequisition ||
-          isPendingUpdateRequisition ||
-          isPendingDraftRequest
-        }
+        openModal={isPendingUpdateRequisition}
         text={
           location.state?.action === "update"
             ? "Actualizando solicitud..."
@@ -281,15 +205,13 @@ function InfoNewRequisition() {
       <div className="w-full  mx-auto p-4 sm:p-6 lg:p-8   text-gray-900 dark:text-gray-100 ">
         {/* Cabecera de la página */}
         <div className="flex items-center justify-between mb-6">
-          <div
-            onClick={() => navigate(-1)}
-            className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group cursor-pointer"
-          >
+          <div className="flex items-center text-gray-600 hover:text-blue-600 dark:text-gray-400 dark:hover:text-blue-400 transition-colors group cursor-pointer">
             <ChevronLeft className="w-5 h-5 mr-1 group-hover:-translate-x-0.5 transition-transform" />
 
             <TextButton
               text={language === "es" ? "Atrás" : "Back"}
               className="p-0 text-lg font-medium"
+              onClick={() => navigate(-1)}
             />
           </div>
           <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">
@@ -346,6 +268,7 @@ function InfoNewRequisition() {
                             [e.target.name]: e.target.value,
                           })
                         }
+                        disabled
                       >
                         <option selected disabled value=""></option>
                         <option value="true">
@@ -373,7 +296,7 @@ function InfoNewRequisition() {
                         name={"requestTypeId"}
                         value={formValues?.requestTypeId || ""}
                         customNameParam={language === "es" ? "name" : "nameEn"}
-                        disabled={formValues?.requiresReplacement?.length === 0}
+                        disabled
                         // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
                         // de que sus estilos internos también soporten el dark mode
                         // (ej. color de fondo, texto del dropdown, etc.).
@@ -398,6 +321,7 @@ function InfoNewRequisition() {
                         name={"requestTypeId"}
                         customNameParam={language === "es" ? "name" : "nameEn"}
                         value={formValues?.requestTypeId || ""}
+                        disabled
                       />
                     )}
                     {/*Entrada* -> cuando se ocupa  obtener solo promocion y movimiento*/}
@@ -412,6 +336,7 @@ function InfoNewRequisition() {
                             // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
                             // de que sus estilos internos también soporten el dark mode
                             // (ej. color de fondo, texto del dropdown, etc.).
+                            disabled
                           />
                         ) : (
                           <AsyncSelect
@@ -421,6 +346,7 @@ function InfoNewRequisition() {
                             // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
                             // de que sus estilos internos también soporten el dark mode
                             // (ej. color de fondo, texto del dropdown, etc.).
+                            disabled
                           />
                         )}
                       </>
@@ -465,6 +391,7 @@ function InfoNewRequisition() {
                       value={formValues?.recruitmentProccess || ""} // Usamos 'value' y un fallback a ""
                       className="w-full text-base"
                       required // Añadido required si este campo debe ser obligatorio
+                      disabled
                     />
                   </div>
                 </div>
@@ -499,6 +426,7 @@ function InfoNewRequisition() {
                         } // Usamos 'value' y un fallback a ""
                         className="w-full text-base"
                         required={true} // Marcado como requerido
+                        disabled
                       />
                     </div>
 
@@ -526,6 +454,7 @@ function InfoNewRequisition() {
                           } // Usamos 'value' y un fallback a ""
                           className="w-full text-base"
                           required // Añadido required si este campo debe ser obligatorio
+                          disabled
                         />
                       </div>
                     )}
@@ -554,6 +483,7 @@ function InfoNewRequisition() {
                           }
                           className="w-full text-base"
                           required // Añadido required si este campo debe ser obligatorio
+                          disabled
                         />
                       </div>
                     )}
@@ -614,96 +544,34 @@ function InfoNewRequisition() {
             <div
               className={`w-full flex justify-end items-center border-t border-gray-200 pt-6 mt-8 dark:border-gray-700`}
             >
-              {/* Si es entrada y no está completada */}
-              {formValues?.requestTypeId === RequestType.Entrada &&
-                formValues?.state !== "Completado" && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSubmitDraftRequest();
-                    }}
-                    className={`bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl
-        transition-all duration-300 shadow-md hover:shadow-lg
-        flex items-center justify-center space-x-2
-        focus:outline-none focus:ring-4 focus:ring-blue-300/50
-        dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-600/50
-        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600 mr-2`}
-                    disabled={isPendingDraftRequest}
-                  >
-                    {!isPendingDraftRequest && (
-                      <CheckCircle className="w-5 h-5 mr-2" />
-                    )}
-                    <span>
-                      {isPendingDraftRequest
-                        ? "Guardando"
-                        : "Guardar temporalmente"}
-                    </span>
-                  </button>
-                )}
-
-              {formValues?.requestTypeId === RequestType.CierreDePlaza ||
-              formValues?.requestTypeId === RequestType.Entrada ? (
-                <>
-                  <button
-                    type="submit"
-                    className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl
-        transition-all duration-300 shadow-md hover:shadow-lg
-        flex items-center justify-center space-x-2
-        focus:outline-none focus:ring-4 focus:ring-blue-300/50
-        dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
-        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
-                  >
-                    <CheckCircle className="w-5 h-5 mr-2" />
-                    <span>
-                      {location.state?.action === "update"
-                        ? "Actualizar Solicitud"
-                        : "Crear Solicitud"}
-                    </span>
-                  </button>
-                </>
-              ) : //* Si es promoción o movimiento sin completar  */
-              (formValues.requestTypeId === RequestType.Promocion &&
-                  formValues?.state !== "Completado") ||
-                (formValues.requestTypeId === RequestType.MovimientoLateral &&
-                  formValues?.state !== "Completado") ? (
-                <>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      onSubmitDraftRequest();
-                    }}
-                    className={`bg-slate-600 hover:bg-slate-700 text-white font-semibold py-3 px-8 rounded-xl
-        transition-all duration-300 shadow-md hover:shadow-lg
-        flex items-center justify-center space-x-2
-        focus:outline-none focus:ring-4 focus:ring-blue-300/50
-        dark:bg-gray-700 dark:hover:bg-gray-800 dark:text-gray-100 dark:focus:ring-blue-600/50
-        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600 mr-2`}
-                    disabled={isPendingDraftRequest}
-                  >
-                    {!isPendingDraftRequest && (
-                      <CheckCircle className="w-5 h-5 mr-2" />
-                    )}
-                    <span>
-                      {isPendingDraftRequest
-                        ? "Guardando"
-                        : "Guardar temporalmente"}
-                    </span>
-                  </button>
-
-                  <button
-                    type="submit"
-                    className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl
-        transition-all duration-300 shadow-md hover:shadow-lg
-        flex items-center justify-center space-x-2
-        focus:outline-none focus:ring-4 focus:ring-blue-300/50
-        dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
-        disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
-                  >
-                    <CheckCircle className="w-5 h-5 mr-2" />
-                    <span> {language === "es" ? "Completar" : "Complete"}</span>
-                  </button>
-                </>
+              {/*"Resto de tipo de entrada"*/}
+              {formValues?.requestTypeId === RequestType.Entrada ? (
+                <button
+                  disabled={
+                    formValues?.requisitionSubtypeId ===
+                      RequisitionSubtype.ConcursoExterno3 ||
+                    formValues?.requisitionSubtypeId ===
+                      RequisitionSubtype.ConcursoExterno8
+                      ? false
+                      : true
+                  }
+                  type="submit"
+                  className={`bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-xl
+      transition-all duration-300 shadow-md hover:shadow-lg
+      flex items-center justify-center space-x-2
+      focus:outline-none focus:ring-4 focus:ring-blue-300/50
+      dark:bg-blue-700 dark:hover:bg-blue-800 dark:text-gray-100 dark:focus:ring-blue-600/50
+      disabled:opacity-50 disabled:cursor-not-allowed disabled:bg-gray-400 dark:disabled:bg-gray-600`}
+                >
+                  <CheckCircle className="w-5 h-5 mr-2" />
+                  <span>
+                    {location.state?.action === "update"
+                      ? "Actualizar Solicitud"
+                      : "Crear Solicitud"}
+                  </span>
+                </button>
               ) : (
+                //Resto de tipo de requisiciones
                 <button
                   disabled={!isFetchedEmployeesByBoss}
                   type="submit"

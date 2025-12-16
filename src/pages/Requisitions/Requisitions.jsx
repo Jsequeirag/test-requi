@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import { IconButton } from "../../components/Button/Button";
 import TextButton from "../../components/Button/TextButton";
 import formStore from "../../../stores/FormStore.js";
+import { getRequisitionStateName } from "../../contansts/RequisitionState";
 import {
   faPlusCircle,
   faFilter,
@@ -22,6 +23,7 @@ import { getRequestByUserId } from "../../api/urls/Request";
 import { getLocalStorageKeyValue } from "../../utils/localstore";
 import RequisitionSkn from "../../components/Skeleton/RequisitionSkn.jsx";
 import ModalContainer from "../../components/modal/ModalContainer.jsx";
+import RequisitionFilters from "./RequisitionFilters.jsx";
 // ==================== Paginación ====================
 const Pagination = ({
   currentPage,
@@ -220,7 +222,12 @@ function Requisitions() {
       refetchRequests();
     }
   }, [location.state, refetchRequests]);
+  //FILTROS
 
+  useEffect(() => {
+    setCurrentPage(1);
+    refetchRequests();
+  }, [filters]);
   // ==================== Render ====================
   return (
     <Layout>
@@ -295,66 +302,14 @@ function Requisitions() {
               <h1 className="px-9 text-3xl p-4">Lista de Requisiciones</h1>
             </div>
           </div>
-          {/* 🔍 Filtros funcionales */}
-          <div className="flex items-center space-x-3 m-4">
-            <select
-              name="state"
-              value={filters.state}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, state: e.target.value }))
-              }
-              className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              <option value="">Todos los estados</option>
-              <option value="0">En proceso</option>
-              <option value="1">Completado</option>
-            </select>
 
-            <input
-              type="text"
-              name="id"
-              placeholder="ID de solicitud"
-              value={filters.requestId}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, requestId: e.target.value }))
-              }
-              className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500 w-[150px]"
-            />
-
-            <input
-              type="datetime-local"
-              name="startDate"
-              value={filters.startDate}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, startDate: e.target.value }))
-              }
-              className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-
-            <input
-              type="datetime-local"
-              name="endDate"
-              value={filters.endDate}
-              onChange={(e) =>
-                setFilters((f) => ({ ...f, endDate: e.target.value }))
-              }
-              className="border border-gray-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-
-            {/*   <button
-              onClick={handleSearch}
-              className="flex items-center bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
-            >
-              <FontAwesomeIcon icon={faSearch} className="mr-2" /> Buscar
-            </button>
-*/}
-            <button
-              onClick={handleReset}
-              className="flex items-center bg-gray-400 hover:bg-gray-500 text-white font-semibold py-2 px-4 rounded-md transition duration-200"
-            >
-              <FontAwesomeIcon icon={faRotateLeft} className="mr-2" /> Limpiar
-            </button>
-          </div>
+          <RequisitionFilters
+            filters={filters}
+            onChange={setFilters}
+            onReset={handleReset}
+            onSearch={handleSearch}
+            showSearchButton={false} // cámbialo a true si quieres un botón Buscar
+          />
           {/* Información de paginación */}
           {requestIsSuccess && requestData && (
             <div className="flex justify-between items-center p-4 bg-gray-50 text-sm text-gray-600 rounded-md mx-4">
@@ -376,7 +331,32 @@ function Requisitions() {
                     requestData.data.map((request, index) => (
                       <div key={request.id} className="border rounded-md">
                         {/* Header de la requisición */}
-                        <div className="flex items-center bg-slate-50 p-4 rounded-md justify-between">
+                        <div className="relative flex items-center bg-slate-50 p-4 rounded-md justify-between overflow-hidden">
+                          {" "}
+                          <div
+                            className={`
+      absolute inset-0 pointer-events-none
+      ${expandedRequest === request.id ? "animate-rainbow-wave" : ""}
+    `}
+                            style={{
+                              background:
+                                expandedRequest === request.id &&
+                                `linear-gradient(90deg,
+        #fee2e2 0%,
+        #fef3c7 10%,
+        #ecfccb 20%,
+        #dbeafe 30%,
+        #e0e7ff 40%,
+        #dbeafe 50%,
+        #ecfccb 60%,
+        #fef3c7 70%,
+        #fee2e2 80%,
+        #fee2e2 100%
+      )`,
+                              backgroundSize: "300% 100%",
+                              opacity: 0.2,
+                            }}
+                          />
                           <span
                             className={`p-2 rounded-md font-semibold text-black ${
                               request.state === "Completado"
@@ -556,14 +536,14 @@ function Requisitions() {
                                       <div className="flex justify-between items-center mb-2">
                                         <p
                                           className={`text-black font-bold py-1 px-2 rounded-full text-xs ${
-                                            req.state === "Completado"
+                                            getRequisitionStateName(
+                                              req.state
+                                            ) === "Completada"
                                               ? "bg-green-400"
                                               : "bg-gray-400"
                                           }`}
                                         >
-                                          {req.state === "En Proceso"
-                                            ? "Incompleto"
-                                            : req.state}
+                                          {getRequisitionStateName(req.state)}
                                         </p>
 
                                         {/* Botón Ver Detalles */}

@@ -43,5 +43,16 @@ export const draftRequest = (data) =>
 
 export const updateRequests = (data) =>
   request({ url: "/updateRequest", method: "POST", data });
-export const updateRequisitionDetail = (data) =>
-  request({ url: "/updateRequisitionDetail", method: "POST", data });
+export const updateRequisitionDetail = ({ data, requestRoleFlowDTO }) => {
+  console.log("data:", data);
+  console.log("requestRoleFlowDTO:", requestRoleFlowDTO);
+
+  return request({
+    url: "/updateRequisitionDetail",
+    method: "POST",
+    data: {
+      data,
+      requestRoleFlowDTO,
+    },
+  });
+};

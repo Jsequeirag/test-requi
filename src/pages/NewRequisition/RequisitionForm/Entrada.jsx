@@ -117,8 +117,7 @@ export default function Entrada() {
             required // Añadido required si este campo debe ser obligatorio
             disabled={
               formValues.requisitionTypeId === RequisitionType.Temporal ||
-              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
-              formValues.requisitionTypeId === ""
+              formValues.requisitionTypeId === RequisitionType.Reemplazo
             }
           />
         </div>
@@ -203,13 +202,14 @@ export default function Entrada() {
           </label>
 
           <input
-            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base 
-                bg-white
-             text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base  text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-smdark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400 ${
+              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
+              formValues.requisitionTypeId === RequisitionType.NuevaPosicion
+                ? "bg-gray-100 cursor-not-allowed"
+                : "bg-white"
+            }`}
             id="estimatedDepartureDate"
             name="estimatedDepartureDate"
-            required
             placeholder="Fecha Estimada de Salida"
             onChange={(e) => {
               setFormValues({
@@ -224,6 +224,11 @@ export default function Entrada() {
                 : new Date().toISOString().split("T")[0]
             }
             type="date"
+            required
+            disabled={
+              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
+              formValues.requisitionTypeId === RequisitionType.NuevaPosicion
+            }
           />
         </div>
         <div>
@@ -232,10 +237,20 @@ export default function Entrada() {
             htmlFor="period"
           >
             Fecha Estimada de Regreso
-          </label>{" "}
+            {formValues?.requisitionTypeId === RequisitionType.Temporal && (
+              <span className="text-red-500"> *</span>
+            )}
+          </label>
           <input
-            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base   bg-white  text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base   text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400 ${
+                         formValues.requisitionTypeId ===
+                           RequisitionType.Reemplazo ||
+                         formValues.requisitionTypeId ===
+                           RequisitionType.NuevaPosicion
+                           ? "bg-gray-100 cursor-not-allowed"
+                           : "bg-white"
+                       }`}
             id="estimatedReturnDate"
             name="estimatedReturnDate"
             placeholder="Fecha Estimada de Regreso"
@@ -252,6 +267,10 @@ export default function Entrada() {
                 : new Date().toISOString().split("T")[0]
             }
             type="date"
+            disabled={
+              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
+              formValues.requisitionTypeId === RequisitionType.NuevaPosicion
+            }
           />
         </div>
         {/*INFORMACION DEL EMPLEADO */}
@@ -308,7 +327,6 @@ export default function Entrada() {
                     }
                   />
                 </div>
-
                 {/* Campo 2: Supervisor */}
                 <div>
                   <label
@@ -337,7 +355,6 @@ export default function Entrada() {
                     }
                   />
                 </div>
-
                 {/* Campo 3: Grado */}
                 <div>
                   <label
@@ -365,7 +382,6 @@ export default function Entrada() {
                     }
                   />
                 </div>
-
                 {/* Campo 4: Proyecto */}
                 <div>
                   <label
@@ -393,7 +409,6 @@ export default function Entrada() {
                     }
                   />
                 </div>
-
                 {/* Campo 5: Departamento */}
                 <div>
                   <label
@@ -423,7 +438,30 @@ export default function Entrada() {
                       RequisitionType.Reemplazo
                     }
                   />
-                </div>
+                </div>{" "}
+                {RequisitionSubtype.ConcursoExterno8 && (
+                  <div>
+                    <label
+                      className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
+                      htmlFor="department"
+                    >
+                      Centro de costo
+                    </label>
+                    <input
+                      className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
+                       bg-gray-100 text-gray-600 cursor-not-allowed
+                       focus:outline-none focus:ring-0 focus:border-gray-300 transition-colors shadow-sm
+                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-400"
+                      disabled
+                      id="posCod" // ID corregido
+                      type="text"
+                      name="posCod" // Name corregido
+                      value={"centro costo(implementar-nueva base de datos)"}
+                      autoComplete="off"
+                      // Se elimina onChange en inputs deshabilitados
+                    />
+                  </div>
+                )}
               </>
             ) : (
               <>
@@ -589,20 +627,18 @@ export default function Entrada() {
                 className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
                 htmlFor="fullName"
               >
-                Nombre{" "}
-                {!formValues.requisitionTypeId == RequisitionType.Reemplazo ||
-                  !formValues.requisitionTypeId === RequisitionType.Temporal ||
-                  (!formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                    !formValues.recruitmentProccess === 14 && (
-                      <>{/* <span className="text-red-500">*</span>*/}</>
-                    ))}
+                Nombre
+                {!formValues.requisitionSubtypeId === 46 && (
+                  <>
+                    <span className="text-red-500">*</span>{" "}
+                  </>
+                )}
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -626,7 +662,7 @@ export default function Entrada() {
                 disabled={
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                 }
               />
             </div>
@@ -642,7 +678,7 @@ export default function Entrada() {
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -666,7 +702,7 @@ export default function Entrada() {
                 disabled={
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                 }
               />
             </div>
@@ -682,7 +718,7 @@ export default function Entrada() {
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -702,7 +738,7 @@ export default function Entrada() {
                 disabled={
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                 }
               />
             </div>
@@ -718,7 +754,7 @@ export default function Entrada() {
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -740,7 +776,7 @@ export default function Entrada() {
                 disabled={
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                 }
               />
             </div>
@@ -756,7 +792,7 @@ export default function Entrada() {
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -778,7 +814,7 @@ export default function Entrada() {
                 disabled={
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                 }
               />
             </div>
@@ -794,7 +830,7 @@ export default function Entrada() {
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                     ? "bg-gray-100 cursor-not-allowed"
                     : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
@@ -818,7 +854,7 @@ export default function Entrada() {
                 disabled={
                   formValues.requisitionTypeId ===
                     RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
+                  formValues.requisitionSubtypeId === 46
                 }
               />
             </div>{" "}
@@ -831,10 +867,11 @@ export default function Entrada() {
               </label>
               <input
                 className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionSubtypeId ===
-                  RequisitionSubtype.ConcursoExterno3
-                    ? "bg-white"
-                    : "bg-gray-100 cursor-not-allowed"
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
+                  formValues.requisitionSubtypeId === 46
+                    ? "bg-gray-100 cursor-not-allowed"
+                    : "bg-white"
                 } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
              dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
                 id="endDate"
@@ -854,8 +891,9 @@ export default function Entrada() {
                 }
                 type="date"
                 disabled={
-                  !formValues.requisitionSubtypeId ===
-                  RequisitionSubtype.ConcursoExterno3
+                  formValues.requisitionTypeId ===
+                    RequisitionType.NuevaPosicion &&
+                  formValues.requisitionSubtypeId === 46
                 }
               />
             </div>

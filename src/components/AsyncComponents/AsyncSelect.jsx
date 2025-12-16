@@ -133,7 +133,7 @@ export default function AsyncSelect({
   // Función para filtrar las opciones basadas en el searchText
   const filteredData = data.filter((item) => {
     const itemText = customNameParam ? item[customNameParam] : item.name;
-    return itemText.toLowerCase().includes(searchText.toLowerCase());
+    return itemText.toLowerCase().includes(searchText?.toLowerCase());
   });
 
   // Manejar la selección de una opción de la lista
@@ -168,9 +168,9 @@ export default function AsyncSelect({
 
   // Manejar el borrado del input
   const handleClearInput = () => {
-    setSelectedValue("");
-    setSearchText("");
-    setFormValues({ [name]: "" });
+    setSelectedValue(null);
+    setSearchText(null);
+    setFormValues({ [name]: null });
     setIsOpen(false);
   };
 

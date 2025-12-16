@@ -30,3 +30,8 @@ export const updateStateRequestRoleFlow = (
       RoleName: RoleName,
     },
   });
+export const GetRequestsRequestRoleFlowByPendingState = () =>
+  request({
+    url: `/GetRequestsRequestRoleFlowByPendingState`,
+    method: "GET",
+  });

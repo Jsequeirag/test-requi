@@ -13,6 +13,41 @@ export const Role = Object.freeze({
   Facilities: 14,
 });
 
+// Traducción desde el nombre usado en navRoleConfig → ID de rol
+export const RoleKeyMap = {
+  supervisor: 1,
+  reclutamiento: 2,
+  finanzas: 5,
+  payroll: 6,
+  humancapital: 8,
+  superadmin: 12,
+};
+
+// Roles que pueden tener notificaciones (todos los roles definidos)
+export const NotifiableRoles = Object.values(Role);
+
+// Devuelve un objeto:
+// { roleId: { hasNotification: boolean, count: number } }
+export function getRoleNotifications(requisitions = []) {
+  const notifications = {};
+
+  // Inicializamos todos los roles con count=0
+  NotifiableRoles.forEach((roleId) => {
+    notifications[roleId] = { hasNotification: false, count: 0 };
+  });
+
+  // Contar ocurrencias por roleId
+  requisitions.forEach((req) => {
+    const roleId = req.roleId;
+
+    if (notifications[roleId]) {
+      notifications[roleId].count++;
+      notifications[roleId].hasNotification = true;
+    }
+  });
+
+  return notifications;
+}
 export const RoleName = {
   [Role.Supervisor]: "Supervisor",
   [Role.Reclutamiento]: "Reclutamiento",
@@ -27,3 +62,11 @@ export const RoleName = {
   [Role.IMAC]: "IMAC",
   [Role.Facilities]: "Facilities",
 };
+export const ActiveMenuRoles = [
+  "supervisor",
+  "reclutamiento",
+  "superadmin",
+  "finanzas",
+  "payroll",
+  "humancapital",
+];

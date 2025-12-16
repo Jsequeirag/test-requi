@@ -28,6 +28,7 @@ export default function SupervisorRequestItem({ request, expandedRequest }) {
 
   const isDisabled =
     request.workflowState === RequestRoleFlow.COMPLETED ||
+    request.workflowState === RequestRoleFlow.DENIED ||
     !request.workflowEnabled;
 
   useEffect(() => {
@@ -54,9 +55,21 @@ export default function SupervisorRequestItem({ request, expandedRequest }) {
 
   const handleDetails = () => {
     if (isDisabled) return;
-    navigate("/infoNewRequisition", {
-      state: { requisition: request, action: "update" },
-    });
+    setTimeout(() => {
+      navigate("/infoNewRequisition", {
+        state: {
+          requisition: request,
+          action: "update",
+          workFlow: {
+            Id: request.workflowId,
+            RequisitionId: request.id,
+            State: 1,
+            FullName: fullName,
+            RoleId: Role.Supervisor,
+          },
+        },
+      });
+    }, 1000);
   };
 
   return (
@@ -165,11 +178,10 @@ export default function SupervisorRequestItem({ request, expandedRequest }) {
 
         {/* Botones */}
         <div className="flex gap-2 justify-end">
-          {request?.state === RequisitionState.COMPLETED ? (
-            <>
-              <button
-                onClick={handleApprove}
-                className={`
+          <>
+            <button
+              onClick={handleApprove}
+              className={`
                   flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
                   transition-all active:scale-95
                   ${
@@ -178,14 +190,14 @@ export default function SupervisorRequestItem({ request, expandedRequest }) {
                       : "bg-white text-green-600 border-green-300 hover:bg-green-50 hover:border-green-400"
                   }
                 `}
-              >
-                <FontAwesomeIcon icon={faCheck} />
-                Aprobar
-              </button>
+            >
+              <FontAwesomeIcon icon={faCheck} />
+              Aprobar
+            </button>
 
-              <button
-                onClick={handleReject}
-                className={`
+            <button
+              onClick={handleReject}
+              className={`
                   flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
                   transition-all active:scale-95
                   ${
@@ -194,14 +206,14 @@ export default function SupervisorRequestItem({ request, expandedRequest }) {
                       : "bg-white text-red-600 border-red-300 hover:bg-red-50 hover:border-red-400"
                   }
                 `}
-              >
-                <FontAwesomeIcon icon={faXmark} />
-                Rechazar
-              </button>
+            >
+              <FontAwesomeIcon icon={faXmark} />
+              Rechazar
+            </button>
 
-              <button
-                onClick={handleDetails}
-                className={`
+            <button
+              onClick={handleDetails}
+              className={`
                   flex items-center gap-1.5 px-4 py-2 text-sm font-medium rounded-lg border 
                   transition-all active:scale-95
                   ${
@@ -210,20 +222,11 @@ export default function SupervisorRequestItem({ request, expandedRequest }) {
                       : "bg-white text-gray-700 border-gray-300 hover:bg-gray-100"
                   }
                 `}
-              >
-                Detalles
-                <FontAwesomeIcon
-                  icon={faChevronRight}
-                  className="text-xs ml-1"
-                />
-              </button>
-            </>
-          ) : (
-            <button className="flex items-center gap-1.5 px-4 py-2 text-sm font-medium bg-gray-100 text-gray-500 rounded-lg cursor-not-allowed">
-              <FontAwesomeIcon icon={faCheck} />
-              Aprobado
+            >
+              Detalles
+              <FontAwesomeIcon icon={faChevronRight} className="text-xs ml-1" />
             </button>
-          )}
+          </>
         </div>
       </div>
 

@@ -15,7 +15,7 @@ import { formatIsoDateToYYYYMMDD } from "../../../utils/dateFormat";
 // -----------------------------------------------------------------------------
 // PAGINACIÓN SIMPLE
 // -----------------------------------------------------------------------------
-const SupervisorSidebar = ({
+const SidebarPagination = ({
   currentPage,
   totalPages,
   onPageChange,
@@ -71,8 +71,8 @@ const PaginationSettings = ({
       </button>
 
       <div
-        className={`overflow-hidden transition-all duration-300 ${
-          isExpanded ? "max-h-20 opacity-100" : "max-h-0 opacity-0"
+        className={`transition-all duration-300 overflow-hidden ${
+          isExpanded ? "max-h-24 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
         <div className="px-3 pb-3">
@@ -96,18 +96,22 @@ const PaginationSettings = ({
 };
 
 // -----------------------------------------------------------------------------
-// FINANCESIDEBAR PRINCIPAL
+// SupervisorSidebar PRINCIPAL
 // -----------------------------------------------------------------------------
-export default function FinanceSidebar({
+export default function SupervisorSidebar({
   onParentSelect,
   setChildRequestsData,
 }) {
-  // PAGINACIÓN
-  const [currentPage, setCurrentPage] = useState(1);
+  // =============================
+  // 1️⃣  PAGINACIÓN INICIAL DESDE LOCALSTORAGE
+  // =============================
+  const savedPage = Number(localStorage.getItem("supervisor_selected_page"));
+  const [currentPage, setCurrentPage] = useState(savedPage || 1);
   const [pageSize, setPageSize] = useState(5);
+
   const [settingsExpanded, setSettingsExpanded] = useState(false);
 
-  // === Estados del buscador ===
+  // ======== FILTROS ========
   const [filtersExpanded, setFiltersExpanded] = useState(false);
   const [filters, setFilters] = useState({
     requestId: "",
@@ -116,16 +120,16 @@ export default function FinanceSidebar({
     endDate: "",
   });
 
-  const activeFilterCount = Object.values(filters).filter((x) => x).length;
+  const activeFilterCount = Object.values(filters).filter(Boolean).length;
 
-  // API
+  // API call
   const {
     data: requestData,
     isFetching,
     refetch,
     isSuccess,
   } = useApiGet(
-    ["GetRequestsFromRequestRoleFlowFinance", currentPage, pageSize],
+    ["SupervisorSidebarData", currentPage, pageSize],
     () => getRequestsFromRequestRoleFlow(1, currentPage, pageSize),
     {
       refetchOnWindowFocus: false,
@@ -136,71 +140,86 @@ export default function FinanceSidebar({
   const [selectedParentId, setSelectedParentId] = useState(null);
   const [showRequests, setShowRequests] = useState(false);
 
-  // Animación de entrada
+  // =============================
+  // 2️⃣  CARGAR ID SELECCIONADO DESDE LOCALSTORAGE
+  // =============================
+  useEffect(() => {
+    const savedId = localStorage.getItem("supervisor_selected_parent");
+    if (savedId) {
+      setSelectedParentId(Number(savedId));
+    }
+  }, []);
+
+  // Animación
   useEffect(() => {
     if (isSuccess && !isFetching && requestData) {
       const t = setTimeout(() => setShowRequests(true), 50);
       return () => clearTimeout(t);
-    } else {
-      setShowRequests(false);
-    }
+    } else setShowRequests(false);
   }, [isSuccess, isFetching, requestData]);
 
-  // Refresh
+  // =============================
+  // 3️⃣  AUTO-SELECCIÓN CUANDO LA DATA LLEGUE
+  // =============================
+  useEffect(() => {
+    if (!requestData?.data) return;
+
+    const savedId = Number(localStorage.getItem("supervisor_selected_parent"));
+    if (!savedId) return;
+
+    const found = requestData.data.find((p) => p.id === savedId);
+    if (!found) return;
+
+    setSelectedParentId(savedId);
+    setChildRequestsData(found.requisitions);
+    onParentSelect(savedId);
+  }, [requestData]);
+
   const handleRefresh = async () => {
     await refetch();
-    setSelectedParentId(null);
-    setChildRequestsData([]);
+    clearSelection();
   };
 
-  // Cambio de página
-  const handlePageChange = (newPage) => {
-    setCurrentPage(newPage);
+  // =============================
+  // 🔥 Fun auxiliar para limpiar selección
+  // =============================
+  const clearSelection = () => {
     setSelectedParentId(null);
     setChildRequestsData([]);
+    onParentSelect(null);
+    localStorage.removeItem("supervisor_selected_parent");
+    localStorage.removeItem("supervisor_selected_page");
   };
 
-  // Cambio de items por página
-  const handlePageSizeChange = (size) => {
-    setPageSize(size);
+  const handlePageChange = (n) => {
+    setCurrentPage(n);
+    clearSelection();
+  };
+
+  const handlePageSizeChange = (n) => {
+    setPageSize(n);
     setCurrentPage(1);
-    setSelectedParentId(null);
-    setChildRequestsData([]);
+    clearSelection();
   };
 
-  // Cálculo total de páginas
   const totalPages = requestData
     ? Math.ceil(requestData.totalRecords / requestData.pageSize)
     : 0;
 
-  // -------------------------------------------------------------------------
-  // FILTRO REAL SOBRE LOS DATOS DEL BACKEND
-  // -------------------------------------------------------------------------
+  // FILTROS
   const filteredRequests =
     requestData?.data?.filter((parent) => {
-      // ---------------------------------------
-      // FILTRO 1: ID de solicitud (displayId o id)
-      // ---------------------------------------
       const requestIdMatch = filters.requestId
         ? parent.displayId?.toString() === filters.requestId ||
           parent.id?.toString() === filters.requestId
         : true;
 
-      // ---------------------------------------
-      // FILTRO 2: ID de requisición interna
-      // ---------------------------------------
       const requisitionIdMatch = filters.requestId
         ? parent.requisitions?.some(
             (req) => req.id?.toString() === filters.requestId
           )
         : true;
 
-      // Solicitud coincide si coincide por solicitud o por requisición
-      const requestOrRequisitionMatch = requestIdMatch || requisitionIdMatch;
-
-      // ---------------------------------------
-      // FILTRO 3: Líder (por nombre o por ID)
-      // ---------------------------------------
       const leaderMatch = filters.leader
         ? parent.user?.id?.toString() === filters.leader ||
           parent.user?.name
@@ -208,9 +227,6 @@ export default function FinanceSidebar({
             .includes(filters.leader.toLowerCase())
         : true;
 
-      // ---------------------------------------
-      // FILTRO 4: Rango de fechas
-      // ---------------------------------------
       const createdDate = new Date(parent.createdDate);
 
       const startMatch = filters.startDate
@@ -221,10 +237,12 @@ export default function FinanceSidebar({
         ? createdDate <= new Date(filters.endDate)
         : true;
 
-      // ---------------------------------------
-      // Resultado final
-      // ---------------------------------------
-      return requestOrRequisitionMatch && leaderMatch && startMatch && endMatch;
+      return (
+        (requestIdMatch || requisitionIdMatch) &&
+        leaderMatch &&
+        startMatch &&
+        endMatch
+      );
     }) || [];
 
   // -------------------------------------------------------------------------
@@ -237,32 +255,30 @@ export default function FinanceSidebar({
         <h2 className="text-2xl font-bold text-gray-800 dark:text-gray-100">
           Solicitudes
         </h2>
-
         <button
           onClick={handleRefresh}
-          className="w-10 h-10 flex items-center justify-center text-gray-500 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+          className="w-10 h-10 flex items-center justify-center rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <FontAwesomeIcon icon={faSyncAlt} size="lg" />
         </button>
       </div>
 
-      {/* ---------------- FILTROS DESPLEGABLE ---------------- */}
+      {/* FILTROS */}
       <div className="mb-4 border border-gray-200 dark:border-gray-700 rounded-xl overflow-hidden bg-white/40 dark:bg-gray-800/40">
         <button
           onClick={() => setFiltersExpanded(!filtersExpanded)}
-          className="w-full flex items-center justify-between px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
+          className="flex justify-between items-center w-full px-4 py-3 text-sm font-semibold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"
         >
           <span>Filtros</span>
 
           {activeFilterCount > 0 && (
-            <span className="text-xs bg-blue-500 text-white px-2 py-0.5 rounded-full">
+            <span className="text-xs bg-blue-600 text-white px-2 py-0.5 rounded-full">
               {activeFilterCount}
             </span>
           )}
 
           <FontAwesomeIcon
             icon={filtersExpanded ? faChevronUp : faChevronDown}
-            size="sm"
           />
         </button>
 
@@ -271,7 +287,7 @@ export default function FinanceSidebar({
             filtersExpanded ? "max-h-96 opacity-100" : "max-h-0 opacity-0"
           }`}
         >
-          <div className="p-4 space-y-3">
+          <div className="p-4 flex flex-col gap-3">
             <input
               type="text"
               placeholder="ID de Solicitud/Requisición"
@@ -279,40 +295,40 @@ export default function FinanceSidebar({
               onChange={(e) =>
                 setFilters((f) => ({ ...f, requestId: e.target.value }))
               }
-              className="w-full p-2 rounded-md text-sm border bg-white dark:bg-gray-900"
+              className="p-2 text-sm border rounded-md bg-white dark:bg-gray-900"
             />
 
             <input
               type="text"
-              placeholder="Líder de equipo"
+              placeholder="Líder"
               value={filters.leader}
               onChange={(e) =>
                 setFilters((f) => ({ ...f, leader: e.target.value }))
               }
-              className="w-full p-2 rounded-md text-sm border bg-white dark:bg-gray-900"
+              className="p-2 text-sm border rounded-md bg-white dark:bg-gray-900"
             />
 
-            <div className="flex flex-col">
-              <label className="text-xs mb-1">Fecha inicio</label>
+            <div>
+              <label className="text-xs text-gray-500">Fecha inicio</label>
               <input
                 type="date"
                 value={filters.startDate}
                 onChange={(e) =>
                   setFilters((f) => ({ ...f, startDate: e.target.value }))
                 }
-                className="p-2 rounded-md text-sm border bg-white dark:bg-gray-900"
+                className="w-full p-2 text-sm border rounded-md bg-white dark:bg-gray-900"
               />
             </div>
 
-            <div className="flex flex-col">
-              <label className="text-xs mb-1">Fecha fin</label>
+            <div>
+              <label className="text-xs text-gray-500">Fecha fin</label>
               <input
                 type="date"
                 value={filters.endDate}
                 onChange={(e) =>
                   setFilters((f) => ({ ...f, endDate: e.target.value }))
                 }
-                className="p-2 rounded-md text-sm border bg-white dark:bg-gray-900"
+                className="w-full p-2 text-sm border rounded-md bg-white dark:bg-gray-900"
               />
             </div>
 
@@ -325,7 +341,7 @@ export default function FinanceSidebar({
                   endDate: "",
                 })
               }
-              className="w-full py-2 text-sm bg-gray-400 hover:bg-gray-500 text-white rounded-md"
+              className="py-2 text-sm bg-gray-400 text-white rounded-md hover:bg-gray-500"
             >
               Limpiar filtros
             </button>
@@ -343,26 +359,48 @@ export default function FinanceSidebar({
               <li
                 key={parent.id}
                 className={`mb-1 transition-all duration-300 ${
-                  showRequests ? "opacity-100" : "opacity-0"
+                  showRequests
+                    ? "opacity-100 translate-x-0"
+                    : "opacity-0 -translate-x-4"
                 }`}
                 style={{ transitionDelay: `${index * 50}ms` }}
               >
                 <div
+                  onClick={() => {
+                    // Deselección
+                    if (selectedParentId === parent.id) {
+                      clearSelection();
+                      return;
+                    }
+
+                    // Selección normal
+                    setSelectedParentId(parent.id);
+                    setChildRequestsData(parent.requisitions);
+                    onParentSelect(parent.id);
+
+                    // Guardar en localStorage
+                    localStorage.setItem(
+                      "supervisor_selected_parent",
+                      parent.id
+                    );
+                    localStorage.setItem(
+                      "supervisor_selected_page",
+                      currentPage
+                    );
+                  }}
                   className={`relative flex items-center justify-between py-3 px-4 rounded-lg cursor-pointer ${
                     selectedParentId === parent.id
-                      ? "bg-blue-500 text-white"
+                      ? "bg-blue-600 text-white"
                       : "hover:bg-gray-100 dark:hover:bg-gray-800"
                   }`}
-                  onClick={() => {
-                    setSelectedParentId(parent.id);
-                    onParentSelect(parent.id);
-                    setChildRequestsData(parent.requisitions);
-                  }}
                 >
                   <div className="flex flex-col flex-grow truncate">
-                    <span className="font-semibold text-base truncate">
-                      {parent.displayId || parent.id}
-                    </span>
+                    <div className="flex justify-between">
+                      <span className="font-semibold">
+                        {parent.displayId || parent.id}
+                      </span>
+                      <span>{parent.state}</span>
+                    </div>
                     <span className="text-xs">
                       {formatIsoDateToYYYYMMDD(parent.createdDate)}
                     </span>
@@ -377,22 +415,22 @@ export default function FinanceSidebar({
                         ? faChevronRight
                         : faChevronDown
                     }
-                    className="ml-3"
+                    className="ml-3 text-sm"
                   />
                 </div>
               </li>
             ))
           ) : (
-            <p className="text-center text-gray-500 mt-8">
+            <p className="text-center text-gray-500 dark:text-gray-400 mt-8">
               No hay solicitudes que coincidan con los filtros.
             </p>
           )}
         </ul>
       </nav>
 
-      {/* PAGINACIÓN */}
+      {/* Paginación */}
       <div className="mt-4">
-        <SupervisorSidebar
+        <SidebarPagination
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={handlePageChange}

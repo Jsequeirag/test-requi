@@ -47,6 +47,8 @@ import { getEmployeesbyBoss } from "../../api/urls/Employee.js";
 import { useApiGet } from "../../api/config/customHooks.js";
 import { RequestType } from "../../contants/requestType.js";
 import { RequisitionType } from "../../contants/requisitionType.js";
+import { FeatureType } from "../../contants/featureType.js";
+import { RequisitionState } from "../../contansts/RequisitionState.jsx";
 import websiteConfigStore from "../../../stores/WebsiteConfig";
 function NewRequisition() {
   const language = websiteConfigStore((s) => s.language);
@@ -168,6 +170,7 @@ function NewRequisition() {
       await createRequisition({
         ...formValues,
         userId: userLogged,
+        userRequisitionCreator: userLogged,
       });
     }
     if (location.state?.action === "update") {
@@ -211,6 +214,7 @@ function NewRequisition() {
       return await createRequisition({
         ...formValues,
         userId: userLogged,
+        userRequisitionCreator: userLogged,
       });
     }
   };
@@ -230,18 +234,22 @@ function NewRequisition() {
         //[]
       } else if (
         //Para PROMOTION, cuandonoescojeempleado
-        !formValues?.employeeId &&
-        formValues?.requestTypeId === RequestType.Promocion
+        (!formValues?.employeeId &&
+          formValues?.recruitmentProccess === FeatureType.ConcursoInterno2) ||
+        (!formValues?.employeeId &&
+          formValues?.recruitmentProccess === FeatureType.ConcursoInterno3)
       ) {
         await updateRequisition({
           ...formValues,
           userId: userLogged,
+          userRequisitionCreator: userLogged,
         });
       } else {
         // si no crea la solicitud
         await updateRequisition({
           ...formValues,
           userId: userLogged,
+          userRequisitionCreator: userLogged,
         });
       }
     } catch (e) {
@@ -321,7 +329,12 @@ function NewRequisition() {
         </div>
 
         {/* Contenedor principal del formulario (la "tarjeta" grande): Colores ajustados para Dark Mode */}
-        <div className=" rounded-2xl shadow-xl p-6 sm:p-8 lg:p-10  bg-white/30 dark:bg-gray-900/40  border border-gray-200   dark:border-gray-700">
+        <div
+          className={`rounded-2xl shadow-xl p-6 sm:p-8 lg:p-10  bg-white/30 dark:bg-gray-900/40  border border-gray-200   dark:border-gray-700 ${
+            formValues.state === RequisitionState.COMPLETED &&
+            "cursor-not-allowed pointer-events-none opacity-60"
+          }`}
+        >
           <form onSubmit={onSubmit}>
             {/* Sección: Tipo de Solicitud - Colores ajustados para Dark Mode */}
             <div className="group mb-8 p-6 bg-blue-50/50 rounded-xl border border-blue-100 shadow-sm dark:bg-blue-950/50 dark:border-blue-800">
@@ -543,7 +556,7 @@ function NewRequisition() {
                           value={
                             location.state?.action === "update" &&
                             location.state.hasPrevRequisition
-                              ? 55
+                              ? 51
                               : formValues?.requisitionSubtypeId || ""
                           } // Usamos 'value' y un fallback a ""
                           className="w-full text-base"
@@ -571,7 +584,7 @@ function NewRequisition() {
                           value={
                             formValues?.requisitionTypeId ===
                             RequisitionType.Temporal
-                              ? 53
+                              ? 49
                               : formValues?.requisitionSubtypeId || ""
                           }
                           className="w-full text-base"

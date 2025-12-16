@@ -9,13 +9,13 @@ import {
 import AsyncModal from "../../../components/AsyncComponents/AsyncModal";
 import { updateStateRequestRoleFlow } from "../../../api/urls/RequestRoleFlow";
 import { useNavigate } from "react-router-dom";
-import { Role } from "../../../contansts/roles";
+import { RequisitionSubtype } from "../../../contants/requisitionSubtypeType";
 import {
   RequestRoleFlow,
   getRequestRoleFlowName,
 } from "../../../contansts/RequestRoleFlowState";
-import { RequisitionState } from "../../../contansts/RequisitionState";
 
+import { Role } from "../../../contansts/roles";
 export default function RecluitmentRequestItem({ request, expandedRequest }) {
   const [modalState, setModalState] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
@@ -74,10 +74,18 @@ export default function RecluitmentRequestItem({ request, expandedRequest }) {
   const handleDetails = () => {
     if (isDisabled) return;
     navigate("/infoNewRequisition", {
-      state: { requisition: request, action: "update" },
+      state: {
+        requisition: request,
+        action: "update",
+        role: Role.Reclutamiento,
+      },
     });
   };
-
+  const isAsolion =
+    request.requisitionSubtypeId === RequisitionSubtype.ConcursoExterno8;
+  const [notifyAsolion, setNotifyAsolion] = useState(
+    request?.notifyAsolion ?? false
+  );
   return (
     <div
       className={`
@@ -181,6 +189,27 @@ export default function RecluitmentRequestItem({ request, expandedRequest }) {
 
         {/* BUTTONS */}
         <div className="flex gap-2 justify-end">
+          {isAsolion}
+          {isAsolion && (
+            <button
+              onClick={() => setNotifyAsolion((prev) => !prev)}
+              className={`
+      flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border
+      transition-all active:scale-95
+      ${
+        notifyAsolion
+          ? "bg-green-50 text-green-700 border-green-400"
+          : "bg-white text-gray-600 border-gray-300 hover:bg-gray-100"
+      }
+    `}
+            >
+              <FontAwesomeIcon
+                icon={faCheck}
+                className={notifyAsolion ? "opacity-100" : "opacity-30"}
+              />
+              Notificar a ASOLION
+            </button>
+          )}
           {/* EN ESPERA BUTTON (state=4) */}
           {canHold && (
             <button

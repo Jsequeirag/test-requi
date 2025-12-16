@@ -697,7 +697,7 @@ const Login = () => {
                 animate={{ opacity: [0, 1] }}
                 transition={{ delay: 1.4, duration: 0.6 }}
               >
-                Requitools
+                Requiflow
               </motion.h1>
               <motion.p
                 className="text-black/70 font-medium mt-1"

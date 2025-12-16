@@ -10,6 +10,7 @@ import ValidateCode from "../pages/Auth/ValidateCode";
 import UpdatePassword from "../pages/Auth/UpdatePassword";
 import NewRequisition from "../pages/NewRequisition/NewRequisition";
 import InfoNewRequisition from "../pages/InfoRequisition/InfoNewRequisition.jsx";
+
 import Requisitions from "../pages/Requisitions/Requisitions";
 import ConfigurationDashboard from "../pages/ConfigurationDashboard/ConfigurationDashboard";
 
@@ -30,57 +31,17 @@ import RecluitmentRequest from "../pages/RolePage/Recluitment/RecluitmentRequest
 
 import SupervisorRequest from "../pages/RolePage/Supervisor/SupervisorRequest.jsx";
 import Home from "../pages/Home/Home";
+
 export default [
-  {
-    path: "/",
-    element: <Navigate to="/login" replace />,
-    title: "Root",
-  },
-  {
-    path: "/home",
-    element: <Home />,
-    title: "home",
-  },
-  {
-    path: "/login",
-    element: <Login />,
-    title: "login",
-  },
-  {
-    path: "/register",
-    element: <Register />,
-    title: "Register",
-  },
-  {
-    path: "/supervisor",
-    element: <Supervisor />,
-    title: "supervisor",
-  },
-  {
-    path: "/newRequisition",
-    element: <NewRequisition />,
-    title: "newRequisition",
-  },
-  {
-    path: "/requisitions",
-    element: <Requisitions />,
-    title: "requisitions",
-  },
-  {
-    path: "/form",
-    element: <Form />,
-    title: "form",
-  },
-  {
-    path: "/rolesAdministration",
-    element: <RolesAdministration />,
-    title: "rolesAdministration",
-  },
-  {
-    path: "/validateCode",
-    element: <ValidateCode />,
-    title: "validateCode",
-  },
+  { path: "/", element: <Navigate to="/login" replace />, title: "Root" },
+
+  // HOME
+  { path: "/home", element: <Home />, title: "home" },
+
+  // AUTH
+  { path: "/login", element: <Login />, title: "login" },
+  { path: "/register", element: <Register />, title: "Register" },
+  { path: "/validateCode", element: <ValidateCode />, title: "validateCode" },
   {
     path: "/updatePassword",
     element: <UpdatePassword />,
@@ -91,11 +52,36 @@ export default [
     element: <RecoverPassword />,
     title: "recoverPassword",
   },
+
+  // SUPERVISOR
+  { path: "/supervisor", element: <Supervisor />, title: "supervisor" },
+  {
+    path: "/supervisorRequest",
+    element: <SupervisorRequest />,
+    title: "supervisorRequest",
+  },
+
+  // REQUISICIONES
+  {
+    path: "/newRequisition",
+    element: <NewRequisition />,
+    title: "newRequisition",
+  },
+  { path: "/requisitions", element: <Requisitions />, title: "requisitions" },
+  {
+    path: "/infoNewRequisition",
+    element: <InfoNewRequisition />,
+    title: "infoNewRequisition",
+  },
+
+  // SUPERADMIN
   {
     path: "/configurationDashboard",
     element: <ConfigurationDashboard />,
     title: "configurationDashboard",
   },
+
+  // FINANZAS
   {
     path: "/finance",
     element: <FinanceDashboard />,
@@ -107,17 +93,11 @@ export default [
     title: "financeRequests",
   },
 
-  {
-    path: "/humanCapitalDashboard",
-    element: <RRHHDashboard />,
-    title: "hr",
-  },
-  {
-    path: "/rrhhRequests",
-    element: <RRHHRequest />,
-    title: "rrhhRequests",
-  },
+  // HUMAN CAPITAL (RRHH)
+  { path: "/humanCapital", element: <RRHHDashboard />, title: "hr" },
+  { path: "/rrhhRequests", element: <RRHHRequest />, title: "rrhhRequests" },
 
+  // RECLUTAMIENTO
   {
     path: "/recruitment",
     element: <RecluitmentDashboard />,
@@ -129,39 +109,30 @@ export default [
     title: "recruitmentRequests",
   },
 
+  // PAYROLL
   {
-    path: "/departmentMaintenance",
-    element: <DepartmentMaintenance />,
-    title: "departmentMaintenance",
-  },
-  {
-    path: "/payRoll",
+    path: "/payroll",
     element: <PayrollDashboard />,
-    title: "payRoll",
-  },
-  {
-    path: "/departmentAdministration",
-    element: <DepartmentAdministration />,
-    title: "departmentAdministration",
+    title: "payrollDashboard",
   },
   {
     path: "/payrollRequests",
     element: <PayrollRequest />,
     title: "payrollRequests",
   },
+
+  // DEPARTMENT MANAGEMENT
   {
-    path: "/supervisorRequest",
-    element: <SupervisorRequest />,
-    title: "supervisorRequest",
+    path: "/departmentMaintenance",
+    element: <DepartmentMaintenance />,
+    title: "departmentMaintenance",
   },
   {
-    path: "/infoNewRequisition",
-    element: <InfoNewRequisition />,
-    title: "infoNewRequisition",
+    path: "/departmentAdministration",
+    element: <DepartmentAdministration />,
+    title: "departmentAdministration",
   },
-  {
-    path: "*",
-    element: <Navigate to="/login" replace />,
-    title: "Not Found",
-  },
+
+  // NOT FOUND
+  { path: "*", element: <Navigate to="/login" replace />, title: "Not Found" },
 ];

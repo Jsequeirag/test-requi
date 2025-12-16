@@ -8,7 +8,13 @@ import { Info } from "lucide-react"; // Importa el icono Info
 import { getEmployeeById } from "../../../api/urls/Employee";
 import { useApiGet } from "../../../api/config/customHooks";
 import { useLocation } from "react-router-dom";
-import { RequisitionType } from "../../../contants/requisitionType.js";
+import { RequisitionType } from "../../../contants/requisitionType";
+import { RequisitionSubtype } from "../../../contants/requisitionSubtypeType";
+import {
+  EMPLOYEE_MATRIX_CE3,
+  EMPLOYEE_MATRIX_CE8,
+} from "../../../contants/matrizAvalableFieldInfoRequisition.js";
+//para validar las entradas
 
 export default function InfoEntrada() {
   const location = useLocation();
@@ -40,6 +46,23 @@ export default function InfoEntrada() {
       setEmployeeSelected({});
     }
   }, [formValues?.employeeId, employeeData, setEmployeeSelected]); // Añadir employeeData y setEmployeeSelected a las dependencias
+  const role = location.state?.role;
+
+  const isNuevaPosicion =
+    formValues.requisitionTypeId === RequisitionType.NuevaPosicion;
+  const EMPLOYEE_MATRICES_BY_SUBTYPE = {
+    [RequisitionSubtype.ConcursoExterno3]: EMPLOYEE_MATRIX_CE3,
+    [RequisitionSubtype.ConcursoExterno8]: EMPLOYEE_MATRIX_CE8,
+  };
+
+  const canEditEmployeeField = (field) => {
+    if (!isNuevaPosicion) return true;
+    const matrix =
+      EMPLOYEE_MATRICES_BY_SUBTYPE[formValues.requisitionSubtypeId];
+    if (!matrix) return true; // fallback
+    return !!matrix[field]?.[role];
+  };
+
   return (
     <>
       <h1 className="text-2xl font-semibold text-gray-800 mb-6 dark:text-gray-200">
@@ -60,13 +83,8 @@ export default function InfoEntrada() {
             )}
           </label>
           <select
-            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-    ${
-      formValues.requisitionTypeId === RequisitionType.NuevaPosicion ||
-      formValues.requisitionTypeId === RequisitionType.Reemplazo
-        ? "bg-gray-100 cursor-not-allowed"
-        : "bg-white"
-    } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base bg-gray-100 cursor-not-allowed 
+       text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
     dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             id="temporaryMonth"
             name="temporaryMonth"
@@ -76,10 +94,7 @@ export default function InfoEntrada() {
               });
             }}
             required
-            disabled={
-              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
-              formValues.requisitionTypeId === RequisitionType.NuevaPosicion
-            }
+            disabled
           >
             <option selected value="" disabled>
               Selecciona un periodo
@@ -105,7 +120,6 @@ export default function InfoEntrada() {
             htmlFor="motivo" // ID corregido y único
           >
             Origen de la Contratación
-            <span className="text-red-500">*</span>{" "}
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
@@ -115,11 +129,7 @@ export default function InfoEntrada() {
             value={formValues?.process || ""} // Usamos 'value' y un fallback a ""
             className="w-full text-base"
             required // Añadido required si este campo debe ser obligatorio
-            disabled={
-              formValues.requisitionTypeId === RequisitionType.Temporal ||
-              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
-              formValues.requisitionTypeId === ""
-            }
+            disabled
           />
         </div>
         <div>
@@ -127,30 +137,14 @@ export default function InfoEntrada() {
             className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
             htmlFor="tForm" // ID único y corregido
           >
-            TForm <span className="text-red-500">*</span>
+            TForm
           </label>
           <input
-            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                      ${
-                        formValues.process !== 21 ||
-                        formValues.requisitionTypeId ===
-                          RequisitionType.Temporal ||
-                        formValues.requisitionTypeId ===
-                          RequisitionType.Reemplazo ||
-                        formValues.requisitionTypeId === ""
-                          ? "bg-gray-100 cursor-not-allowed"
-                          : "bg-white"
-                      } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-basebg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             id="tForm" // ID único y corregido
             name="tForm"
             placeholder="TForm"
-            disabled={
-              formValues.process !== 21 ||
-              formValues.requisitionTypeId === RequisitionType.Temporal ||
-              formValues.requisitionTypeId === RequisitionType.Reemplazo ||
-              formValues.requisitionTypeId === ""
-            }
+            disabled
             onChange={(e) => {
               formValues.requisitionTypeId === RequisitionType.NuevaPosicion &&
                 setFormValues({
@@ -173,9 +167,6 @@ export default function InfoEntrada() {
             htmlFor="period"
           >
             Tipo de Temporalidad
-            {formValues?.requisitionTypeId === RequisitionType.Temporal && (
-              <span className="text-red-500"> *</span>
-            )}
           </label>
 
           <AsyncSelect
@@ -197,16 +188,10 @@ export default function InfoEntrada() {
             htmlFor="period"
           >
             Fecha Estimada de Salida
-            {formValues?.requisitionTypeId === RequisitionType.Temporal && (
-              <span className="text-red-500"> *</span>
-            )}
           </label>
 
           <input
-            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base 
-                bg-white
-             text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-basebg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             id="estimatedDepartureDate"
             name="estimatedDepartureDate"
             required
@@ -224,6 +209,7 @@ export default function InfoEntrada() {
                 : new Date().toISOString().split("T")[0]
             }
             type="date"
+            disabled
           />
         </div>
         <div>
@@ -234,8 +220,7 @@ export default function InfoEntrada() {
             Fecha Estimada de Regreso
           </label>{" "}
           <input
-            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base   bg-white  text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
+            className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-basebg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             id="estimatedReturnDate"
             name="estimatedReturnDate"
             placeholder="Fecha Estimada de Regreso"
@@ -252,606 +237,369 @@ export default function InfoEntrada() {
                 : new Date().toISOString().split("T")[0]
             }
             type="date"
+            disabled
           />
         </div>
         {/*INFORMACION DEL EMPLEADO */}
-        <div className={`col-span-3`}>
-          <h1 className="text-2xl font-semibold text-gray-800  dark:text-gray-200">
-            Informacion de Empleado
+        <div className="col-span-3">
+          <h1 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">
+            Información de Empleado
           </h1>
-          {formValues.requisitionTypeId === RequisitionType.Reemplazo && (
-            <h1 className="mt-2 text-lg font-semibold">
-              Empleado de la requisición anterior
-            </h1>
-          )}
-          {/* Campo 1: Código de Posición */}{" "}
-          <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-6 ">
-            {formValues.requisitionTypeId !== RequisitionType.Reemplazo ? (
-              <>
-                <div className="">
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="positionCode"
-                  >
+
+          <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-6">
+            {/* Código de Posición */}
+            {(() => {
+              const canEdit = canEditEmployeeField("positionCode");
+              return (
+                <div>
+                  <label className="block text-sm font-semibold mb-2">
                     Código de Posición{" "}
-                    {(formValues?.requisitionTypeId ===
-                      RequisitionType.NuevaPosicion ||
-                      formValues?.requisitionTypeId ===
-                        RequisitionType.Temporal) && (
-                      <span className="text-red-500">*</span>
-                    )}
+                    {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <input
-                    className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-            ${
-              formValues.requisitionTypeId === RequisitionType.Reemplazo
-                ? "bg-gray-100 cursor-not-allowed"
-                : "bg-white"
-            } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-           dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                    id="positionCode"
                     name="positionCode"
-                    placeholder="Código de Posición"
-                    onChange={(e) => {
+                    value={formValues.positionCode || ""}
+                    disabled={!canEdit}
+                    required={canEdit}
+                    className={`border rounded-lg w-full py-2.5 px-4 ${
+                      !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                    }`}
+                    onChange={(e) =>
+                      canEdit &&
                       setFormValues({
                         ...formValues,
-                        [e.target.name]: e.target.value,
-                      });
-                    }}
-                    autoComplete="off"
-                    value={formValues.positionCode || ""}
-                    maxLength={8}
-                    pattern="[A-Za-z0-9]{1,8}"
-                    title="Solo caracteres alfanuméricos, máximo 8 caracteres"
-                    disabled={
-                      formValues.requisitionTypeId === RequisitionType.Reemplazo
+                        positionCode: e.target.value,
+                      })
                     }
                   />
                 </div>
+              );
+            })()}
 
-                {/* Campo 2: Supervisor */}
+            {/* Supervisor */}
+            {(() => {
+              const canEdit = canEditEmployeeField("supervisor");
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="supervisor"
-                  >
+                  <label className="block text-sm font-semibold mb-2">
                     Supervisor{" "}
-                    {(formValues?.requisitionTypeId ===
-                      RequisitionType.NuevaPosicion ||
-                      formValues?.requisitionTypeId ===
-                        RequisitionType.Temporal) && (
-                      <span className="text-red-500">*</span>
-                    )}
+                    {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <AsyncSelect
                     url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesBySupervisorRole`}
-                    name={"supervisor"}
-                    id={"supervisor"}
+                    name="supervisor"
                     value={formValues?.supervisor || ""}
-                    className="w-full text-base"
+                    disabled={!canEdit}
+                    required={canEdit}
                     customNameParam={"nombre"}
-                    required={true}
-                    placeholder="Lista desplegable de personas con puestos de liderazgo"
-                    disabled={
-                      formValues.requisitionTypeId === RequisitionType.Reemplazo
+                    onChange={(value) =>
+                      canEdit &&
+                      setFormValues({ ...formValues, supervisor: value })
                     }
                   />
                 </div>
+              );
+            })()}
 
-                {/* Campo 3: Grado */}
+            {/* Grado */}
+            {(() => {
+              const canEdit = canEditEmployeeField("grade");
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="grade"
-                  >
-                    Grado{" "}
-                    {(formValues?.requisitionTypeId ===
-                      RequisitionType.NuevaPosicion ||
-                      formValues?.requisitionTypeId ===
-                        RequisitionType.Temporal) && (
-                      <span className="text-red-500">*</span>
-                    )}
+                  <label className="block text-sm font-semibold mb-2">
+                    Grado {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <AsyncSelect
                     url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetGrades`}
-                    name={"grade"}
-                    id={"grade"}
+                    name="grade"
                     value={formValues?.grade || ""}
-                    className="w-full text-base"
-                    required={true}
-                    placeholder="Lista desplegable de los grados únicos de exactus"
-                    disabled={
-                      formValues.requisitionTypeId === RequisitionType.Reemplazo
+                    disabled={!canEdit}
+                    required={canEdit}
+                    onChange={(value) =>
+                      canEdit && setFormValues({ ...formValues, grade: value })
                     }
                   />
                 </div>
+              );
+            })()}
 
-                {/* Campo 4: Proyecto */}
+            {/* Proyecto */}
+            {(() => {
+              const canEdit = canEditEmployeeField("project");
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="project"
-                  >
+                  <label className="block text-sm font-semibold mb-2">
                     Proyecto{" "}
-                    {(formValues?.requisitionTypeId ===
-                      RequisitionType.NuevaPosicion ||
-                      formValues?.requisitionTypeId ===
-                        RequisitionType.Temporal) && (
-                      <span className="text-red-500">*</span>
-                    )}
+                    {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <AsyncSelectFreeText
                     url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
-                    name={"project"}
-                    id={"project"}
+                    name="project"
                     value={formValues?.project || ""}
-                    className="w-full text-base"
-                    required={true}
-                    placeholder="Lista desplegable de los proyectos únicos de exactus"
-                    disabled={
-                      formValues.requisitionTypeId === RequisitionType.Reemplazo
+                    disabled={!canEdit}
+                    required={canEdit}
+                    onChange={(value) =>
+                      canEdit &&
+                      setFormValues({ ...formValues, project: value })
                     }
                   />
                 </div>
+              );
+            })()}
+            {/*Nombre de area*/}
+            {(() => {
+              const canEdit = canEditEmployeeField("areaName");
 
-                {/* Campo 5: Departamento */}
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="department"
-                  >
+                  <label className="block text-sm font-semibold mb-2">
                     Nombre del Área{" "}
-                    {(formValues?.requisitionTypeId ===
-                      RequisitionType.NuevaPosicion ||
-                      formValues?.requisitionTypeId ===
-                        RequisitionType.Temporal) && (
-                      <span className="text-red-500">*</span>
-                    )}
+                    {canEdit && <span className="text-red-500">*</span>}
                   </label>
+
                   <AsyncSelect
                     url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getDepartments`}
-                    name={"department"}
-                    id={"department"}
-                    customNameParam={"descriptionDepartamento"}
-                    customIdParam={"departamento"}
-                    value={formValues?.department || ""}
-                    className="w-full text-base"
-                    required={true}
-                    placeholder="Lista desplegable de los nombres de las áreas únicas de exactus"
-                    disabled={
-                      formValues?.requisitionTypeId ===
-                      RequisitionType.Reemplazo
+                    name="areaName"
+                    value={formValues?.areaName || ""}
+                    disabled={!canEdit}
+                    required={canEdit}
+                    customNameParam="descriptionDepartamento"
+                    onChange={(value) => {
+                      if (!canEdit) return;
+                      setFormValues({ ...formValues, areaName: value });
+                    }}
+                  />
+                </div>
+              );
+            })()}
+            {/*Centro Costo*/}
+            <div>
+              <label className="block text-sm font-semibold mb-2">
+                Centro de Costo
+              </label>
+
+              <input
+                value={"centro costo(implementar-nueva base de datos)"}
+                disabled
+                className="border rounded-lg w-full py-2.5 px-4 bg-gray-100 cursor-not-allowed"
+              />
+            </div>
+            {/* Nombre */}
+            {(() => {
+              const canEdit = canEditEmployeeField("fullName");
+              return (
+                <div>
+                  <label className="block text-sm font-semibold mb-2">
+                    Nombre {canEdit && <span className="text-red-500">*</span>}
+                  </label>
+                  <input
+                    name="fullName"
+                    value={formValues?.fullName || ""}
+                    disabled={!canEdit}
+                    required={canEdit}
+                    className={`border rounded-lg w-full py-2.5 px-4 ${
+                      !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                    }`}
+                    onChange={(e) =>
+                      canEdit &&
+                      setFormValues({ ...formValues, fullName: e.target.value })
                     }
                   />
                 </div>
-              </>
-            ) : (
-              <>
+              );
+            })()}
+
+            {/* Exactus ID */}
+            {(() => {
+              const canEdit = canEditEmployeeField("exactusId");
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="employeeId"
-                  >
-                    Nombre
-                  </label>
-                  <AsyncSelect
-                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
-                    name={"employeeId"}
-                    customNameParam="nombre"
-                    //para promocion no debe ser obligatorio
-                    required={false}
-                    disabled={true}
-                    value={location.state.prevRequisition?.employeeId || ""}
-                    className="w-full text-base"
-                  />
-                </div>
-                {/* Campo 2: Exactus ID */}
-                <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="idExactus"
-                  >
+                  <label className="block text-sm font-semibold mb-2">
                     Exactus ID
                   </label>
                   <input
-                    className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-gray-100 text-gray-600 cursor-not-allowed
-                       focus:outline-none focus:ring-0 focus:border-gray-300 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-400"
-                    disabled
-                    id="idExactus"
-                    type="text"
-                    name="idExactus"
-                    value={employeeSelected?.id || ""}
-                    autoComplete="off"
-                    // Se elimina onChange en inputs deshabilitados
+                    type="number"
+                    name="exactusId"
+                    value={formValues?.exactusId || ""}
+                    disabled={!canEdit}
+                    className={`border rounded-lg w-full py-2.5 px-4 ${
+                      !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                    }`}
+                    onChange={(e) =>
+                      canEdit &&
+                      setFormValues({
+                        ...formValues,
+                        exactusId: e.target.value,
+                      })
+                    }
                   />
                 </div>
-                {/* Campo 3: # Código de Posición */}
+              );
+            })()}
+            {/*Career settings */}
+            {(() => {
+              const canEdit = canEditEmployeeField("careerSettingsId");
+
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="posCod"
-                  >
-                    # Código de Posición
+                  <label className="block text-sm font-semibold mb-2">
+                    Career Settings ID
                   </label>
+
                   <input
-                    className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-gray-100 text-gray-600 cursor-not-allowed
-                       focus:outline-none focus:ring-0 focus:border-gray-300 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-400"
-                    disabled
-                    id="posCod" // ID corregido
-                    type="text"
-                    name="posCod" // Name corregido
-                    value={"54321"}
-                    autoComplete="off"
-                    // Se elimina onChange en inputs deshabilitados
+                    type="number"
+                    name="careerSettingsId"
+                    value={formValues?.careerSettingsId || ""}
+                    disabled={!canEdit}
+                    className={`border rounded-lg w-full py-2.5 px-4 ${
+                      !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                    }`}
+                    onChange={(e) => {
+                      if (!canEdit) return;
+                      setFormValues({
+                        ...formValues,
+                        careerSettingsId: e.target.value,
+                      });
+                    }}
                   />
                 </div>
-                {/* Campo 4: Supervisor */}
+              );
+            })()}
+            {/* Lion Login*/}
+            {(() => {
+              const canEdit = canEditEmployeeField("lionLogin");
+
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="supervisor"
-                  >
-                    Supervisor
+                  <label className="block text-sm font-semibold mb-2">
+                    Lion Login
                   </label>
+
                   <input
-                    className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-gray-100 text-gray-600 cursor-not-allowed
-                       focus:outline-none focus:ring-0 focus:border-gray-300 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-400"
-                    id="supervisor" // ID corregido
-                    type="text"
-                    name="supervisor" // Name corregido
-                    disabled
-                    value={employeeSelected?.nombre_Supervisor || ""}
-                    autoComplete="off"
-                    // Se elimina onChange en inputs deshabilitados
+                    name="lionLogin"
+                    value={formValues?.lionLogin || ""}
+                    disabled={!canEdit}
+                    className={`border rounded-lg w-full py-2.5 px-4 ${
+                      !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                    }`}
+                    onChange={(e) => {
+                      if (!canEdit) return;
+                      setFormValues({
+                        ...formValues,
+                        lionLogin: e.target.value,
+                      });
+                    }}
                   />
                 </div>
-                {/* Campo 5: Grado */}
+              );
+            })()}
+            {/*Correo empresa*/}
+            {(() => {
+              const canEdit = canEditEmployeeField("companyEmail");
+
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="grado"
-                  >
-                    Grado
+                  <label className="block text-sm font-semibold mb-2">
+                    Correo Empresa
                   </label>
+
                   <input
-                    className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-gray-100 text-gray-600 cursor-not-allowed
-                       focus:outline-none focus:ring-0 focus:border-gray-300 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-400"
-                    disabled
-                    id="grado" // ID corregido
-                    type="text"
-                    name="grado" // Name corregido
-                    value={employeeSelected?.grado || ""}
-                    autoComplete="off"
-                    // Se elimina onChange en inputs deshabilitados
+                    type="email"
+                    name="companyEmail"
+                    value={formValues?.companyEmail || ""}
+                    disabled={!canEdit}
+                    className={`border rounded-lg w-full py-2.5 px-4 ${
+                      !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                    }`}
+                    onChange={(e) => {
+                      if (!canEdit) return;
+                      setFormValues({
+                        ...formValues,
+                        companyEmail: e.target.value,
+                      });
+                    }}
                   />
                 </div>
-                {/* Campo 6: Proyecto */}
+              );
+            })()}
+            {/* Fecha de Ingreso */}
+            {(() => {
+              const canEdit = canEditEmployeeField("startDate");
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="proyecto"
-                  >
-                    Proyecto
+                  <label className="block text-sm font-semibold mb-2">
+                    Fecha de Ingreso
                   </label>
                   <input
-                    className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-gray-100 text-gray-600 cursor-not-allowed
-                       focus:outline-none focus:ring-0 focus:border-gray-300 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-400"
-                    disabled
-                    id="proyecto" // ID corregido
-                    type="text"
-                    name="proyecto" // Name corregido
-                    value={"Proyecto A"}
-                    autoComplete="off"
-                    // Se elimina onChange en inputs deshabilitados
+                    type="date"
+                    name="startDate"
+                    value={formValues?.startDate?.split("T")[0] || ""}
+                    disabled={!canEdit}
+                    className={`border rounded-lg w-full py-2.5 px-4 ${
+                      !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                    }`}
+                    onChange={(e) =>
+                      canEdit &&
+                      setFormValues({
+                        ...formValues,
+                        startDate: e.target.value,
+                      })
+                    }
                   />
                 </div>
-                {/* Campo 8: Departamento */}
+              );
+            })()}
+            {/*Fecha de Finalización*/}
+            {(() => {
+              const canEdit = canEditEmployeeField("endDate");
+
+              return (
                 <div>
-                  <label
-                    className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                    htmlFor="departamento"
-                  >
-                    Nombre de Area
+                  <label className="block text-sm font-semibold mb-2">
+                    Fecha de Finalización
                   </label>
+
                   <input
-                    className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-gray-100 text-gray-600 cursor-not-allowed
-                       focus:outline-none focus:ring-0 focus:border-gray-300 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-400"
-                    disabled
-                    id="departamento" // ID corregido
-                    type="text"
-                    name="departamento" // Name corregido
-                    value={employeeSelected?.descrip_Area || ""}
-                    autoComplete="off"
-                    // Se elimina onChange en inputs deshabilitados
+                    type="date"
+                    name="endDate"
+                    value={formValues?.endDate?.split("T")[0] || ""}
+                    disabled={!canEdit}
+                    className={`border rounded-lg w-full py-2.5 px-4 ${
+                      !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                    }`}
+                    onChange={(e) => {
+                      if (!canEdit) return;
+                      setFormValues({ ...formValues, endDate: e.target.value });
+                    }}
                   />
-                </div>{" "}
-              </>
-            )}
+                </div>
+              );
+            })()}
           </div>
-          <h1 className="text-lg font-semibold text-gray-800 mb-6 dark:text-gray-200 mt-4">
-            Empleado
-          </h1>
-          <div className="grid grid-cols-3 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-6 mt-2">
-            <div>
-              <label
-                className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                htmlFor="fullName"
-              >
-                Nombre{" "}
-                {!formValues.requisitionTypeId == RequisitionType.Reemplazo ||
-                  !formValues.requisitionTypeId === RequisitionType.Temporal ||
-                  (!formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                    !formValues.recruitmentProccess === 14 && (
-                      <>{/* <span className="text-red-500">*</span>*/}</>
-                    ))}
-              </label>
-              <input
-                className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : "bg-white"
-                } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                id="fullName"
-                name="fullName"
-                placeholder="Nombre"
-                onChange={(e) => {
-                  setFormValues({
-                    ...formValues,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
-                autoComplete="off"
-                value={formValues.fullName || ""}
-                type="text"
-                required={
-                  !formValues.requisitionTypeId ===
-                  RequisitionType.NuevaPosicion
-                }
-                disabled={
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                }
-              />
-            </div>
 
-            {/* Campo 2: Exactus ID */}
-            <div>
-              <label
-                className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                htmlFor="exactusId"
-              >
-                Exactus ID {/* <span className="text-red-500">*</span>*/}
-              </label>
-              <input
-                className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : "bg-white"
-                } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                id="exactusId"
-                name="exactusId"
-                placeholder="Exactus ID"
-                onChange={(e) => {
-                  setFormValues({
-                    ...formValues,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
-                autoComplete="off"
-                value={formValues.exactusId || ""}
-                type="number"
-                max={999999}
-                min={0}
-                pattern="[0-9]{1,6}"
-                title="Solo números, máximo 6 caracteres"
-                disabled={
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                }
-              />
-            </div>
-
-            {/* Campo 3: Career Settings ID */}
-            <div>
-              <label
-                className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                htmlFor="careerSettingsId"
-              >
-                Career Settings ID
-              </label>
-              <input
-                className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : "bg-white"
-                } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                id="careerSettingsId"
-                name="careerSettingsId"
-                placeholder="Career Settings ID"
-                onChange={(e) => {
-                  setFormValues({
-                    ...formValues,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
-                autoComplete="off"
-                value={formValues.careerSettingsId || ""}
-                type="number"
-                disabled={
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                }
-              />
-            </div>
-
-            {/* Campo 4: Lion Login */}
-            <div>
-              <label
-                className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                htmlFor="lionLogin"
-              >
-                Lion Login
-              </label>
-              <input
-                className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : "bg-white"
-                } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                id="lionLogin"
-                name="lionLogin"
-                placeholder="Lion Login"
-                onChange={(e) => {
-                  setFormValues({
-                    ...formValues,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
-                autoComplete="off"
-                value={formValues.lionLogin || ""}
-                type="text"
-                pattern="[A-Za-z0-9]+"
-                title="Solo caracteres alfanuméricos"
-                disabled={
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                }
-              />
-            </div>
-
-            {/* Campo 5: Company Email */}
-            <div>
-              <label
-                className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                htmlFor="companyEmail"
-              >
-                Correo empresa
-              </label>
-              <input
-                className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : "bg-white"
-                } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                id="companyEmail"
-                name="companyEmail"
-                placeholder="Correo empresa"
-                onChange={(e) => {
-                  setFormValues({
-                    ...formValues,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
-                autoComplete="off"
-                value={formValues.companyEmail || ""}
-                type="email"
-                pattern="[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,}$"
-                title="Ingrese un correo electrónico válido"
-                disabled={
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                }
-              />
-            </div>
-
-            {/* Campo 6: Start Date */}
-            <div>
-              <label
-                className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-                htmlFor="startDate"
-              >
-                Fecha de Ingreso
-              </label>
-              <input
-                className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base ${
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                    ? "bg-gray-100 cursor-not-allowed"
-                    : "bg-white"
-                } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-             dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400`}
-                id="startDate"
-                name="startDate"
-                placeholder="Fecha"
-                onChange={(e) => {
-                  setFormValues({
-                    ...formValues,
-                    [e.target.name]: e.target.value,
-                  });
-                }}
-                autoComplete="off"
-                value={
-                  formValues.startDate
-                    ? formValues.startDate.split("T")[0]
-                    : new Date().toISOString().split("T")[0]
-                }
-                type="date"
-                disabled={
-                  formValues.requisitionTypeId ===
-                    RequisitionType.NuevaPosicion &&
-                  formValues.recruitmentProccess === 14
-                }
-              />
-            </div>
-          </div>
-          {/* Campo 8: Comentario (ocupará 3 columnas en LG) */}
-        </div>{" "}
-        <div className="lg:col-span-3">
-          <label
-            className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300"
-            htmlFor="comment" // ID único y corregido
-          >
-            Comentario
-          </label>
-          <textarea
-            className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
-                       dark:bg-gray-750 dark:border-gray-600 dark:text-gray-200 dark:focus:ring-blue-400 dark:focus:border-blue-400 h-[200px]"
-            placeholder="Comentario"
-            name="comment"
-            id="comment" // Añadido ID
-            onChange={(e) => {
-              // *** CORRECCIÓN CRÍTICA: Asegura que se fusiona el estado anterior ***
-              setFormValues({ ...formValues, [e.target.name]: e.target.value });
-            }}
-            autoComplete="off"
-            value={formValues.comment || ""}
-          />
-        </div>{" "}
+          {/* Comentario */}
+          {(() => {
+            const canEdit = canEditEmployeeField("comment");
+            return (
+              <div className="mt-6">
+                <label className="block text-sm font-semibold mb-2">
+                  Comentario
+                </label>
+                <textarea
+                  value={formValues.comment || ""}
+                  disabled={!canEdit}
+                  className={`border rounded-lg w-full py-2.5 px-4 h-[200px] ${
+                    !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
+                  }`}
+                  onChange={(e) =>
+                    canEdit &&
+                    setFormValues({ ...formValues, comment: e.target.value })
+                  }
+                />
+              </div>
+            );
+          })()}
+        </div>
       </div>
       {/* Campo 1: Nombre */}
     </>

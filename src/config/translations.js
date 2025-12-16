@@ -1,0 +1,26 @@
+export const translations = {
+  es: {
+    home: "Inicio",
+    supervisor: "Supervisor",
+    recruitment: "Reclutamiento",
+    finance: "Finanzas",
+    payroll: "Payroll",
+    superAdmin: "SuperAdmin",
+    hr: "HR",
+    humanCapital: "Human Capital",
+    logout: "Cerrar Sesión",
+    requiflow: "Requiflow",
+  },
+  en: {
+    home: "Home",
+    supervisor: "Supervisor",
+    recruitment: "Recruitment",
+    finance: "Finance",
+    payroll: "Payroll",
+    superAdmin: "Administrator",
+    hr: "HR",
+    humanCapital: "Human Capital",
+    logout: "Logout",
+    requiflow: "Requiflow",
+  },
+};

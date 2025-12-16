@@ -4,7 +4,7 @@ export const RequestRoleFlow = Object.freeze({
   DENIED: 2,
   COMPLETED: 3,
   PENDING: 4,
-  ONHOLD: 4,
+  ONHOLD: 5,
 });
 
 export const RequestRoleFlowName = {
