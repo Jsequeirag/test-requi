@@ -123,7 +123,7 @@ export default function InfoEntrada() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=9`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequisitionFeature?requisitionFeatureId=9`}
             name={"process"}
             id={"process"} // Añadido ID
             value={formValues?.process || ""} // Usamos 'value' y un fallback a ""
@@ -170,7 +170,7 @@ export default function InfoEntrada() {
           </label>
 
           <AsyncSelect
-            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=10`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequisitionFeature?requisitionFeatureId=10`}
             id={"typeTemporality"}
             name="typeTemporality"
             value={formValues?.typeTemporality || ""}
@@ -286,7 +286,7 @@ export default function InfoEntrada() {
                     {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <AsyncSelect
-                    url={`https://localhost:7040/getEmployeesBySupervisorRole`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetEmployeesBySupervisorRole`}
                     name="supervisor"
                     value={formValues?.supervisor || ""}
                     disabled={!canEdit}
@@ -310,7 +310,7 @@ export default function InfoEntrada() {
                     Grado {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <AsyncSelect
-                    url={`https://localhost:7040/GetGrades`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netGetGrades`}
                     name="grade"
                     value={formValues?.grade || ""}
                     disabled={!canEdit}
@@ -333,7 +333,7 @@ export default function InfoEntrada() {
                     {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <AsyncSelectFreeText
-                    url={`https://localhost:7040/GetProjectsByExactus`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netGetProjectsByExactus`}
                     name="project"
                     value={formValues?.project || ""}
                     disabled={!canEdit}
@@ -358,7 +358,7 @@ export default function InfoEntrada() {
                   </label>
 
                   <AsyncSelect
-                    url={`https://localhost:7040/getDepartments`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetDepartments`}
                     name="areaName"
                     value={formValues?.areaName || ""}
                     disabled={!canEdit}

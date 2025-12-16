@@ -238,7 +238,7 @@ export default function RDetailSalida({ closeModel }) {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=4`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequisitionFeature?requisitionFeatureId=4`}
             name={"processType"}
             id={"processType"}
             disabled={!showHiringProcessFields || !requiresHiringProcess}
@@ -293,7 +293,7 @@ export default function RDetailSalida({ closeModel }) {
               </div>
             )}
             <AsyncSelect
-              url={`https://localhost:7040/getEmployeesBySupervisorRole`}
+              url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetEmployeesBySupervisorRole`}
               name={"asignEmployees"}
               id={"asignEmployees"}
               customNameParam={"nombre"}
