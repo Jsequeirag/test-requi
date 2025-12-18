@@ -2,7 +2,7 @@ import axios from "axios";
 
 const client = axios.create({
   baseURL:
-    "https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net",
+    "https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/",
   headers: {
     "Content-Type": "application/json",
   },

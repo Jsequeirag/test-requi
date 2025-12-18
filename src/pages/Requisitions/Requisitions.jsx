@@ -336,7 +336,11 @@ function Requisitions() {
                           <div
                             className={`
       absolute inset-0 pointer-events-none
-      ${expandedRequest === request.id ? "animate-rainbow-wave" : ""}
+      ${
+        expandedRequest === request.id
+          ? "animate-rainbow-wave"
+          : "animate-rainbow-wave"
+      }
     `}
                             style={{
                               background:

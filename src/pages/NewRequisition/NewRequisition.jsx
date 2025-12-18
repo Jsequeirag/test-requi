@@ -50,6 +50,7 @@ import { RequisitionType } from "../../contants/requisitionType.js";
 import { FeatureType } from "../../contants/featureType.js";
 import { RequisitionState } from "../../contansts/RequisitionState.jsx";
 import websiteConfigStore from "../../../stores/WebsiteConfig";
+import { RequisitionSubtype } from "../../contants/requisitionSubtypeType.js";
 function NewRequisition() {
   const language = websiteConfigStore((s) => s.language);
   const navigate = useNavigate();
@@ -404,7 +405,7 @@ function NewRequisition() {
                         </span>
                       </label>
                       <AsyncSelect
-                        url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequestType/false/${location.state.prevRequisition.requestTypeId}/${formValues.requiresReplacement}`}
+                        url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestType/false/${location.state.prevRequisition.requestTypeId}/${formValues.requiresReplacement}`}
                         name={"requestTypeId"}
                         value={formValues?.requestTypeId || ""}
                         customNameParam={language === "es" ? "name" : "nameEn"}
@@ -429,7 +430,7 @@ function NewRequisition() {
                     {/*Cuando se esta creando solo carga entra y salida */}
                     {location.state?.action === "create" && (
                       <AsyncSelect
-                        url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequestType/true/0/false`}
+                        url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestType/true/0/false`}
                         name={"requestTypeId"}
                         customNameParam={language === "es" ? "name" : "nameEn"}
                         value={formValues?.requestTypeId || ""}
@@ -441,7 +442,7 @@ function NewRequisition() {
                         {location.state?.prevRequisition?.requestTypeId ===
                         RequestType.Entrada ? (
                           <AsyncSelect
-                            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequestTypeForPrevNewJoiner/${location.state.prevRequisition.requisitionTypeId}/${location.state.prevRequisition.recruitmentType}`}
+                            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestTypeForPrevNewJoiner/${location.state.prevRequisition.requisitionTypeId}/${location.state.prevRequisition.recruitmentType}`}
                             name={"requestTypeId"}
                             value={formValues?.requestTypeId || ""}
                             // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
@@ -450,7 +451,7 @@ function NewRequisition() {
                           />
                         ) : (
                           <AsyncSelect
-                            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequestType/false/0/false`}
+                            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequestType/false/0/false`}
                             name={"requestTypeId"}
                             value={formValues?.requestTypeId || ""}
                             // Nota: Si AsyncSelect es un componente custom, deberías asegurarte
@@ -489,7 +490,7 @@ function NewRequisition() {
                       {/* Asterisco de requerido */}
                     </label>
                     <AsyncSelect
-                      url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequisitionFeature?requisitionFeatureId=${
+                      url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=${
                         formValues.requestTypeId ===
                         RequestType.MovimientoLateral
                           ? 8
@@ -521,15 +522,15 @@ function NewRequisition() {
                         url={`${
                           location.state?.action === "update" &&
                           location.state.hasPrevRequisition
-                            ? `https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netGetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/true`
-                            : `https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netGetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`
+                            ? `https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/true`
+                            : `https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`
                         }`}
                         name={"requisitionTypeId"}
                         id={"requisitionTypeId"}
                         value={
                           location.state?.action === "update" &&
                           location.state.hasPrevRequisition
-                            ? 11
+                            ? RequisitionType.Reemplazo
                             : formValues?.requisitionTypeId || ""
                         } // Usamos 'value' y un fallback a ""
                         className="w-full text-base"
@@ -550,13 +551,13 @@ function NewRequisition() {
                           {/* Asterisco de requerido */}
                         </label>
                         <AsyncSelect
-                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
+                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
                           name={"requisitionSubtypeId"}
                           id={"requisitionSubtypeId"} // Añadido ID
                           value={
                             location.state?.action === "update" &&
                             location.state.hasPrevRequisition
-                              ? 51
+                              ? RequisitionSubtype.ConcursoExterno7
                               : formValues?.requisitionSubtypeId || ""
                           } // Usamos 'value' y un fallback a ""
                           className="w-full text-base"
@@ -578,7 +579,7 @@ function NewRequisition() {
                           {/* Asterisco de requerido */}
                         </label>
                         <AsyncSelect
-                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.netgetRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
+                          url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${formValues?.requisitionTypeId}`}
                           id={"requisitionSubtypeId"} // Añadido ID
                           name={"requisitionSubtypeId"}
                           value={
