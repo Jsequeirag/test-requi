@@ -1,15 +1,15 @@
-import React from "react";
-import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
-import { convertirBase64 } from "../../../utils/Base64.js";
-import FileUploadWithPreview from "../../../components/FileUploadWithPreview/FileUploadWithPreview.jsx";
-
+import { useLocation } from "react-router-dom";
 import Tooltip from "../../../components/Tooltip";
+import { Role } from "../../../contansts/roles";
 import websiteConfigStore from "../../../../stores/WebsiteConfig";
 export default function InfoPromocion() {
+  const location = useLocation();
   const language = websiteConfigStore((s) => s.language);
+  const isSupervisor = location?.state?.workFlow?.RoleId === Role.Supervisor;
+  const isDisabled = !isSupervisor;
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
   const setFormValues = formStore((state) => state.setFormValues);
@@ -85,7 +85,8 @@ export default function InfoPromocion() {
               });
             }}
             autoComplete="off"
-          />{" "}
+            disabled={isDisabled}
+          />
         </div>
 
         {/* Campo 5: Ventana de Promocion */}
@@ -115,6 +116,7 @@ export default function InfoPromocion() {
             value={selectedMonth}
             onChange={handleMonthChange}
             autoComplete="off"
+            disabled={isDisabled}
           >
             {allowedMonths.map((month) => (
               <option key={month.value} value={month.value}>
@@ -147,6 +149,7 @@ export default function InfoPromocion() {
             }}
             value={formValues.comment || ""}
             autoComplete="off"
+            disabled={isDisabled}
           />
         </div>
       </div>

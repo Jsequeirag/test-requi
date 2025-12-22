@@ -36,12 +36,13 @@ export default function InfoSalida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
+            url={`https://localhost:7040/GetRequisitionTypeByRequestTypeId/${formValues?.requestTypeId}/false`}
             name={"requisitionTypeId"}
             customNameParam={language === "es" ? "name" : "nameEn"}
             id={"requisitionMotivo"} // Añadido ID
             value={formValues?.requisitionTypeId || ""}
             className="w-full text-base"
+            disabled={true}
           />
         </div>
         {/* Campo 11: Motivo (Reason) */}
@@ -55,7 +56,7 @@ export default function InfoSalida() {
             <span className="text-red-500 font-bold dark:text-red-400">*</span>
           </label>
           <AsyncSelect
-            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionSubtypeByRequisitionTypeId/${
+            url={`https://localhost:7040/getRequisitionSubtypeByRequisitionTypeId/${
               formValues?.requisitionTypeId || ""
             }`}
             value={formValues?.requisitionSubtypeId || ""}
@@ -63,6 +64,7 @@ export default function InfoSalida() {
             customNameParam={language === "es" ? "name" : "nameEn"}
             id={"RequisitionSubtypeSelect"} // Añadido ID
             className="w-full text-base"
+            disabled={true}
           />
         </div>
         {/* Campo 2: Carta de Renuncia */}
@@ -106,7 +108,7 @@ export default function InfoSalida() {
           <select
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       bg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             name="trialPeriod"
             id="trialPeriod" // Añadido ID
@@ -123,6 +125,7 @@ export default function InfoSalida() {
                 [e.target.name]: e.target.value === "true",
               });
             }}
+            disabled
           >
             {/* Solo una opción puede ser 'selected' inicialmente, si no, es mejor omitirlo y dejar que el estado lo controle */}
 
@@ -136,7 +139,7 @@ export default function InfoSalida() {
         <div>
           <div className="flex">
             <label
-              className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2"
+              className="block text-gray-700 text-sm font-semibold mb-2 dark:text-gray-300 mr-2 "
               htmlFor="officialEmployeeDepartureDate" // ID único
             >
               R-Form{" "}
@@ -150,12 +153,7 @@ export default function InfoSalida() {
           <input
             required
             className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                 ${
-                   formValues?.requisitionTypeId !== RequisitionType.Despido ||
-                   formValues?.trialPeriod !== false
-                     ? "bg-gray-100 cursor-not-allowed"
-                     : "bg-white"
-                 }
+               bg-gray-100 cursor-not-allowed
                  text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                  dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             type="text"
@@ -169,10 +167,7 @@ export default function InfoSalida() {
             }}
             autoComplete="off"
             value={formValues.rForm ? formValues.rForm : ""}
-            disabled={
-              formValues?.requisitionTypeId !== RequisitionType.Despido ||
-              formValues?.trialPeriod !== false
-            }
+            disabled
           />
         </div>
         <div>
@@ -187,7 +182,7 @@ export default function InfoSalida() {
           <select
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       bg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             name="rehirable"
             id="rehirable" // Añadido ID
@@ -204,6 +199,7 @@ export default function InfoSalida() {
                 [e.target.name]: e.target.value === "true",
               });
             }}
+            disabled={true}
           >
             {/* Solo una opción puede ser 'selected' inicialmente, si no, es mejor omitirlo y dejar que el estado lo controle */}
 
@@ -240,7 +236,7 @@ export default function InfoSalida() {
           <input
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       bg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="date"
             id="officialEmployeeDepartureDate" // ID único
@@ -258,6 +254,7 @@ export default function InfoSalida() {
                 ? formValues.officialEmployeeDepartureDate.split("T")[0]
                 : ""
             }
+            disabled
           />
         </div>
         {/* Campo 7: Fecha Real de Salida */}
@@ -284,7 +281,7 @@ export default function InfoSalida() {
           <input
             required
             className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                     bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                     bg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             type="date"
             id="employeeDepartureDate" // ID único
@@ -302,6 +299,7 @@ export default function InfoSalida() {
                 ? formValues.employeeDepartureDate.split("T")[0]
                 : ""
             }
+            disabled
           />
         </div>
         {/* Campo 8: Fecha Entrega de Equipo */}
@@ -328,7 +326,7 @@ export default function InfoSalida() {
           <input
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                      bg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="date"
             name="returnWorkEquipmentDate"
@@ -346,6 +344,7 @@ export default function InfoSalida() {
                 ? formValues.returnWorkEquipmentDate.split("T")[0]
                 : ""
             }
+            disabled
           />
         </div>
         {/* Campo 9: Número de teléfono */}
@@ -361,7 +360,7 @@ export default function InfoSalida() {
           <input
             required
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       bg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="number"
             name="phoneNumber"
@@ -378,6 +377,7 @@ export default function InfoSalida() {
             }}
             autoComplete="off"
             value={formValues.phoneNumber || ""}
+            disabled
           />
         </div>
         {/* Campo 10: Correo Personal */}
@@ -392,7 +392,7 @@ export default function InfoSalida() {
           </label>
           <input
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                       bg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400"
             type="email"
             name="personalEmail"
@@ -407,6 +407,7 @@ export default function InfoSalida() {
             }}
             autoComplete="off"
             value={formValues.personalEmail || ""}
+            disabled
           />
         </div>
         {/* Campo 12: Nueva Empresa */}
@@ -419,11 +420,7 @@ export default function InfoSalida() {
           </label>
           <input
             className={`border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-  ${
-    formValues?.requisitionTypeId === RequisitionType.Despido
-      ? "bg-gray-100 cursor-not-allowed"
-      : "bg-white"
-  } text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+  bg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
              dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400`}
             type="text"
             name="joinNewCompany" // Nombre corregido
@@ -438,7 +435,7 @@ export default function InfoSalida() {
             autoComplete="off"
             value={formValues.joinNewCompany || ""}
             required={formValues?.requisitionTypeId === RequisitionType.Despido} // Despido
-            disabled={formValues?.requisitionTypeId === RequisitionType.Despido} // Despido
+            disabled
           />
         </div>
         {/* Campo 13: Comentario (ocupa las 3 columnas en pantallas grandes) */}
@@ -451,7 +448,7 @@ export default function InfoSalida() {
           </label>
           <textarea
             className="border border-gray-300 rounded-lg w-full py-2.5 px-4 text-base
-                       bg-white text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
+                      bg-gray-100 cursor-not-allowed text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors shadow-sm
                        dark:bg-gray-750 dark:border-gray-600  dark:focus:ring-blue-400 dark:focus:border-blue-400 h-[200px]"
             placeholder={language === "es" ? "Comentario" : "Comments"}
             name="comment"
@@ -464,6 +461,7 @@ export default function InfoSalida() {
             }}
             value={formValues.comment || ""}
             autoComplete="off"
+            disabled
           />
         </div>
       </div>

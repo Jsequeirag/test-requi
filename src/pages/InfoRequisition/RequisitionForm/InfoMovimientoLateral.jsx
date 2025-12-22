@@ -3,11 +3,16 @@ import AsyncSelect from "../../../components/AsyncComponents/AsyncSelect.jsx";
 import formStore from "../../../../stores/FormStore.js";
 import { useApiGet } from "../../../api/config/customHooks.js";
 import { getRequestType } from "../../../api/urls/Request.js";
+import { useLocation } from "react-router-dom";
+import { Role } from "../../../contansts/roles";
 // RMovimientoLateral está importado pero no se usa en este componente.
 // Si no se usa en el renderizado o lógica de MovimientoLateral, puedes considerar quitarlo.
 // import RMovimientoLateral from "../RequisitionDetail/RDetailMovimientoLateral.jsx";
 
 export default function InfoMovimientoLateral() {
+  const location = useLocation();
+  const isSupervisor = location?.state?.workFlow?.RoleId === Role.Supervisor;
+  const isDisabled = !isSupervisor;
   //GLOBAL
   const formValues = formStore((state) => state.formValues);
   const setFormValues = formStore((state) => state.setFormValues);
@@ -56,6 +61,7 @@ export default function InfoMovimientoLateral() {
                 ? formValues.movementDate.split("T")[0]
                 : new Date().toISOString().split("T")[0]
             }
+            disabled={isDisabled}
           />
         </div>{" "}
         {/* Campo 3: Comentario (ocupará 1 columna como los demás, ya que hay espacio) */}
@@ -81,6 +87,7 @@ export default function InfoMovimientoLateral() {
             }}
             autoComplete="off"
             value={formValues.comment || ""}
+            disabled={isDisabled}
           />
         </div>
       </div>
