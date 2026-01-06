@@ -109,7 +109,7 @@ export default function Entrada() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=9`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=9`}
             name={"process"}
             id={"process"} // Añadido ID
             value={formValues?.process || ""} // Usamos 'value' y un fallback a ""
@@ -172,7 +172,7 @@ export default function Entrada() {
           </label>
 
           <AsyncSelect
-            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=10`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=10`}
             id={"typeTemporality"}
             name="typeTemporality"
             value={formValues?.typeTemporality || ""}
@@ -336,7 +336,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://localhost:7040/getEmployeesBySupervisorRole`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesBySupervisorRole`}
                     name={"supervisor"}
                     id={"supervisor"}
                     value={formValues?.supervisor || ""}
@@ -364,7 +364,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://localhost:7040/GetGrades`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetGrades`}
                     name={"grade"}
                     id={"grade"}
                     value={formValues?.grade || ""}
@@ -391,7 +391,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelectFreeText
-                    url={`https://localhost:7040/GetProjectsByExactus`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
                     name={"project"}
                     id={"project"}
                     value={formValues?.project || ""}
@@ -418,7 +418,7 @@ export default function Entrada() {
                     )}
                   </label>
                   <AsyncSelect
-                    url={`https://localhost:7040/getDepartments`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getDepartments`}
                     name={"department"}
                     id={"department"}
                     customNameParam={"descriptionDepartamento"}
@@ -467,7 +467,7 @@ export default function Entrada() {
                     Nombre
                   </label>
                   <AsyncSelect
-                    url={`https://localhost:7040/getEmployees`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployees`}
                     name={"employeeId"}
                     customNameParam="nombre"
                     //para promocion no debe ser obligatorio
@@ -681,13 +681,14 @@ export default function Entrada() {
                 name="exactusId"
                 placeholder="Exactus ID"
                 onChange={(e) => {
+                  const val = e.target.value;
                   setFormValues({
                     ...formValues,
-                    [e.target.name]: e.target.value,
+                    exactusId: val === "" ? 0 : Number(val),
                   });
                 }}
                 autoComplete="off"
-                value={formValues.exactusId || ""}
+                value={formValues.exactusId === 0 ? "" : formValues.exactusId}
                 type="number"
                 max={999999}
                 min={0}
@@ -721,13 +722,18 @@ export default function Entrada() {
                 name="careerSettingsId"
                 placeholder="Career Settings ID"
                 onChange={(e) => {
+                  const val = e.target.value;
                   setFormValues({
                     ...formValues,
-                    [e.target.name]: e.target.value,
+                    careerSettingsId: val === "" ? 0 : Number(val),
                   });
                 }}
                 autoComplete="off"
-                value={formValues.careerSettingsId || ""}
+                value={
+                  formValues.careerSettingsId === 0
+                    ? ""
+                    : formValues.careerSettingsId
+                }
                 type="number"
                 disabled={
                   formValues.requisitionTypeId ===

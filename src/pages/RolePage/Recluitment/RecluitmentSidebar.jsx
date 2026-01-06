@@ -143,12 +143,6 @@ export default function RecluitmentSidebar({
   // =============================
   // 2️⃣  CARGAR ID SELECCIONADO DESDE LOCALSTORAGE
   // =============================
-  useEffect(() => {
-    const savedId = localStorage.getItem("recruitment_selected_parent");
-    if (savedId) {
-      setSelectedParentId(Number(savedId));
-    }
-  }, []);
 
   // Animación
   useEffect(() => {
@@ -162,17 +156,21 @@ export default function RecluitmentSidebar({
   // 3️⃣  AUTO-SELECCIÓN CUANDO LA DATA LLEGUE
   // =============================
   useEffect(() => {
-    if (!requestData?.data) return;
+    if (!requestData?.data?.length) return;
 
     const savedId = Number(localStorage.getItem("recruitment_selected_parent"));
+
     if (!savedId) return;
 
-    const found = requestData.data.find((p) => p.id === savedId);
-    if (!found) return;
+    const selectedParent = requestData.data.find(
+      (parent) => parent.id === savedId
+    );
 
-    setSelectedParentId(savedId);
-    setChildRequestsData(found.requisitions);
-    onParentSelect(savedId);
+    if (!selectedParent) return;
+
+    setSelectedParentId(selectedParent.id);
+    setChildRequestsData(selectedParent.requisitions);
+    onParentSelect(selectedParent);
   }, [requestData]);
 
   const handleRefresh = async () => {
@@ -376,7 +374,7 @@ export default function RecluitmentSidebar({
                     // Selección normal
                     setSelectedParentId(parent.id);
                     setChildRequestsData(parent.requisitions);
-                    onParentSelect(parent.id);
+                    onParentSelect(parent);
 
                     // Guardar en localStorage
                     localStorage.setItem(

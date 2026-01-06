@@ -8,11 +8,13 @@ import { Info } from "lucide-react"; // Importa el icono Info
 import { getEmployeeById } from "../../../api/urls/Employee";
 import { useApiGet } from "../../../api/config/customHooks";
 import { useLocation } from "react-router-dom";
+import { RequestType } from "../../../contants/requestType.js";
 import { RequisitionType } from "../../../contants/requisitionType";
 import { RequisitionSubtype } from "../../../contants/requisitionSubtypeType";
 import {
   EMPLOYEE_MATRIX_CE3,
   EMPLOYEE_MATRIX_CE8,
+  EMPLOYEE_MATRIX_CE7,
 } from "../../../contants/matrizAvalableFieldInfoRequisition.js";
 //para validar las entradas
 
@@ -48,10 +50,10 @@ export default function InfoEntrada() {
   }, [formValues?.employeeId, employeeData, setEmployeeSelected]); // Añadir employeeData y setEmployeeSelected a las dependencias
   const role = location.state?.role;
 
-  const isNuevaPosicion =
-    formValues.requisitionTypeId === RequisitionType.NuevaPosicion;
+  const isNuevaPosicion = formValues.requestTypeId === RequestType.Entrada;
   const EMPLOYEE_MATRICES_BY_SUBTYPE = {
     [RequisitionSubtype.ConcursoExterno3]: EMPLOYEE_MATRIX_CE3,
+    [RequisitionSubtype.ConcursoExterno7]: EMPLOYEE_MATRIX_CE7,
     [RequisitionSubtype.ConcursoExterno8]: EMPLOYEE_MATRIX_CE8,
   };
 
@@ -123,7 +125,7 @@ export default function InfoEntrada() {
             {/* Asterisco de requerido */}
           </label>
           <AsyncSelect
-            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=9`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=9`}
             name={"process"}
             id={"process"} // Añadido ID
             value={formValues?.process || ""} // Usamos 'value' y un fallback a ""
@@ -170,7 +172,7 @@ export default function InfoEntrada() {
           </label>
 
           <AsyncSelect
-            url={`https://localhost:7040/getRequisitionFeature?requisitionFeatureId=10`}
+            url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getRequisitionFeature?requisitionFeatureId=10`}
             id={"typeTemporality"}
             name="typeTemporality"
             value={formValues?.typeTemporality || ""}
@@ -253,7 +255,7 @@ export default function InfoEntrada() {
               return (
                 <div>
                   <label className="block text-sm font-semibold mb-2">
-                    Código de Posición{" "}
+                    Código de Posición
                     {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <input
@@ -286,7 +288,7 @@ export default function InfoEntrada() {
                     {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <AsyncSelect
-                    url={`https://localhost:7040/getEmployeesBySupervisorRole`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getEmployeesBySupervisorRole`}
                     name="supervisor"
                     value={formValues?.supervisor || ""}
                     disabled={!canEdit}
@@ -310,7 +312,7 @@ export default function InfoEntrada() {
                     Grado {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <AsyncSelect
-                    url={`https://localhost:7040/GetGrades`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetGrades`}
                     name="grade"
                     value={formValues?.grade || ""}
                     disabled={!canEdit}
@@ -333,7 +335,7 @@ export default function InfoEntrada() {
                     {canEdit && <span className="text-red-500">*</span>}
                   </label>
                   <AsyncSelectFreeText
-                    url={`https://localhost:7040/GetProjectsByExactus`}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/GetProjectsByExactus`}
                     name="project"
                     value={formValues?.project || ""}
                     disabled={!canEdit}
@@ -348,7 +350,7 @@ export default function InfoEntrada() {
             })()}
             {/*Nombre de area*/}
             {(() => {
-              const canEdit = canEditEmployeeField("areaName");
+              const canEdit = canEditEmployeeField("deparment");
 
               return (
                 <div>
@@ -358,15 +360,15 @@ export default function InfoEntrada() {
                   </label>
 
                   <AsyncSelect
-                    url={`https://localhost:7040/getDepartments`}
-                    name="areaName"
-                    value={formValues?.areaName || ""}
+                    url={`https://requitool-be-dwabg9fhbcexhubv.canadacentral-01.azurewebsites.net/getDepartments`}
+                    name="department"
+                    value={formValues?.department || ""}
                     disabled={!canEdit}
                     required={canEdit}
                     customNameParam="descriptionDepartamento"
                     onChange={(value) => {
                       if (!canEdit) return;
-                      setFormValues({ ...formValues, areaName: value });
+                      setFormValues({ ...formValues, department: value });
                     }}
                   />
                 </div>
@@ -420,18 +422,20 @@ export default function InfoEntrada() {
                   <input
                     type="number"
                     name="exactusId"
-                    value={formValues?.exactusId || ""}
+                    value={
+                      formValues.exactusId === 0 ? "" : formValues.exactusId
+                    }
                     disabled={!canEdit}
                     className={`border rounded-lg w-full py-2.5 px-4 ${
                       !canEdit ? "bg-gray-100 cursor-not-allowed" : "bg-white"
                     }`}
-                    onChange={(e) =>
-                      canEdit &&
+                    onChange={(e) => {
+                      const val = e.target.value;
                       setFormValues({
                         ...formValues,
-                        exactusId: e.target.value,
-                      })
-                    }
+                        exactusId: val === "" ? 0 : Number(val),
+                      });
+                    }}
                   />
                 </div>
               );
@@ -580,6 +584,7 @@ export default function InfoEntrada() {
           {/* Comentario */}
           {(() => {
             const canEdit = canEditEmployeeField("comment");
+            console.log(canEdit);
             return (
               <div className="mt-6">
                 <label className="block text-sm font-semibold mb-2">

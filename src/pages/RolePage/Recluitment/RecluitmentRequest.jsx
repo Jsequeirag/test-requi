@@ -18,12 +18,13 @@ import {
 export default function RecluitmentRequest() {
   const navigate = new useNavigate();
   const [childRequestsData, setChildRequestsData] = useState([]);
-  const [selectedParentId, setSelectedParentId] = useState(null);
+
+  const [selectedParent, setSelectedParent] = useState(null);
   const [expandedChildId, setExpandedChildId] = useState(null);
   const [showChildRequests, setShowChildRequests] = useState(false); // Nuevo estado para controlar la animación
 
   const handleParentSelect = (parentId) => {
-    setSelectedParentId(parentId);
+    setSelectedParent(parentId);
     setExpandedChildId(null); // Resetear cualquier hijo expandido al cambiar de padre
     setShowChildRequests(false); // Ocultar los hijos inmediatamente al cambiar de padre
   };
@@ -76,10 +77,10 @@ export default function RecluitmentRequest() {
               Lista de Requisiciones - Reclutamiento
             </h1>
           </div>
-          {selectedParentId ? (
+          {selectedParent ? (
             <div className="space-y-4">
               {/* Espaciado entre items */}
-              {getChildRequests(selectedParentId).map((child, index) => (
+              {getChildRequests(selectedParent.id).map((child, index) => (
                 <div
                   key={child.id}
                   className={`transition-all duration-300 transform ease-out
@@ -98,10 +99,11 @@ export default function RecluitmentRequest() {
                     request={child}
                     expandedRequest={expandedChildId}
                     handleExpand={handleExpandChild}
+                    workFlow={selectedParent}
                   />
                 </div>
               ))}
-              {getChildRequests(selectedParentId)?.length === 0 && (
+              {getChildRequests(selectedParent.id)?.length === 0 && (
                 <p className="text-gray-600 dark:text-gray-400 mt-4 text-center">
                   No hay detalles para esta solicitud.
                 </p>

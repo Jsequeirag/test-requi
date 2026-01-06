@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCheck,
@@ -16,7 +16,11 @@ import {
 } from "../../../contansts/RequestRoleFlowState";
 
 import { Role } from "../../../contansts/roles";
-export default function RecluitmentRequestItem({ request, expandedRequest }) {
+export default function RecluitmentRequestItem({
+  request,
+  expandedRequest,
+  workFlow,
+}) {
   const [modalState, setModalState] = useState(false);
   const [modalMessage, setModalMessage] = useState("");
   const [requestState, setRequestState] = useState("");
@@ -24,7 +28,7 @@ export default function RecluitmentRequestItem({ request, expandedRequest }) {
   const [workflowId, setWorkflowId] = useState("");
   const [comment, setComment] = useState("");
   const navigate = useNavigate();
-
+  console.log(workFlow);
   const fullName = JSON.parse(
     localStorage.getItem("requitool-employeeInfo")
   ).name;
@@ -84,16 +88,30 @@ export default function RecluitmentRequestItem({ request, expandedRequest }) {
           State: 1,
           FullName: fullName,
           RoleId: Role.Supervisor,
-          NotifyAsolion: isAsolion,
+          NotifyAsolion: notifyAsolionRef.current,
         },
       },
     });
   };
   const isAsolion =
     request.requisitionSubtypeId === RequisitionSubtype.ConcursoExterno8;
-  const [notifyAsolion, setNotifyAsolion] = useState(
-    request?.notifyAsolion ?? false
-  );
+
+  const [notifyAsolion, setNotifyAsolion] = useState(workFlow.notifyAsolion);
+
+  const notifyAsolionRef = useRef(workFlow.notifyAsolion);
+
+  useEffect(() => {
+    console.log("Navigate con:", notifyAsolionRef.current);
+  }, [notifyAsolion]);
+
+  const toggleNotifyAsolion = () => {
+    setNotifyAsolion((prev) => {
+      const newValue = !prev;
+      notifyAsolionRef.current = newValue;
+      return newValue;
+    });
+  };
+
   return (
     <div
       className={`
@@ -200,7 +218,7 @@ export default function RecluitmentRequestItem({ request, expandedRequest }) {
           {isAsolion}
           {isAsolion && (
             <button
-              onClick={() => setNotifyAsolion((prev) => !prev)}
+              onClick={toggleNotifyAsolion}
               className={`
       flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg border
       transition-all active:scale-95
